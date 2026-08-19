@@ -21,6 +21,16 @@ namespace PHD.Game
 
         public int Index => index;
 
+        /// <summary>이 버튼의 문양(중앙 무대에서 같은 스프라이트를 보여줄 때 사용).</summary>
+        public Sprite Sprite
+        {
+            get
+            {
+                if (_renderer == null) _renderer = GetComponent<SpriteRenderer>();
+                return _renderer != null ? _renderer.sprite : null;
+            }
+        }
+
         /// <summary>버튼이 눌렸을 때(인덱스 전달).</summary>
         public event Action<int> Pressed;
 

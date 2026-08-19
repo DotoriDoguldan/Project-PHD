@@ -94,22 +94,42 @@ namespace PHD.EditorTools
             var uiSprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
 
             // 재실행 대비 정리
+            DestroyIfExists("Game");
             DestroyIfExists("Game World");
             DestroyIfExists("UI Canvas");
 
             var camera = EnsureCamera();
             EnsureEventSystem();
 
-            BuildWorld(sprites);
-            BuildUI(camera, uiSprite, font);
+            var world = BuildWorld(sprites);
+            var ui = BuildUI(camera, uiSprite, font);
+            WireGame(world, ui);
         }
 
         // ---------------------------------------------------------------- 월드
 
-        static void BuildWorld(List<Sprite> sprites)
+        struct WorldRefs
+        {
+            public PadButton[] Pads;
+            public PadInput Input;
+            public StageIcon Stage;
+        }
+
+        struct UiRefs
+        {
+            public GameObject Canvas;
+            public CanvasScaler Scaler;
+            public TextMeshProUGUI Round;
+            public TextMeshProUGUI Score;
+            public TextMeshProUGUI Message;
+            public ProgressDots Dots;
+        }
+
+        static WorldRefs BuildWorld(List<Sprite> sprites)
         {
             var world = new GameObject("Game World").transform;
-            world.gameObject.AddComponent<PadInput>();
+            var padInput = world.gameObject.AddComponent<PadInput>();
+            var padButtons = new PadButton[ButtonSpriteNames.Length];
 
             // --- 입력 패드(2x2) ---
             var pad = new GameObject("Pad").transform;
@@ -145,7 +165,9 @@ namespace PHD.EditorTools
                 var collider = go.AddComponent<BoxCollider2D>();
                 collider.size = native;   // 로컬 크기 → 스케일 적용 후 실제 버튼 크기와 일치
 
-                go.AddComponent<PadButton>().SetIndex(i);
+                var button = go.AddComponent<PadButton>();
+                button.SetIndex(i);
+                padButtons[i] = button;
             }
 
             // --- 중앙 문양(시퀀스 재생 위치) ---
@@ -166,14 +188,18 @@ namespace PHD.EditorTools
             SetAnchor(stageIcon.AddComponent<ScreenAnchor>(),
                 ScreenEdge.Center, new Vector2(0f, GameLayout.ToUnits(GameLayout.StageCenterY)));
 
+            var stage = stageIcon.AddComponent<StageIcon>();
+
             // --- 연출용 빈 루트(파티클/2D 라이트를 여기에 붙인다) ---
             var vfx = new GameObject("VFX").transform;
             vfx.SetParent(world, false);
+
+            return new WorldRefs { Pads = padButtons, Input = padInput, Stage = stage };
         }
 
         // ---------------------------------------------------------------- UI
 
-        static void BuildUI(Camera camera, Sprite uiSprite, TMP_FontAsset font)
+        static UiRefs BuildUI(Camera camera, Sprite uiSprite, TMP_FontAsset font)
         {
             var canvasGo = new GameObject("UI Canvas", typeof(RectTransform));
             canvasGo.layer = LayerMask.NameToLayer("UI");
@@ -215,8 +241,8 @@ namespace PHD.EditorTools
             topLayout.childForceExpandWidth = true;
             topLayout.childForceExpandHeight = true;
 
-            CreateHudStat(topBar, "Round", "ROUND", "1", uiSprite, font);
-            CreateHudStat(topBar, "Score", "SCORE", "0", uiSprite, font);
+            var roundValue = CreateHudStat(topBar, "Round", "ROUND", "1", uiSprite, font);
+            var scoreValue = CreateHudStat(topBar, "Score", "SCORE", "0", uiSprite, font);
 
             // --- 중앙 안내 문구(월드 Stage Icon 과 같은 높이) ---
             var message = NewText("Message", frame, "READY", FontMessage, ColText, font, FontStyles.Bold);
@@ -238,10 +264,22 @@ namespace PHD.EditorTools
             dotsLayout.childForceExpandWidth = false;
             dotsLayout.childForceExpandHeight = false;
 
+            var progressDots = dots.gameObject.AddComponent<ProgressDots>();
+
             Selection.activeGameObject = canvasGo;
+
+            return new UiRefs
+            {
+                Canvas = canvasGo,
+                Scaler = scaler,
+                Round = roundValue,
+                Score = scoreValue,
+                Message = message,
+                Dots = progressDots
+            };
         }
 
-        static void CreateHudStat(RectTransform parent, string name, string key, string value,
+        static TextMeshProUGUI CreateHudStat(RectTransform parent, string name, string key, string value,
             Sprite uiSprite, TMP_FontAsset font)
         {
             var panel = NewImage(name, parent, uiSprite, ColPanel);
@@ -259,6 +297,49 @@ namespace PHD.EditorTools
             valueText.rectTransform.anchorMax = new Vector2(1f, 0.55f);
             valueText.rectTransform.offsetMin = Vector2.zero;
             valueText.rectTransform.offsetMax = Vector2.zero;
+
+            return valueText;
+        }
+
+        // ---------------------------------------------------------------- 게임 로직 연결
+
+        static void WireGame(WorldRefs world, UiRefs ui)
+        {
+            // HUD 는 UI 캔버스에, 게임 루프는 별도 루트에 둔다.
+            var hud = ui.Canvas.AddComponent<GameHud>();
+            var hudSo = new SerializedObject(hud);
+            hudSo.FindProperty("roundText").objectReferenceValue = ui.Round;
+            hudSo.FindProperty("scoreText").objectReferenceValue = ui.Score;
+            hudSo.FindProperty("messageText").objectReferenceValue = ui.Message;
+            hudSo.FindProperty("dots").objectReferenceValue = ui.Dots;
+            hudSo.ApplyModifiedPropertiesWithoutUndo();
+
+            // 픽셀 배율 동기화 대상(캔버스)을 명시적으로 연결한다.
+            // 런타임 자동 탐색에도 폴백이 있지만, 씬에 박아두는 편이 확실하다.
+            var uiScaler = Object.FindFirstObjectByType<PixelPerfectUIScaler>();
+            if (uiScaler != null && ui.Scaler != null)
+            {
+                var scalerSo = new SerializedObject(uiScaler);
+                var targetsProp = scalerSo.FindProperty("targets");
+                targetsProp.arraySize = 1;
+                targetsProp.GetArrayElementAtIndex(0).objectReferenceValue = ui.Scaler;
+                scalerSo.ApplyModifiedPropertiesWithoutUndo();
+            }
+
+            var gameGo = new GameObject("Game");
+            var flow = gameGo.AddComponent<GameFlow>();
+
+            var flowSo = new SerializedObject(flow);
+            var padsProp = flowSo.FindProperty("pads");
+            padsProp.arraySize = world.Pads.Length;
+            for (int i = 0; i < world.Pads.Length; i++)
+            {
+                padsProp.GetArrayElementAtIndex(i).objectReferenceValue = world.Pads[i];
+            }
+            flowSo.FindProperty("padInput").objectReferenceValue = world.Input;
+            flowSo.FindProperty("stageIcon").objectReferenceValue = world.Stage;
+            flowSo.FindProperty("hud").objectReferenceValue = hud;
+            flowSo.ApplyModifiedPropertiesWithoutUndo();
         }
 
         // ---------------------------------------------------------------- 씬 공통

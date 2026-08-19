@@ -54,7 +54,16 @@ namespace PHD.Core
 
         CanvasScaler[] Targets()
         {
-            if (targets != null && targets.Length > 0) return targets;
+            // 인스펙터에서 비워두면 배열 길이가 0 이 아니라 "null 한 칸"으로 직렬화되는 경우가 있다.
+            // 길이만 보고 판단하면 아무것도 적용되지 않으므로, 유효한 항목이 하나라도 있는지 확인한다.
+            if (targets != null)
+            {
+                for (int i = 0; i < targets.Length; i++)
+                {
+                    if (targets[i] != null) return targets;
+                }
+            }
+
             targets = FindObjectsByType<CanvasScaler>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             return targets;
         }
