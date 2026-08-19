@@ -263,7 +263,9 @@
       // ---- 카카오톡 공유 설정 -------------------------------------------------
       // 켜려면 https://developers.kakao.com 에서
       //   1) 앱 생성 후 [앱 키 > JavaScript 키] 를 아래에 넣고
-      //   2) [앱 설정 > 플랫폼 > Web] 에 배포 도메인(예: https://glesu.github.io)을 등록한다.
+      //   2) [앱 설정 > 플랫폼 > Web] 에 이 페이지가 서빙되는 origin 을 등록한다.
+      //      배포: https://dotoridoguldan.github.io  (경로는 뺀다. 하위 경로는 자동으로 커버된다)
+      //      로컬 확인이 필요하면 http://localhost:<포트> 도 함께 등록한다.
       // 비워두면 카카오 버튼은 숨겨지고, 시스템 공유 시트와 복사만 쓴다.
       var KAKAO_JS_KEY = "a85ba2768dfcf7e1636058cdc9c8c683";
       var KAKAO_SDK_URL = "https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js";
