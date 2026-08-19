@@ -113,15 +113,15 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: playstation-buttons_0
+      name: "\uB124\uBAA8"
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 1200
-        height: 1200
+        x: 23
+        y: 401
+        width: 400
+        height: 400
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -134,11 +134,77 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: "\uC138\uBAA8"
+      rect:
+        serializedVersion: 2
+        x: 399
+        y: 774
+        width: 400
+        height: 400
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 719a03fe12a26c14ca911d8f7b63a252
+      internalID: 1361093729
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\uC5D1\uC2A4"
+      rect:
+        serializedVersion: 2
+        x: 397
+        y: 25
+        width: 400
+        height: 400
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4ef990343d5c02b47a7e9fffdec22c3f
+      internalID: -2068507807
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\uB3D9\uAE00"
+      rect:
+        serializedVersion: 2
+        x: 774
+        y: 399
+        width: 400
+        height: 400
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9976955acf05a9f4dbda342017b52eee
+      internalID: 123157513
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: c401b10e0c20fb0448c4b3e90e5be179
     internalID: 0
     vertices: []
     indices: 
@@ -146,9 +212,14 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":2.0,"y":2.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      playstation-buttons_0: -8170092169302623626
+      "\uB124\uBAA8": -8170092169302623626
+      "\uB3D9\uAE00": 123157513
+      "\uC138\uBAA8": 1361093729
+      "\uC5D1\uC2A4": -2068507807
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
