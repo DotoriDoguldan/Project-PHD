@@ -108,6 +108,40 @@ public static class WebGLBuilder
     static void WritePagesFiles(string outputPath)
     {
         System.IO.File.WriteAllText(System.IO.Path.Combine(outputPath, ".nojekyll"), string.Empty);
+        StampCacheBuster(outputPath);
+    }
+
+    /// <summary>
+    /// index.html 안의 Build/ 파일 주소에 배포 시각을 쿼리로 붙인다.
+    ///
+    /// 왜 필요한가
+    ///  - 빌드마다 파일 이름이 같다(docs.data.unityweb).
+    ///  - Unity 로더는 .data 만 IndexedDB 에 "must-revalidate" 로 캐시하고,
+    ///    나머지는 "no-store"(= 브라우저 HTTP 캐시, Pages 는 max-age=600)로 받는다.
+    ///  - 그래서 재배포 직후 이전 빌드를 본 브라우저가 <b>옛 .data + 새 .wasm</b> 을
+    ///    섞어 쥘 수 있고, 부팅 중 "memory access out of bounds" 로 죽는다.
+    ///
+    /// 주소가 배포마다 달라지면 한 index.html 이 가리키는 네 파일이 항상 같은 빌드가 된다.
+    /// (index.html 자체가 캐시돼 옛 버전이 떠도, 그 안의 주소는 옛 빌드로 일관된다)
+    /// </summary>
+    static void StampCacheBuster(string outputPath)
+    {
+        string indexPath = System.IO.Path.Combine(outputPath, "index.html");
+        if (!System.IO.File.Exists(indexPath))
+        {
+            Debug.LogWarning("[PHD] index.html 을 찾지 못해 캐시 버스터를 건너뜁니다: " + indexPath);
+            return;
+        }
+
+        string buildId = System.DateTime.UtcNow.ToString("yyMMddHHmmss");
+        string html = System.IO.File.ReadAllText(indexPath);
+
+        // 따옴표로 감싼 Build/... 경로만 바꾼다. 이미 쿼리가 붙은 주소는 건드리지 않는다.
+        string stamped = System.Text.RegularExpressions.Regex.Replace(
+            html, @"(?<=[""'])Build/[^""'?\s]+(?=[""'])", m => m.Value + "?v=" + buildId);
+
+        System.IO.File.WriteAllText(indexPath, stamped);
+        Debug.Log($"[PHD] 캐시 버스터 적용: ?v={buildId}");
     }
 
     /// <summary>웹에서 미니게임처럼 동작하기 위한 플레이어 설정.</summary>
