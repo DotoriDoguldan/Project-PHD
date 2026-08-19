@@ -101,6 +101,395 @@
 
   <div id="unity-error"></div>
 
+  <!-- ==================== 결과 · 공유 오버레이 ====================
+       게임오버 때 Unity(ResultShare.cs → PHDResult.jslib)가 window.PHDResult.show() 를 부른다.
+       Unity 없이 모양만 확인하려면 브라우저 콘솔에서:
+         PHDResult.show({ round: 8, score: 1240, best: 1500, newBest: false })
+  -->
+  <div id="phd-result" role="dialog" aria-modal="true" aria-labelledby="phd-title">
+    <div id="phd-card">
+      <p id="phd-title">GAME OVER</p>
+      <p id="phd-score">0</p>
+      <p id="phd-meta">ROUND 0 · BEST 0</p>
+      <p id="phd-pattern"></p>
+
+      <button type="button" id="phd-kakao" class="phd-btn phd-btn--kakao">카카오톡으로 공유</button>
+      <div class="phd-row">
+        <button type="button" id="phd-share" class="phd-btn phd-btn--ghost">공유하기</button>
+        <button type="button" id="phd-copy" class="phd-btn phd-btn--ghost">결과 복사</button>
+      </div>
+      <button type="button" id="phd-replay" class="phd-btn phd-btn--primary">다시하기</button>
+
+      <div id="phd-toast" role="status" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <style>
+    #phd-result {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));
+      box-sizing: border-box;
+      background: rgba(6, 8, 18, 0.74);
+      -webkit-backdrop-filter: blur(3px);
+      backdrop-filter: blur(3px);
+      font-family: system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    }
+    /* 등장만 애니메이션으로 처리한다(기본 상태 = 다 보이는 상태).
+       애니메이션이 꺼지거나 실행되지 않는 환경에서도 결과창이 사라지지 않는다. */
+    #phd-result.is-visible { display: flex; animation: phd-fade-in 0.16s ease-out; }
+    #phd-result.is-visible.is-closing { animation: phd-fade-in 0.14s ease-in reverse; }
+
+    @keyframes phd-fade-in { from { opacity: 0; } }
+    @keyframes phd-pop-in {
+      from { opacity: 0; transform: translateY(10px) scale(0.98); }
+    }
+
+    #phd-card {
+      width: 100%;
+      max-width: 320px;
+      box-sizing: border-box;
+      padding: 22px 18px 16px;
+      background: #141828;
+      border: 2px solid rgba(124, 140, 255, 0.35);
+      border-radius: 6px;
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
+      text-align: center;
+    }
+    #phd-result.is-visible #phd-card { animation: phd-pop-in 0.18s ease-out; }
+
+    #phd-card p { margin: 0; }
+
+    #phd-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: #9AA3C7;
+    }
+    #phd-title.is-best { color: #FFD76E; }
+
+    #phd-score {
+      margin-top: 6px !important;
+      font-size: 44px;
+      font-weight: 800;
+      line-height: 1.1;
+      color: #FFFFFF;
+      font-variant-numeric: tabular-nums;
+    }
+
+    #phd-meta {
+      margin-top: 6px !important;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      color: #7C8CFF;
+    }
+
+    #phd-pattern {
+      margin: 14px 0 18px !important;
+      font-size: 15px;
+      line-height: 1.5;
+      word-break: break-all;
+      /* 패턴은 길게 눌러 직접 복사할 수도 있게 선택을 허용한다 */
+      -webkit-user-select: text;
+      user-select: text;
+    }
+
+    .phd-btn {
+      display: block;
+      width: 100%;
+      min-height: 46px;
+      margin-top: 8px;
+      padding: 0 12px;
+      box-sizing: border-box;
+      border: 0;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      /* 모바일에서 더블탭 확대·탭 하이라이트 제거 */
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.08s ease-out;
+    }
+    .phd-btn:active { transform: scale(0.97); }
+    .phd-btn:focus-visible { outline: 2px solid #7C8CFF; outline-offset: 2px; }
+    .phd-btn[hidden] { display: none; }
+
+    .phd-btn--kakao { background: #FEE500; color: #191600; }
+    .phd-btn--primary { background: #7C8CFF; color: #0D0F1A; }
+    .phd-btn--ghost {
+      background: transparent;
+      color: #9AA3C7;
+      border: 1px solid rgba(154, 163, 199, 0.35);
+    }
+
+    .phd-row { display: flex; gap: 8px; }
+
+    #phd-toast {
+      height: 22px;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #7C8CFF;
+      opacity: 0;
+      transition: opacity 0.16s ease-out;
+    }
+    #phd-toast.is-on { opacity: 1; }
+    #phd-toast.is-error { color: #FF8FA3; }
+
+    /* 가로로 눕힌 폰처럼 세로가 짧은 화면 */
+    @media (max-height: 520px) {
+      #phd-score { font-size: 34px; }
+      #phd-pattern { margin: 10px 0 12px !important; }
+      .phd-btn { min-height: 40px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #phd-result.is-visible,
+      #phd-result.is-visible #phd-card,
+      #phd-result.is-visible.is-closing { animation: none; }
+      .phd-btn:active { transform: none; }
+    }
+  </style>
+
+  <script>
+    window.PHDResult = (function () {
+      "use strict";
+
+      // ---- 카카오톡 공유 설정 -------------------------------------------------
+      // 켜려면 https://developers.kakao.com 에서
+      //   1) 앱 생성 후 [앱 키 > JavaScript 키] 를 아래에 넣고
+      //   2) [앱 설정 > 플랫폼 > Web] 에 배포 도메인(예: https://glesu.github.io)을 등록한다.
+      // 비워두면 카카오 버튼은 숨겨지고, 시스템 공유 시트와 복사만 쓴다.
+      var KAKAO_JS_KEY = "a85ba2768dfcf7e1636058cdc9c8c683";
+      var KAKAO_SDK_URL = "https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js";
+
+      var GAME_TITLE = (document.title || "기억력 게임").trim();
+      // 공유 링크에는 쿼리/해시를 빼고 페이지 주소만 담는다.
+      var SHARE_URL = location.origin + location.pathname;
+
+      var root = document.getElementById("phd-result");
+      var elTitle = document.getElementById("phd-title");
+      var elScore = document.getElementById("phd-score");
+      var elMeta = document.getElementById("phd-meta");
+      var elPattern = document.getElementById("phd-pattern");
+      var elToast = document.getElementById("phd-toast");
+      var btnKakao = document.getElementById("phd-kakao");
+      var btnShare = document.getElementById("phd-share");
+      var btnCopy = document.getElementById("phd-copy");
+      var btnReplay = document.getElementById("phd-replay");
+
+      var last = null;      // 마지막 결과 데이터
+      var pending = 0;      // Unity 가 아직 가져가지 않은 선택 (0 없음 / 1 다시하기 / 2 닫힘)
+      var toastTimer = 0;
+      var closeTimer = 0;
+      var kakaoReady = false;
+
+      // ---- 공유 문구 ---------------------------------------------------------
+
+      function fmt(n) {
+        return (n || 0).toLocaleString("ko-KR");
+      }
+
+      // 클리어한 라운드만큼 채운 블록 + 틀린 라운드 한 칸.
+      // 워들처럼 결과가 한 줄로 보여서, 대화창에 붙였을 때 눈에 띈다.
+      function pattern(cleared) {
+        if (cleared > 12) return "🟪x" + cleared + "🟥";
+        return new Array(cleared + 1).join("🟪") + "🟥";
+      }
+
+      function buildText(d, withUrl) {
+        var cleared = Math.max(0, (d.round || 1) - 1);
+        var lines = [
+          GAME_TITLE + " · ROUND " + (d.round || 1),
+          pattern(cleared),
+          "SCORE " + fmt(d.score) + (d.newBest ? " · 신기록! 🏆" : " · BEST " + fmt(d.best))
+        ];
+        if (withUrl !== false) lines.push("▶ " + SHARE_URL);
+        return lines.join("\n");
+      }
+
+      // ---- 잔손질 -----------------------------------------------------------
+
+      function toast(message, isError) {
+        elToast.textContent = message;
+        elToast.classList.toggle("is-error", !!isError);
+        elToast.classList.add("is-on");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () {
+          elToast.classList.remove("is-on");
+        }, 1600);
+      }
+
+      // navigator.clipboard 는 https(또는 localhost)에서만 동작한다.
+      // 그 밖의 환경(구형 사파리, http 로 연 로컬 빌드)에서는 execCommand 로 떨어진다.
+      function copyText(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+          return navigator.clipboard.writeText(text);
+        }
+        return new Promise(function (resolve, reject) {
+          var ta = document.createElement("textarea");
+          ta.value = text;
+          ta.setAttribute("readonly", "");
+          ta.style.position = "fixed";
+          ta.style.top = "-1000px";
+          ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.select();
+          ta.setSelectionRange(0, ta.value.length);
+          var ok = false;
+          try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+          document.body.removeChild(ta);
+          if (ok) resolve(); else reject(new Error("execCommand copy failed"));
+        });
+      }
+
+      // 결과창을 열 때 미리 불러둔다. 버튼을 누른 뒤에 로드하면 사용자 제스처와
+      // 시간이 벌어져 카카오 공유창이 팝업 차단에 걸릴 수 있다.
+      function loadKakao() {
+        if (!KAKAO_JS_KEY || kakaoReady || window.__phdKakaoLoading) return;
+        window.__phdKakaoLoading = true;
+
+        var script = document.createElement("script");
+        script.src = KAKAO_SDK_URL;
+        script.async = true;
+        script.onload = function () {
+          try {
+            if (!window.Kakao.isInitialized()) window.Kakao.init(KAKAO_JS_KEY);
+            kakaoReady = true;
+            // 결과창이 이미 떠 있으면 버튼을 그때 꺼내 준다.
+            if (isOpen()) btnKakao.hidden = false;
+          } catch (e) {
+            console.warn("[PHD] 카카오 SDK 초기화 실패:", e);
+          }
+        };
+        script.onerror = function () {
+          console.warn("[PHD] 카카오 SDK 를 불러오지 못했습니다.");
+        };
+        document.head.appendChild(script);
+      }
+
+      // ---- 동작 -------------------------------------------------------------
+
+      function shareKakao() {
+        // SDK 2.x 는 Kakao.Share, 그 이전 버전은 Kakao.Link 였다.
+        var api = window.Kakao && (window.Kakao.Share || window.Kakao.Link);
+        if (!kakaoReady || !api) {
+          toast("카카오톡 공유를 쓸 수 없어요", true);
+          return;
+        }
+        var link = { mobileWebUrl: SHARE_URL, webUrl: SHARE_URL };
+        try {
+          api.sendDefault({
+            objectType: "text",
+            text: buildText(last, false) + "\n나도 도전해볼래?",
+            link: link,
+            buttons: [{ title: "도전하기", link: link }]
+          });
+        } catch (e) {
+          console.warn("[PHD] 카카오 공유 실패:", e);
+          toast("공유에 실패했어요", true);
+        }
+      }
+
+      function shareSystem() {
+        if (!navigator.share) return;
+        navigator.share({
+          title: GAME_TITLE,
+          text: buildText(last, false),
+          url: SHARE_URL
+        }).catch(function (e) {
+          // 공유 시트를 그냥 닫은 경우(AbortError)는 실패가 아니다.
+          if (e && e.name !== "AbortError") toast("공유에 실패했어요", true);
+        });
+      }
+
+      function copyResult() {
+        copyText(buildText(last, true)).then(function () {
+          toast("결과를 복사했어요");
+        }).catch(function () {
+          toast("복사할 수 없어요. 길게 눌러 선택해 주세요", true);
+        });
+      }
+
+      function isOpen() {
+        return root.classList.contains("is-visible") && !root.classList.contains("is-closing");
+      }
+
+      function close(action) {
+        if (!isOpen()) return;
+        pending = action;
+        hide();
+      }
+
+      function hide() {
+        if (!root.classList.contains("is-visible")) return;
+        clearTimeout(toastTimer);
+        elToast.classList.remove("is-on");
+
+        // 사라지는 동안 캔버스 입력을 가로채지 않도록 곧바로 클릭을 막고,
+        // 페이드가 끝나면 display 를 끈다. (타이머는 애니메이션과 무관하게 항상 정리한다)
+        root.classList.add("is-closing");
+        root.style.pointerEvents = "none";
+        clearTimeout(closeTimer);
+        closeTimer = setTimeout(function () {
+          root.classList.remove("is-visible", "is-closing");
+          root.style.pointerEvents = "";
+        }, 140);
+      }
+
+      function show(data) {
+        last = data || {};
+        pending = 0;
+
+        var newBest = !!last.newBest;
+        elTitle.textContent = newBest ? "NEW BEST!" : "GAME OVER";
+        elTitle.classList.toggle("is-best", newBest);
+        elScore.textContent = fmt(last.score);
+        elMeta.textContent = "ROUND " + (last.round || 1) + " · BEST " + fmt(last.best);
+        elPattern.textContent = pattern(Math.max(0, (last.round || 1) - 1));
+
+        // 쓸 수 없는 공유 수단은 아예 감춘다(눌렀는데 아무 일도 안 나는 버튼이 제일 나쁘다).
+        btnKakao.hidden = !kakaoReady;
+        btnShare.hidden = !navigator.share;
+        loadKakao();
+
+        // 닫히는 중에 다시 열릴 수 있으므로(다시하기 → 바로 게임오버) 정리부터 한다.
+        clearTimeout(closeTimer);
+        root.classList.remove("is-visible", "is-closing");
+        root.style.pointerEvents = "";
+        void root.offsetWidth;   // 애니메이션을 처음부터 다시 재생시킨다
+        root.classList.add("is-visible");
+      }
+
+      // Unity 가 매 프레임 폴링한다. 값은 한 번만 꺼내진다.
+      function takeAction() {
+        var action = pending;
+        pending = 0;
+        return action;
+      }
+
+      btnKakao.addEventListener("click", shareKakao);
+      btnShare.addEventListener("click", shareSystem);
+      btnCopy.addEventListener("click", copyResult);
+      btnReplay.addEventListener("click", function () { close(1); });
+
+      // 카드 바깥(배경)을 누르면 닫기
+      root.addEventListener("click", function (e) {
+        if (e.target === root) close(2);
+      });
+      document.addEventListener("keydown", function (e) {
+        if (isOpen() && e.key === "Escape") close(2);
+      });
+
+      return { show: show, hide: hide, takeAction: takeAction, buildText: buildText };
+    })();
+  </script>
+
   <script src="Build/docs.loader.js"></script>
   <script>
     (function () {
