@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#0D0F1A">
-  <title>{{{ PRODUCT_NAME }}}</title>
+  <title>Project-PHD</title>
   <style>
     html, body {
       margin: 0;
@@ -101,7 +101,7 @@
 
   <div id="unity-error"></div>
 
-  <script src="Build/{{{ LOADER_FILENAME }}}"></script>
+  <script src="Build/docs.loader.js"></script>
   <script>
     (function () {
       var canvas = document.querySelector("#unity-canvas");
@@ -157,19 +157,13 @@
       if (window.ResizeObserver) new ResizeObserver(layoutCanvas).observe(document.documentElement);
 
       var config = {
-        dataUrl: "Build/{{{ DATA_FILENAME }}}",
-        frameworkUrl: "Build/{{{ FRAMEWORK_FILENAME }}}",
-        codeUrl: "Build/{{{ CODE_FILENAME }}}",
-#if MEMORY_FILENAME
-        memoryUrl: "Build/{{{ MEMORY_FILENAME }}}",
-#endif
-#if SYMBOLS_FILENAME
-        symbolsUrl: "Build/{{{ SYMBOLS_FILENAME }}}",
-#endif
+        dataUrl: "Build/docs.data.unityweb",
+        frameworkUrl: "Build/docs.framework.js.unityweb",
+        codeUrl: "Build/docs.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
-        companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
-        productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
-        productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
+        companyName: "DefaultCompany",
+        productName: "Project-PHD",
+        productVersion: "1.0",
         // 렌더 버퍼는 layoutCanvas 가 직접 관리하므로 Unity 가 덮어쓰지 않게 한다.
         matchWebGLToCanvasSize: false,
         devicePixelRatio: 1

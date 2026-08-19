@@ -13,21 +13,32 @@ using UnityEngine;
 public static class WebGLBuilder
 {
     const string OutputPath = "Build/WebGL";
+    // GitHub Pages 는 저장소 안의 폴더를 그대로 서빙한다(Settings > Pages > main /docs).
+    const string PagesOutputPath = "docs";
     const string TemplateName = "PROJECT:PHDMobile";
     const string GameScenePath = "Assets/00. Scenes/GameScene.unity";
 
-    [MenuItem("Tools/PHD/WebGL 빌드")]
-    public static void BuildMenu() => Build(false);
+    [MenuItem("Tools/PHD/WebGL 빌드 (로컬 확인용)")]
+    public static void BuildMenu() => Build(OutputPath, false);
+
+    [MenuItem("Tools/PHD/WebGL 빌드 (GitHub Pages 배포용)")]
+    public static void BuildPagesMenu() => Build(PagesOutputPath, true);
 
     public static void BuildFromCLI()
     {
-        bool ok = Build(true);
+        bool ok = Build(OutputPath, false);
         EditorApplication.Exit(ok ? 0 : 1);
     }
 
-    static bool Build(bool cli)
+    public static void BuildPagesFromCLI()
     {
-        ApplyWebSettings();
+        bool ok = Build(PagesOutputPath, true);
+        EditorApplication.Exit(ok ? 0 : 1);
+    }
+
+    static bool Build(string outputPath, bool forPages)
+    {
+        ApplyWebSettings(forPages);
 
         var scenes = ResolveScenes();
         if (scenes.Length == 0)
@@ -39,7 +50,7 @@ public static class WebGLBuilder
         var options = new BuildPlayerOptions
         {
             scenes = scenes,
-            locationPathName = OutputPath,
+            locationPathName = outputPath,
             target = BuildTarget.WebGL,
             targetGroup = BuildTargetGroup.WebGL,
             options = BuildOptions.None
@@ -50,7 +61,9 @@ public static class WebGLBuilder
 
         if (summary.result == BuildResult.Succeeded)
         {
-            Debug.Log($"[PHD] WebGL 빌드 성공: {OutputPath} " +
+            if (forPages) WritePagesFiles(outputPath);
+
+            Debug.Log($"[PHD] WebGL 빌드 성공: {outputPath} " +
                       $"({summary.totalSize / 1024 / 1024f:F1} MB, {summary.totalTime.TotalSeconds:F0}초)");
             return true;
         }
@@ -88,19 +101,38 @@ public static class WebGLBuilder
         return valid.Where(s => s.enabled).Select(s => s.path).ToArray();
     }
 
+    /// <summary>
+    /// GitHub Pages 는 Jekyll 로 사이트를 처리하는데, 밑줄로 시작하는 파일을 무시하고
+    /// 빌드 시간도 늘어난다. .nojekyll 을 두면 폴더를 그대로 정적 서빙한다.
+    /// </summary>
+    static void WritePagesFiles(string outputPath)
+    {
+        System.IO.File.WriteAllText(System.IO.Path.Combine(outputPath, ".nojekyll"), string.Empty);
+    }
+
     /// <summary>웹에서 미니게임처럼 동작하기 위한 플레이어 설정.</summary>
-    static void ApplyWebSettings()
+    static void ApplyWebSettings(bool forPages)
     {
         PlayerSettings.WebGL.template = TemplateName;
 
         // 탭이 비활성일 때도 코루틴이 죽지 않도록(브라우저가 rAF 를 멈추면 어차피 함께 멈춘다).
         PlayerSettings.runInBackground = true;
 
-        // 압축: 로컬 확인/정적 호스팅 편의를 위해 우선 끈다.
-        //  - 실제 배포 시에는 Brotli + 서버의 Content-Encoding 헤더 설정이 가장 작고 빠르다.
-        //  - 헤더를 못 만지는 정적 호스팅(GitHub Pages 등)이라면 Gzip + decompressionFallback = true.
-        PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Disabled;
-        PlayerSettings.WebGL.decompressionFallback = false;
+        // 압축
+        //  - 로컬 확인: 껐을 때 빌드가 빠르고 서버 설정도 필요 없다.
+        //  - GitHub Pages: Content-Encoding 헤더를 설정할 수 없으므로, 압축 파일을
+        //    브라우저가 아니라 Unity 로더(JS)가 풀도록 decompressionFallback 을 켠다.
+        //    Brotli 가 더 작지만 JS 디코딩이 느리고 순간 메모리를 더 쓴다 → 모바일 고려해 Gzip.
+        if (forPages)
+        {
+            PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Gzip;
+            PlayerSettings.WebGL.decompressionFallback = true;
+        }
+        else
+        {
+            PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Disabled;
+            PlayerSettings.WebGL.decompressionFallback = false;
+        }
 
         // 재방문 시 IndexedDB 캐시로 즉시 로딩
         PlayerSettings.WebGL.dataCaching = true;
