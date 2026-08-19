@@ -55,6 +55,7 @@ public class GameFlow : MonoBehaviour
     Coroutine _loop;
     bool _paused;
     bool _failed;
+    bool _replayRequested;
     int _round;
     int _score;
     int _best;
@@ -90,6 +91,9 @@ public class GameFlow : MonoBehaviour
 
     void OnDestroy()
     {
+        // 씬이 내려가는데 결과창만 남아 화면을 덮고 있는 상황을 막는다.
+        ResultShare.Hide();
+
         if (pads == null) return;
         for (int i = 0; i < pads.Length; i++)
         {
@@ -171,7 +175,13 @@ public class GameFlow : MonoBehaviour
     void StartGame()
     {
         if (_loop != null) StopCoroutine(_loop);
+        BeginRun();
+        _loop = StartCoroutine(RunGame());
+    }
 
+    /// <summary>한 판을 시작할 수 있는 상태로 되돌린다.</summary>
+    void BeginRun()
+    {
         _round = 1;
         _score = 0;
         _failed = false;
@@ -179,19 +189,27 @@ public class GameFlow : MonoBehaviour
         _phase = GamePhase.Countdown;
         padInput.InputEnabled = false;
         hud.SetScore(0);
-
-        _loop = StartCoroutine(RunGame());
     }
 
     IEnumerator RunGame()
     {
-        while (!_failed)
+        bool again = true;
+        while (again)
         {
-            yield return RunRound();
-            if (!_failed) _round++;
+            while (!_failed)
+            {
+                yield return RunRound();
+                if (!_failed) _round++;
+            }
+
+            yield return GameOver();
+
+            // 결과창에서 "다시하기"를 누르면 대기 화면을 거치지 않고 바로 다음 판으로 간다.
+            // (코루틴 밖에서 StartGame 을 다시 부르면 실행 중인 자기 자신을 멈추게 되므로 여기서 돈다)
+            again = _replayRequested;
+            if (again) BeginRun();
         }
 
-        yield return GameOver();
         EnterReady();
         _loop = null;
     }
@@ -278,8 +296,10 @@ public class GameFlow : MonoBehaviour
     {
         _phase = GamePhase.GameOver;
         padInput.InputEnabled = false;
+        _replayRequested = false;
 
-        if (_score > _best)
+        bool newBest = _score > _best;
+        if (newBest)
         {
             _best = _score;
             SaveBest(_best);
@@ -290,7 +310,26 @@ public class GameFlow : MonoBehaviour
             hud.SetMessage("GAME OVER");
         }
 
-        yield return Wait(resultTime * 1.6f);
+        // 결과창이 곧바로 덮으면 점수가 오르는 걸 못 보고 놓친다. 잠깐 보여주고 띄운다.
+        yield return Wait(resultTime * 0.8f);
+
+        // 웹이 아니면(에디터/스탠드얼론) 예전처럼 문구만 보여주고 대기화면으로.
+        if (!ResultShare.IsAvailable)
+        {
+            yield return Wait(resultTime * 0.8f);
+            yield break;
+        }
+
+        ResultShare.Show(_round, _score, _best, newBest);
+
+        var action = ResultShare.Action.None;
+        while (action == ResultShare.Action.None)
+        {
+            yield return null;
+            action = ResultShare.Poll();
+        }
+
+        _replayRequested = action == ResultShare.Action.Replay;
     }
 
     // ------------------------------------------------------------ 유틸
