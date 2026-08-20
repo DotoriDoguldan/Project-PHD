@@ -44,6 +44,7 @@ public class PadButton : MonoBehaviour
     /// <summary>플레이어 입력. PadInput 이 호출한다.</summary>
     public void Press()
     {
+        SoundManager.Instance?.PlaySfx(SfxId.Pad(index));
         Play(Flash(0.16f, pressScale));
         Pressed?.Invoke(index);
     }

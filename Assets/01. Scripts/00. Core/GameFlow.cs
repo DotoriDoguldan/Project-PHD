@@ -150,6 +150,7 @@ public class GameFlow : MonoBehaviour
         }
         else
         {
+            SoundManager.Instance?.PlaySfx(SfxId.Wrong);
             _failed = true;
             _phase = GamePhase.GameOver;
         }
@@ -230,6 +231,7 @@ public class GameFlow : MonoBehaviour
         for (int n = 3; n >= 1; n--)
         {
             hud.SetMessage("{0}", n);
+            SoundManager.Instance?.PlaySfx(SfxId.Countdown);
             yield return Wait(countdownStep);
         }
         hud.ClearMessage();
@@ -244,6 +246,7 @@ public class GameFlow : MonoBehaviour
             int step = _sequence[i];
             stageIcon.Show(pads[step].Sprite, show);
             pads[step].Highlight(show);
+            SoundManager.Instance?.PlaySfx(SfxId.Pad(step));
             yield return Wait(show + gap);
         }
         stageIcon.Hide();
@@ -274,6 +277,7 @@ public class GameFlow : MonoBehaviour
         _score += bonus;
         hud.SetScore(_score);
         hud.SetMessage("PERFECT +{0}", bonus);
+        SoundManager.Instance?.PlaySfx(SfxId.RoundClear);
         yield return Wait(resultTime);
     }
 
@@ -304,10 +308,12 @@ public class GameFlow : MonoBehaviour
             _best = _score;
             SaveBest(_best);
             hud.SetMessage("NEW BEST {0}", _best);
+            SoundManager.Instance?.PlaySfx(SfxId.NewBest);
         }
         else
         {
             hud.SetMessage("GAME OVER");
+            SoundManager.Instance?.PlaySfx(SfxId.GameOver);
         }
 
         // 결과창이 곧바로 덮으면 점수가 오르는 걸 못 보고 놓친다. 잠깐 보여주고 띄운다.

@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a230e7850ce9524429635160aa2794fe, type: 3}
+  m_Name: SoundLibrary
+  m_EditorClassIdentifier: Assembly-CSharp::SoundLibrary
+  _audioMixer: {fileID: 0}
+  _bgmGroup: {fileID: 0}
+  _sfxGroup: {fileID: 0}
+  _initialSfxPoolSize: 8
+  _maxSfxPoolSize: 24
+  _masterVolume: 1
+  _bgmVolume: 0.7
+  _sfxVolume: 1
+  _startupBgmId: main
+  _sfx:
+  - _id: pad_0
+    _clips:
+    - {fileID: 8300000, guid: be443cec1fd18504baed4c4321972797, type: 3}
+    _volume: 1
+    _randomVolumeRange: {x: 1, y: 1}
+    _pitch: 1
+    _randomPitchRange: {x: 1, y: 1}
+    _cooldown: 0
+    _maxSimultaneous: 4
+    _priority: 0
+  - _id: pad_1
+    _clips:
+    - {fileID: 8300000, guid: be443cec1fd18504baed4c4321972797, type: 3}
+    _volume: 1
+    _randomVolumeRange: {x: 1, y: 1}
+    _pitch: 1.122
+    _randomPitchRange: {x: 1, y: 1}
+    _cooldown: 0
+    _maxSimultaneous: 4
+    _priority: 0
+  - _id: pad_2
+    _clips:
+    - {fileID: 8300000, guid: be443cec1fd18504baed4c4321972797, type: 3}
+    _volume: 1
+    _randomVolumeRange: {x: 1, y: 1}
+    _pitch: 1.26
+    _randomPitchRange: {x: 1, y: 1}
+    _cooldown: 0
+    _maxSimultaneous: 4
+    _priority: 0
+  - _id: pad_3
+    _clips:
+    - {fileID: 8300000, guid: be443cec1fd18504baed4c4321972797, type: 3}
+    _volume: 1
+    _randomVolumeRange: {x: 1, y: 1}
+    _pitch: 1.335
+    _randomPitchRange: {x: 1, y: 1}
+    _cooldown: 0
+    _maxSimultaneous: 4
+    _priority: 0
+  _bgm: []
