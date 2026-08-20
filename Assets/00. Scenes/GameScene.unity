@@ -1250,7 +1250,7 @@ MonoBehaviour:
   firstRoundLength: 3
   pointsPerHit: 10
   roundClearBonus: 50
-  roundTitleTime: 0.7
+  roundTitleTime: 0.76
   countdownStep: 0.5
   showSecondsBase: 0.62
   showSecondsMin: 0.3

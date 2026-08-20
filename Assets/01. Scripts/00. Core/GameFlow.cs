@@ -39,7 +39,7 @@ public class GameFlow : MonoBehaviour
     [SerializeField] int maxMistakes = 3;
 
     [Header("연출 시간(초)")]
-    [SerializeField] float roundTitleTime = 0.7f;
+    [SerializeField] float roundTitleTime = 0.76f;
     [SerializeField] float countdownStep = 0.5f;
     [SerializeField] float showSecondsBase = 0.62f;
     [SerializeField] float showSecondsMin = 0.30f;
