@@ -35,6 +35,8 @@ public class GameFlow : MonoBehaviour
     [SerializeField] int firstRoundLength = 3;
     [SerializeField] int pointsPerHit = 10;
     [SerializeField] int roundClearBonus = 50;
+    [Tooltip("한 판에서 허용하는 실수 횟수. 이 횟수째 실수에서 게임오버. 1이면 한 번에 게임오버.")]
+    [SerializeField] int maxMistakes = 3;
 
     [Header("연출 시간(초)")]
     [SerializeField] float roundTitleTime = 0.7f;
@@ -59,6 +61,7 @@ public class GameFlow : MonoBehaviour
     int _round;
     int _score;
     int _best;
+    int _mistakes;        // 이번 판에서 지금까지 틀린 횟수
     float _inputElapsed;
 
     public GamePhase Phase => _phase;
@@ -150,9 +153,26 @@ public class GameFlow : MonoBehaviour
         }
         else
         {
-            SoundManager.Instance?.PlaySfx(SfxId.Wrong);
-            _failed = true;
-            _phase = GamePhase.GameOver;
+            _mistakes++;
+            var sound = SoundManager.Instance;
+
+            if (_mistakes >= maxMistakes)
+            {
+                // 마지막(치명적) 실수: 즉시 배경음악을 멈추고 게임오버 효과음을 재생한다.
+                if (sound != null)
+                {
+                    sound.StopBgm(sound.GameOverBgmFade);
+                    sound.PlaySfx(SfxId.GameOver);
+                }
+                _failed = true;
+                _phase = GamePhase.GameOver;
+            }
+            else
+            {
+                // 기회가 남음: wrong 효과음만 한 번 재생하고, 같은 입력을 다시 시도하게 둔다.
+                // (MemorySequence.Submit 이 실패 시 Progress를 올리지 않아 같은 순서를 재입력할 수 있다.)
+                sound?.PlaySfx(SfxId.Wrong);
+            }
         }
     }
 
@@ -190,6 +210,7 @@ public class GameFlow : MonoBehaviour
         _round = 1;
         _score = 0;
         _failed = false;
+        _mistakes = 0;
         // 코루틴이 시작되기 전에 상태를 넘겨, 같은 프레임의 추가 입력으로 중복 시작되지 않게 한다.
         _phase = GamePhase.Countdown;
         padInput.InputEnabled = false;
@@ -318,6 +339,7 @@ public class GameFlow : MonoBehaviour
         padInput.InputEnabled = false;
         _replayRequested = false;
 
+        // BGM 페이드 아웃과 게임오버 효과음은 오답(wrong) 시점에서 이미 처리됨.
         bool newBest = _score > _best;
         if (newBest)
         {
@@ -329,7 +351,6 @@ public class GameFlow : MonoBehaviour
         else
         {
             hud.SetMessage("GAME OVER");
-            SoundManager.Instance?.PlaySfx(SfxId.GameOver);
         }
 
         // 결과창이 곧바로 덮으면 점수가 오르는 걸 못 보고 놓친다. 잠깐 보여주고 띄운다.

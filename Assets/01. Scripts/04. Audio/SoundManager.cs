@@ -64,6 +64,9 @@ public sealed class SoundManager : MonoBehaviour
     /// <summary>플레이(play) BGM 전환 페이드 길이입니다. (SoundLibrary에서 설정)</summary>
     public float PlayBgmFade => _library != null ? _library.PlayFadeSeconds : 1f;
 
+    /// <summary>게임 오버 시 BGM 페이드 아웃 길이입니다. (SoundLibrary에서 설정)</summary>
+    public float GameOverBgmFade => _library != null ? _library.GameOverFadeSeconds : 1.5f;
+
     // 첫 씬이 로드되기 전에 매니저를 자동 생성합니다. 씬마다 배치할 필요가 없습니다.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void Bootstrap()

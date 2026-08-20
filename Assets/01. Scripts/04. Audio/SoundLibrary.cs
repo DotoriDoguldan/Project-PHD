@@ -42,6 +42,8 @@ public sealed class SoundLibrary : ScriptableObject
     private float _countdownFadeSeconds = 0.8f;
     [SerializeField, Min(0f), Tooltip("플레이(play) BGM으로 전환할 때의 페이드 길이입니다.")]
     private float _playFadeSeconds = 1f;
+    [SerializeField, Min(0f), Tooltip("게임 오버 시 BGM을 페이드 아웃(정지)하는 길이입니다.")]
+    private float _gameOverFadeSeconds = 1.5f;
 
     [Header("Clips")]
     [SerializeField] private List<SfxDefinition> _sfx = new();
@@ -66,6 +68,7 @@ public sealed class SoundLibrary : ScriptableObject
     public float ReadyFadeSeconds => _readyFadeSeconds;
     public float CountdownFadeSeconds => _countdownFadeSeconds;
     public float PlayFadeSeconds => _playFadeSeconds;
+    public float GameOverFadeSeconds => _gameOverFadeSeconds;
 
     private void OnEnable()
     {
