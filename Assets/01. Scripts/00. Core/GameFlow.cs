@@ -47,6 +47,8 @@ public class GameFlow : MonoBehaviour
     [SerializeField] float gapSecondsBase = 0.20f;
     [SerializeField] float gapSecondsMin = 0.10f;
     [SerializeField] float resultTime = 1.0f;
+    [Tooltip("박자 동기화 재생 시, 한 박 중 패드가 켜져 있는 비율(나머지는 여백).")]
+    [SerializeField, Range(0.1f, 1f)] float showBeatHoldRatio = 0.7f;
 
     const string BestScoreKey = "phd.memory.best";
     const float MaxTimeStep = 0.1f;      // 한 프레임에 인정할 최대 경과시간
@@ -275,17 +277,14 @@ public class GameFlow : MonoBehaviour
 
         // --- 순서 재생 ---
         _phase = GamePhase.Showing;
-        float show = Mathf.Max(showSecondsMin, showSecondsBase - showSecondsPerRound * (_round - 1));
-        float gap = Mathf.Max(gapSecondsMin, gapSecondsBase - showSecondsPerRound * 0.5f * (_round - 1));
 
-        for (int i = 0; i < _sequence.Length; i++)
-        {
-            int step = _sequence[i];
-            stageIcon.Show(pads[step].Sprite, show);
-            pads[step].Highlight(show);
-            SoundManager.Instance?.PlaySfx(SfxId.Pad(step));
-            yield return Wait(show + gap);
-        }
+        // play BGM에 박자 정보(BPM)가 있으면 박자에 맞춰, 없으면 기존 show/gap 방식으로 보여준다.
+        var showSound = SoundManager.Instance;
+        if (showSound != null && showSound.BgmHasBeat)
+            yield return ShowSequenceOnBeat(showSound);
+        else
+            yield return ShowSequenceFree();
+
         stageIcon.Hide();
 
         // --- 입력 ---
@@ -316,6 +315,42 @@ public class GameFlow : MonoBehaviour
         hud.SetMessage("PERFECT +{0}", bonus);
         SoundManager.Instance?.PlaySfx(SfxId.RoundClear);
         yield return Wait(resultTime);
+    }
+
+    // play BGM의 박자에 맞춰 순서를 보여준다. 패드 1개 = 1박(템포 고정).
+    // 먼저 다음 박자 경계까지 정렬한 뒤, 매 박자마다 패드를 하나씩 공개한다.
+    IEnumerator ShowSequenceOnBeat(SoundManager sound)
+    {
+        float beat = sound.BgmBeatDuration;
+        float hold = beat * showBeatHoldRatio;
+
+        // 시작을 다음 박자에 맞춘다.
+        yield return Wait(sound.SecondsToNextBeat());
+
+        for (int i = 0; i < _sequence.Length; i++)
+        {
+            int step = _sequence[i];
+            stageIcon.Show(pads[step].Sprite, hold);
+            pads[step].Highlight(hold);
+            SoundManager.Instance?.PlaySfx(SfxId.Pad(step));
+            yield return Wait(beat);
+        }
+    }
+
+    // 박자 정보가 없을 때의 폴백. 라운드가 오를수록 조금씩 빨라지는 기존 방식이다.
+    IEnumerator ShowSequenceFree()
+    {
+        float show = Mathf.Max(showSecondsMin, showSecondsBase - showSecondsPerRound * (_round - 1));
+        float gap = Mathf.Max(gapSecondsMin, gapSecondsBase - showSecondsPerRound * 0.5f * (_round - 1));
+
+        for (int i = 0; i < _sequence.Length; i++)
+        {
+            int step = _sequence[i];
+            stageIcon.Show(pads[step].Sprite, show);
+            pads[step].Highlight(show);
+            SoundManager.Instance?.PlaySfx(SfxId.Pad(step));
+            yield return Wait(show + gap);
+        }
     }
 
     IEnumerator FailFeedback()

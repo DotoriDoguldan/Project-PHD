@@ -45,6 +45,8 @@ public sealed class SoundManager : MonoBehaviour
     private Transform _bgmRoot;
     private string _currentBgmId;
     private bool _bgmPaused;
+    private float _currentBgmBpm;
+    private float _currentBgmFirstBeatOffset; // 첫 다운비트까지의 오프셋(초). '박' 단위 설정값을 BPM으로 변환해 저장.
 
     /// <summary>마스터 볼륨 설정값입니다.</summary>
     public float MasterVolume => _masterVolume;
@@ -66,6 +68,42 @@ public sealed class SoundManager : MonoBehaviour
 
     /// <summary>게임 오버 시 BGM 페이드 아웃 길이입니다. (SoundLibrary에서 설정)</summary>
     public float GameOverBgmFade => _library != null ? _library.GameOverFadeSeconds : 1.5f;
+
+    private AudioSource ActiveBgmSource =>
+        (_bgmSources != null && _bgmSources.Length > 0) ? _bgmSources[_activeBgmSourceIndex] : null;
+
+    /// <summary>현재 BGM에 박자 정보(BPM)가 있고 실제 재생 중인지입니다.</summary>
+    public bool BgmHasBeat
+    {
+        get
+        {
+            AudioSource src = ActiveBgmSource;
+            return _currentBgmBpm > 0f && src != null && src.isPlaying;
+        }
+    }
+
+    /// <summary>현재 BGM의 한 박 길이(초)입니다. 박자 정보가 없으면 0입니다.</summary>
+    public float BgmBeatDuration => _currentBgmBpm > 0f ? 60f / _currentBgmBpm : 0f;
+
+    /// <summary>
+    /// 현재 재생 위치를 기준으로 다음 박자 경계까지 남은 시간(초)을 돌려줍니다.
+    /// 방금 박자를 지난 참(경계 근처)이면 그 박자에 맞추도록 0을 돌려줍니다.
+    /// subdivision 을 2로 주면 반 박, 4로 주면 1/4 박 단위로 정렬합니다.
+    /// </summary>
+    public float SecondsToNextBeat(int subdivision = 1)
+    {
+        AudioSource src = ActiveBgmSource;
+        if (_currentBgmBpm <= 0f || src == null || !src.isPlaying) return 0f;
+
+        float beat = (60f / _currentBgmBpm) / Mathf.Max(1, subdivision);
+        float pos = src.time - _currentBgmFirstBeatOffset;
+        if (pos < 0f) return -pos; // 아직 첫 다운비트 전이면 그때까지 대기
+
+        float into = pos - Mathf.Floor(pos / beat) * beat; // 0..beat
+        // 방금 박자를 지났으면(경계 근처) 한 박을 통째로 기다리지 않고 지금 시작한다.
+        if (into < beat * 0.15f) return 0f;
+        return beat - into;
+    }
 
     // 첫 씬이 로드되기 전에 매니저를 자동 생성합니다. 씬마다 배치할 필요가 없습니다.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -213,6 +251,12 @@ public sealed class SoundManager : MonoBehaviour
         AudioClip clip = PickClip(definition.Clips);
         if (clip == null) return;
 
+        // 박자 동기화용 템포 정보를 이번 곡 기준으로 갱신합니다.
+        // First Beat Offset은 '박' 단위이므로 BPM으로 초로 변환해 둡니다.
+        _currentBgmBpm = definition.Bpm;
+        float beatDuration = definition.Bpm > 0f ? 60f / definition.Bpm : 0f;
+        _currentBgmFirstBeatOffset = definition.FirstBeatOffsetBeats * beatDuration;
+
         CrossFadeBgm(id, clip, targetVolume, fadeSeconds);
     }
 
@@ -223,6 +267,7 @@ public sealed class SoundManager : MonoBehaviour
         if (_bgmFadeRoutine != null) StopCoroutine(_bgmFadeRoutine);
         _bgmFadeRoutine = StartCoroutine(FadeOutAndStop(_bgmSources[_activeBgmSourceIndex], fadeSeconds));
         _currentBgmId = null;
+        _currentBgmBpm = 0f;
     }
 
     /// <summary>BGM을 일시정지합니다.</summary>

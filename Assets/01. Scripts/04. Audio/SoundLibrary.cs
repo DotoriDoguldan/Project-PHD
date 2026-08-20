@@ -228,9 +228,22 @@ public sealed class BgmDefinition : ISoundIdEntry
     private AudioClip[] _clips;
     [SerializeField, Range(0f, 1f)] private float _volume = 1f;
 
+    [Header("Beat (박자 동기화용, 선택)")]
+    [SerializeField, Min(0f), Tooltip("이 곡의 BPM(분당 박자). 0이면 박자 동기화를 사용하지 않습니다.")]
+    private float _bpm;
+    [SerializeField, Min(0f), Tooltip("클립 시작부터 첫 박자(다운비트)까지의 거리를 '박(beat)' 단위로 지정합니다. " +
+        "0.5면 반 박. 실제 초는 BPM에 맞춰 자동 계산됩니다. 루프가 박자에서 시작하면 0.")]
+    private float _firstBeatOffset;
+
     public string Id => _id;
     public IReadOnlyList<AudioClip> Clips => _clips;
     public float Volume => _volume;
+
+    /// <summary>곡의 BPM입니다. 0이면 박자 정보가 없다는 뜻입니다.</summary>
+    public float Bpm => _bpm;
+
+    /// <summary>클립 시작부터 첫 다운비트까지의 거리를 '박' 단위로 나타낸 값입니다.</summary>
+    public float FirstBeatOffsetBeats => _firstBeatOffset;
 
     // BGM 도 인스펙터에서 새로 추가하면 볼륨이 0이라 무음이 됩니다.
     // 볼륨 0인 BGM은 의미가 없으므로 그 경우 기본값 1로 채웁니다. (0을 원하면 재생하지 않으면 됩니다.)

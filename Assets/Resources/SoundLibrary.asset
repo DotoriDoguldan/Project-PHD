@@ -23,7 +23,7 @@ MonoBehaviour:
   _startupBgmId: ready
   _readyFadeSeconds: 0
   _countdownFadeSeconds: 0
-  _playFadeSeconds: 0
+  _playFadeSeconds: 0.205
   _gameOverFadeSeconds: 0.25
   _sfx:
   - _id: pad_0
@@ -91,11 +91,17 @@ MonoBehaviour:
     _clips:
     - {fileID: 8300000, guid: 47c7d17f6989e684abf354eb4640efb9, type: 3}
     _volume: 1
+    _bpm: 0
+    _firstBeatOffset: 0
   - _id: countdown
     _clips:
     - {fileID: 8300000, guid: ad5d2430206dac94eb61ae3b6629caac, type: 3}
     _volume: 1
+    _bpm: 0
+    _firstBeatOffset: 0
   - _id: play
     _clips:
     - {fileID: 8300000, guid: a67b4f5f055900a4e9eaea2c777f4a70, type: 3}
     _volume: 1
+    _bpm: 73
+    _firstBeatOffset: 0.25
