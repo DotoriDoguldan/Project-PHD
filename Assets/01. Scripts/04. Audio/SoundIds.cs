@@ -52,8 +52,12 @@ public static class SfxId
 /// </summary>
 public static class BgmId
 {
-    public const string Main = "main";
-    public const string Title = "title";
+    // 1) 시작 전 대기 화면(TAP TO START)에서 재생
+    public const string Ready = "ready";
+    // 2) 게임 시작 직후 카운트다운(3-2-1) 동안 재생
+    public const string Countdown = "countdown";
+    // 3) 이후 실제 플레이 중 ~ 패배 전까지 재생
+    public const string Play = "play";
 }
 
 /// <summary>

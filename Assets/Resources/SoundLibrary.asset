@@ -20,7 +20,10 @@ MonoBehaviour:
   _masterVolume: 1
   _bgmVolume: 0.7
   _sfxVolume: 1
-  _startupBgmId: main
+  _startupBgmId: ready
+  _readyFadeSeconds: 0
+  _countdownFadeSeconds: 0
+  _playFadeSeconds: 0
   _sfx:
   - _id: pad_0
     _clips:
@@ -62,4 +65,16 @@ MonoBehaviour:
     _cooldown: 0
     _maxSimultaneous: 4
     _priority: 0
-  _bgm: []
+  _bgm:
+  - _id: ready
+    _clips:
+    - {fileID: 8300000, guid: 47c7d17f6989e684abf354eb4640efb9, type: 3}
+    _volume: 1
+  - _id: countdown
+    _clips:
+    - {fileID: 8300000, guid: ad5d2430206dac94eb61ae3b6629caac, type: 3}
+    _volume: 1
+  - _id: play
+    _clips:
+    - {fileID: 8300000, guid: a67b4f5f055900a4e9eaea2c777f4a70, type: 3}
+    _volume: 1

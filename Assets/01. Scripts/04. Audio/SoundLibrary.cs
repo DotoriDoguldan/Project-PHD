@@ -33,7 +33,15 @@ public sealed class SoundLibrary : ScriptableObject
 
     [Header("Startup")]
     [SerializeField, SoundIdDropdown(SoundIdKind.Bgm), Tooltip("게임 시작 시 자동으로 재생할 BGM ID입니다. 비우면 자동 재생하지 않습니다.")]
-    private string _startupBgmId = BgmId.Main;
+    private string _startupBgmId = BgmId.Ready;
+
+    [Header("BGM Transition (크로스페이드 초)")]
+    [SerializeField, Min(0f), Tooltip("대기(ready) BGM으로 전환할 때의 페이드 길이입니다.")]
+    private float _readyFadeSeconds = 2f;
+    [SerializeField, Min(0f), Tooltip("카운트다운(countdown) BGM으로 전환할 때의 페이드 길이입니다.")]
+    private float _countdownFadeSeconds = 0.8f;
+    [SerializeField, Min(0f), Tooltip("플레이(play) BGM으로 전환할 때의 페이드 길이입니다.")]
+    private float _playFadeSeconds = 1f;
 
     [Header("Clips")]
     [SerializeField] private List<SfxDefinition> _sfx = new();
@@ -54,6 +62,10 @@ public sealed class SoundLibrary : ScriptableObject
     public float SfxVolume => _sfxVolume;
 
     public string StartupBgmId => _startupBgmId;
+
+    public float ReadyFadeSeconds => _readyFadeSeconds;
+    public float CountdownFadeSeconds => _countdownFadeSeconds;
+    public float PlayFadeSeconds => _playFadeSeconds;
 
     private void OnEnable()
     {

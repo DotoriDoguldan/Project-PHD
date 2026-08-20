@@ -55,6 +55,15 @@ public sealed class SoundManager : MonoBehaviour
     /// <summary>SFX 볼륨 설정값입니다.</summary>
     public float SfxVolume => _sfxVolume;
 
+    /// <summary>대기(ready) BGM 전환 페이드 길이입니다. (SoundLibrary에서 설정)</summary>
+    public float ReadyBgmFade => _library != null ? _library.ReadyFadeSeconds : 2f;
+
+    /// <summary>카운트다운(countdown) BGM 전환 페이드 길이입니다. (SoundLibrary에서 설정)</summary>
+    public float CountdownBgmFade => _library != null ? _library.CountdownFadeSeconds : 0.8f;
+
+    /// <summary>플레이(play) BGM 전환 페이드 길이입니다. (SoundLibrary에서 설정)</summary>
+    public float PlayBgmFade => _library != null ? _library.PlayFadeSeconds : 1f;
+
     // 첫 씬이 로드되기 전에 매니저를 자동 생성합니다. 씬마다 배치할 필요가 없습니다.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void Bootstrap()
@@ -181,10 +190,6 @@ public sealed class SoundManager : MonoBehaviour
         if (_library == null) return;
         if (!_library.TryGetBgm(id, out BgmDefinition definition)) return;
 
-        // 후보 클립이 여러 개면 이번 재생에 쓸 하나를 랜덤으로 고릅니다.
-        AudioClip clip = PickClip(definition.Clips);
-        if (clip == null) return;
-
         float targetVolume = volumeOverride.HasValue
             ? Mathf.Clamp01(volumeOverride.Value)
             : definition.Volume;
@@ -192,6 +197,18 @@ public sealed class SoundManager : MonoBehaviour
         // Mixer가 없으면 BGM/마스터 볼륨을 목표 볼륨에 직접 반영합니다.
         if (_library.AudioMixer == null)
             targetVolume *= _bgmVolume * _masterVolume;
+
+        // 볼륨이 0이면 이 BGM은 '끔(정지)'으로 취급합니다.
+        // (예: SoundLibrary에서 ready의 Volume을 0으로 두면 대기 화면이 무음이 됩니다.)
+        if (targetVolume <= 0.0001f)
+        {
+            StopBgm(fadeSeconds);
+            return;
+        }
+
+        // 후보 클립이 여러 개면 이번 재생에 쓸 하나를 랜덤으로 고릅니다.
+        AudioClip clip = PickClip(definition.Clips);
+        if (clip == null) return;
 
         CrossFadeBgm(id, clip, targetVolume, fadeSeconds);
     }
