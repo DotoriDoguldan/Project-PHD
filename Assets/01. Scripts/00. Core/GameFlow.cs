@@ -35,7 +35,7 @@ public class GameFlow : MonoBehaviour
     [SerializeField] private int firstRoundLength = 3;
     [SerializeField] private int pointsPerHit = 10;
     [SerializeField] private int roundClearBonus = 50;
-    [Tooltip("한 판에서 허용하는 실수 횟수. 이 횟수째 실수에서 게임오버. 1이면 한 번에 게임오버.")]
+    [Tooltip("한 판에서 허용하는 실수 횟수. 이 횟수째 실수에서 게임오버. 1이면 한 번에 게임오버. HUD 의 목숨 칸 수도 이 값을 따라간다.")]
     [SerializeField] private int maxMistakes = 3;
     [Tooltip("확장 전에 사용할 패드 수. pads 배열의 앞에서부터 이 개수만 보이고, 시퀀스도 이 범위에서만 나온다.")]
     [SerializeField] private int basePadCount = 4;
@@ -79,6 +79,8 @@ public class GameFlow : MonoBehaviour
     private float _inputElapsed;
 
     public GamePhase Phase => _phase;
+    /// <summary>이번 판에 남은 기회(목숨). HUD 표시와 같은 값이다.</summary>
+    public int RemainingLives => Mathf.Max(0, maxMistakes - _mistakes);
     public int Score => _score;
     public int Round => _round;
     public int BestScore => _best;
@@ -170,6 +172,7 @@ public class GameFlow : MonoBehaviour
         else
         {
             _mistakes++;
+            hud.SetLives(RemainingLives);
             var sound = SoundManager.Instance;
 
             if (_mistakes >= maxMistakes)
@@ -200,12 +203,14 @@ public class GameFlow : MonoBehaviour
         _round = 0;
         _score = 0;
         _failed = false;
+        _mistakes = 0;
 
         stageIcon.Hide();
         ApplyPadCount(PadCountForRound(_round));
         hud.SetRound(0);
         hud.SetScore(0);
         hud.Dots.Clear();
+        hud.SetupLives(maxMistakes);
         hud.SetMessage("TAP TO START");
         padInput.InputEnabled = true;
 
@@ -232,6 +237,7 @@ public class GameFlow : MonoBehaviour
         _phase = GamePhase.Countdown;
         padInput.InputEnabled = false;
         ApplyPadCount(PadCountForRound(_round));
+        hud.SetupLives(maxMistakes);
         hud.SetScore(0);
     }
 
