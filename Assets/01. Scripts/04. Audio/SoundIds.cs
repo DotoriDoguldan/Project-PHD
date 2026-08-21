@@ -23,9 +23,12 @@ public static class SfxId
     public const string Pad1 = "pad_1";
     public const string Pad2 = "pad_2";
     public const string Pad3 = "pad_3";
+    // 6라운드부터 열리는 추가 패드(LT/RT).
+    public const string Pad4 = "pad_4";
+    public const string Pad5 = "pad_5";
 
     // 패드 인덱스로 위 ID를 순서대로 매핑합니다. 정의된 개수를 벗어나면 null(무음)입니다.
-    private static readonly string[] PadIds = { Pad0, Pad1, Pad2, Pad3 };
+    private static readonly string[] PadIds = { Pad0, Pad1, Pad2, Pad3, Pad4, Pad5 };
 
     /// <summary>패드 인덱스에 해당하는 SFX ID를 돌려줍니다. 범위를 벗어나면 null입니다.</summary>
     public static string Pad(int index)

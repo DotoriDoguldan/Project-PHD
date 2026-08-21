@@ -65,6 +65,26 @@ MonoBehaviour:
     _cooldown: 0
     _maxSimultaneous: 4
     _priority: 0
+  - _id: pad_4
+    _clips:
+    - {fileID: 8300000, guid: be443cec1fd18504baed4c4321972797, type: 3}
+    _volume: 1
+    _randomVolumeRange: {x: 1, y: 1}
+    _pitch: 1.498
+    _randomPitchRange: {x: 1, y: 1}
+    _cooldown: 0
+    _maxSimultaneous: 4
+    _priority: 0
+  - _id: pad_5
+    _clips:
+    - {fileID: 8300000, guid: be443cec1fd18504baed4c4321972797, type: 3}
+    _volume: 1
+    _randomVolumeRange: {x: 1, y: 1}
+    _pitch: 1.682
+    _randomPitchRange: {x: 1, y: 1}
+    _cooldown: 0
+    _maxSimultaneous: 4
+    _priority: 0
   - _id: game_over
     _clips:
     - {fileID: 8300000, guid: 4fd25c7dd8388d548ab70180e845dc67, type: 3}

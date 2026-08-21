@@ -37,6 +37,10 @@ public class GameFlow : MonoBehaviour
     [SerializeField] private int roundClearBonus = 50;
     [Tooltip("한 판에서 허용하는 실수 횟수. 이 횟수째 실수에서 게임오버. 1이면 한 번에 게임오버.")]
     [SerializeField] private int maxMistakes = 3;
+    [Tooltip("확장 전에 사용할 패드 수. pads 배열의 앞에서부터 이 개수만 보이고, 시퀀스도 이 범위에서만 나온다.")]
+    [SerializeField] private int basePadCount = 4;
+    [Tooltip("이 라운드부터 pads 전체(추가 패드 포함)를 사용한다. 6이면 5라운드를 깬 뒤 6라운드부터 늘어난다.")]
+    [SerializeField] private int padExpandRound = 6;
 
     [Header("연출 시간(초)")]
     [SerializeField] private float roundTitleTime = 0.76f;
@@ -100,6 +104,8 @@ public class GameFlow : MonoBehaviour
         if (padInput == null) Debug.LogError("[PHD] GameFlow: padInput 이 없습니다.", this);
         if (stageIcon == null) Debug.LogError("[PHD] GameFlow: stageIcon 이 없습니다.", this);
         if (hud == null) Debug.LogError("[PHD] GameFlow: hud 가 없습니다.", this);
+        if (pads != null && basePadCount > pads.Length)
+            Debug.LogWarning("[PHD] GameFlow: basePadCount 가 pads 개수보다 큽니다. pads 개수로 잘라 씁니다.", this);
     }
 
     private void OnDestroy()
@@ -196,6 +202,7 @@ public class GameFlow : MonoBehaviour
         _failed = false;
 
         stageIcon.Hide();
+        ApplyPadCount(PadCountForRound(_round));
         hud.SetRound(0);
         hud.SetScore(0);
         hud.Dots.Clear();
@@ -224,6 +231,7 @@ public class GameFlow : MonoBehaviour
         // 코루틴이 시작되기 전에 상태를 넘겨, 같은 프레임의 추가 입력으로 중복 시작되지 않게 한다.
         _phase = GamePhase.Countdown;
         padInput.InputEnabled = false;
+        ApplyPadCount(PadCountForRound(_round));
         hud.SetScore(0);
     }
 
@@ -256,7 +264,9 @@ public class GameFlow : MonoBehaviour
         _phase = GamePhase.Countdown;
 
         int length = firstRoundLength + (_round - 1);
-        _sequence.Generate(length, pads.Length);
+        int padCount = PadCountForRound(_round);
+        ApplyPadCount(padCount);
+        _sequence.Generate(length, padCount);
 
         hud.SetRound(_round);
         hud.Dots.Setup(length);
@@ -445,6 +455,33 @@ public class GameFlow : MonoBehaviour
         }
 
         _replayRequested = action == ResultShare.Action.Replay;
+    }
+
+    // ------------------------------------------------------------ 패드 확장
+
+    /// <summary>해당 라운드에서 사용할 패드 수. <see cref="padExpandRound"/> 부터 pads 전체를 쓴다.</summary>
+    private int PadCountForRound(int round)
+    {
+        if (pads == null || pads.Length == 0) return 0;
+        int baseCount = Mathf.Clamp(basePadCount, 1, pads.Length);
+        return round >= padExpandRound ? pads.Length : baseCount;
+    }
+
+    /// <summary>
+    /// 앞에서부터 <paramref name="count"/> 개만 켠다. 꺼진 패드는 보이지도 않고
+    /// 콜라이더도 함께 꺼지므로 <see cref="PadInput"/> 이 집어내지 못한다.
+    /// </summary>
+    private void ApplyPadCount(int count)
+    {
+        if (pads == null) return;
+        for (int i = 0; i < pads.Length; i++)
+        {
+            var pad = pads[i];
+            if (pad == null) continue;
+
+            bool on = i < count;
+            if (pad.gameObject.activeSelf != on) pad.gameObject.SetActive(on);
+        }
     }
 
     // ------------------------------------------------------------ 유틸
