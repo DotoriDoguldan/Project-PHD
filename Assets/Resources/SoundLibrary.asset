@@ -108,7 +108,7 @@ MonoBehaviour:
   - _id: countdown
     _clips:
     - {fileID: 8300000, guid: 9feeccd666e9f4748b65d6fa2f8be1c2, type: 3}
-    _volume: 1
+    _volume: 0
     _randomVolumeRange: {x: 1, y: 1}
     _pitch: 1
     _randomPitchRange: {x: 1, y: 1}
@@ -126,5 +126,5 @@ MonoBehaviour:
     _clips:
     - {fileID: 8300000, guid: ca8088f2458237148aa207554f2fec7d, type: 3}
     _volume: 1
-    _bpm: 60
+    _bpm: 73
     _firstBeatOffset: 0.25
