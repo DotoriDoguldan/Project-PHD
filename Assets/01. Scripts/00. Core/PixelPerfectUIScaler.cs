@@ -18,21 +18,21 @@ using UnityEngine.UI;
 public class PixelPerfectUIScaler : MonoBehaviour
 {
     [Tooltip("비워두면 씬 안의 모든 CanvasScaler 를 찾아 적용한다.")]
-    [SerializeField] CanvasScaler[] targets;
+    [SerializeField] private CanvasScaler[] targets;
 
-    PixelPerfectCamera _pixelPerfect;
-    int _lastRatio = -1;
+    private PixelPerfectCamera _pixelPerfect;
+    private int _lastRatio = -1;
 
-    void OnEnable()
+    private void OnEnable()
     {
         _pixelPerfect = GetComponent<PixelPerfectCamera>();
         _lastRatio = -1;
         Apply();
     }
 
-    void LateUpdate() => Apply();
+    private void LateUpdate() => Apply();
 
-    void Apply()
+    private void Apply()
     {
         if (_pixelPerfect == null) _pixelPerfect = GetComponent<PixelPerfectCamera>();
         if (_pixelPerfect == null) return;
@@ -50,7 +50,7 @@ public class PixelPerfectUIScaler : MonoBehaviour
         }
     }
 
-    CanvasScaler[] Targets()
+    private CanvasScaler[] Targets()
     {
         // 인스펙터에서 비워두면 배열 길이가 0 이 아니라 "null 한 칸"으로 직렬화되는 경우가 있다.
         // 길이만 보고 판단하면 아무것도 적용되지 않으므로, 유효한 항목이 하나라도 있는지 확인한다.

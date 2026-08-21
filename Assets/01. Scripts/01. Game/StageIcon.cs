@@ -8,14 +8,14 @@ using UnityEngine;
 [RequireComponent(typeof(SpriteRenderer))]
 public class StageIcon : MonoBehaviour
 {
-    [SerializeField] float popScale = 1.12f;
-    [SerializeField] float popTime = 0.09f;
+    [SerializeField] private float popScale = 1.12f;
+    [SerializeField] private float popTime = 0.09f;
 
-    SpriteRenderer _renderer;
-    Coroutine _routine;
-    Vector3 _baseScale;
+    private SpriteRenderer _renderer;
+    private Coroutine _routine;
+    private Vector3 _baseScale;
 
-    void Awake()
+    private void Awake()
     {
         _renderer = GetComponent<SpriteRenderer>();
         _baseScale = transform.localScale;
@@ -43,7 +43,7 @@ public class StageIcon : MonoBehaviour
         transform.localScale = _baseScale;
     }
 
-    IEnumerator ShowRoutine(float duration)
+    private IEnumerator ShowRoutine(float duration)
     {
         SetVisible(true);
 
@@ -65,7 +65,7 @@ public class StageIcon : MonoBehaviour
         _routine = null;
     }
 
-    void SetVisible(bool visible)
+    private void SetVisible(bool visible)
     {
         if (_renderer == null) _renderer = GetComponent<SpriteRenderer>();
         _renderer.enabled = visible;

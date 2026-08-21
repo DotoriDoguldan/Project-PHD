@@ -13,18 +13,18 @@ using UnityEngine.Rendering.Universal;
 [RequireComponent(typeof(Camera))]
 public class CameraFitter : MonoBehaviour
 {
-    [SerializeField] Vector2 referenceResolution = new Vector2(1080f, 1920f);
-    [SerializeField] float pixelsPerUnit = 100f;
+    [SerializeField] private Vector2 referenceResolution = new Vector2(1080f, 1920f);
+    [SerializeField] private float pixelsPerUnit = 100f;
 
-    Camera _camera;
-    PixelPerfectCamera _pixelPerfect;
-    Vector2Int _lastScreen;
+    private Camera _camera;
+    private PixelPerfectCamera _pixelPerfect;
+    private Vector2Int _lastScreen;
 
     /// <summary>
     /// PixelPerfectCamera 는 스스로 orthographicSize 를 계산해 매 프레임 덮어쓴다.
     /// 둘이 서로를 덮어쓰지 않도록, 픽셀 퍼펙트가 켜져 있으면 이 컴포넌트는 물러난다.
     /// </summary>
-    bool PixelPerfectOwnsCamera
+    private bool PixelPerfectOwnsCamera
     {
         get
         {
@@ -45,16 +45,16 @@ public class CameraFitter : MonoBehaviour
         }
     }
 
-    Camera Cam => _camera != null ? _camera : (_camera = GetComponent<Camera>());
+    private Camera Cam => _camera != null ? _camera : (_camera = GetComponent<Camera>());
 
-    void OnEnable() => Apply();
+    private void OnEnable() => Apply();
 
-    void Update()
+    private void Update()
     {
         if (Screen.width != _lastScreen.x || Screen.height != _lastScreen.y) Apply();
     }
 
-    void Apply()
+    private void Apply()
     {
         if (PixelPerfectOwnsCamera) return;
 

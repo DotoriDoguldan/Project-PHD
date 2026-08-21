@@ -15,19 +15,19 @@ public enum ScreenEdge
 [ExecuteAlways]
 public class ScreenAnchor : MonoBehaviour
 {
-    [SerializeField] ScreenEdge edge = ScreenEdge.Bottom;
+    [SerializeField] private ScreenEdge edge = ScreenEdge.Bottom;
     [Tooltip("기준 지점으로부터의 오프셋(월드 유닛)")]
-    [SerializeField] Vector2 offset = Vector2.zero;
-    [SerializeField] bool useSafeArea = true;
+    [SerializeField] private Vector2 offset = Vector2.zero;
+    [SerializeField] private bool useSafeArea = true;
 
-    Camera _camera;
-    Vector2Int _lastScreen;
-    Rect _lastSafeArea;
-    float _lastOrthoSize;
+    private Camera _camera;
+    private Vector2Int _lastScreen;
+    private Rect _lastSafeArea;
+    private float _lastOrthoSize;
 
-    void OnEnable() => Apply();
+    private void OnEnable() => Apply();
 
-    void LateUpdate()
+    private void LateUpdate()
     {
         var cam = Cam;
         if (cam == null) return;
@@ -39,7 +39,7 @@ public class ScreenAnchor : MonoBehaviour
         }
     }
 
-    Camera Cam
+    private Camera Cam
     {
         get
         {
@@ -48,7 +48,7 @@ public class ScreenAnchor : MonoBehaviour
         }
     }
 
-    void Apply()
+    private void Apply()
     {
         var cam = Cam;
         if (cam == null || Screen.width <= 0 || Screen.height <= 0) return;

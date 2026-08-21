@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// </summary>
 public class MemorySequence
 {
-    readonly List<int> _steps = new List<int>(32);
+    private readonly List<int> _steps = new List<int>(32);
 
     /// <summary>출제된 순서의 길이.</summary>
     public int Length => _steps.Count;

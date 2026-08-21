@@ -26,53 +26,53 @@ public enum GamePhase
 public class GameFlow : MonoBehaviour
 {
     [Header("참조")]
-    [SerializeField] PadButton[] pads;
-    [SerializeField] PadInput padInput;
-    [SerializeField] StageIcon stageIcon;
-    [SerializeField] GameHud hud;
+    [SerializeField] private PadButton[] pads;
+    [SerializeField] private PadInput padInput;
+    [SerializeField] private StageIcon stageIcon;
+    [SerializeField] private GameHud hud;
 
     [Header("규칙")]
-    [SerializeField] int firstRoundLength = 3;
-    [SerializeField] int pointsPerHit = 10;
-    [SerializeField] int roundClearBonus = 50;
+    [SerializeField] private int firstRoundLength = 3;
+    [SerializeField] private int pointsPerHit = 10;
+    [SerializeField] private int roundClearBonus = 50;
     [Tooltip("한 판에서 허용하는 실수 횟수. 이 횟수째 실수에서 게임오버. 1이면 한 번에 게임오버.")]
-    [SerializeField] int maxMistakes = 3;
+    [SerializeField] private int maxMistakes = 3;
 
     [Header("연출 시간(초)")]
-    [SerializeField] float roundTitleTime = 0.76f;
-    [SerializeField] float countdownStep = 0.5f;
-    [SerializeField] float showSecondsBase = 0.62f;
-    [SerializeField] float showSecondsMin = 0.30f;
-    [SerializeField] float showSecondsPerRound = 0.03f;
-    [SerializeField] float gapSecondsBase = 0.20f;
-    [SerializeField] float gapSecondsMin = 0.10f;
-    [SerializeField] float resultTime = 1.0f;
+    [SerializeField] private float roundTitleTime = 0.76f;
+    [SerializeField] private float countdownStep = 0.5f;
+    [SerializeField] private float showSecondsBase = 0.62f;
+    [SerializeField] private float showSecondsMin = 0.30f;
+    [SerializeField] private float showSecondsPerRound = 0.03f;
+    [SerializeField] private float gapSecondsBase = 0.20f;
+    [SerializeField] private float gapSecondsMin = 0.10f;
+    [SerializeField] private float resultTime = 1.0f;
     [Tooltip("박자 동기화 재생 시, 한 박 중 패드가 켜져 있는 비율(나머지는 여백).")]
-    [SerializeField, Range(0.1f, 1f)] float showBeatHoldRatio = 0.7f;
+    [SerializeField, Range(0.1f, 1f)] private float showBeatHoldRatio = 0.7f;
 
     [Header("박자 타이밍 (play BGM에 BPM이 있을 때만 적용, 단위: 박)")]
     [Tooltip("play 음악이 시작(첫 박자에 정렬)된 뒤 몇 박자 후에 3-2-1 카운트다운을 시작할지.")]
-    [SerializeField, Min(0f)] float countdownStartBeats = 2f;
+    [SerializeField, Min(0f)] private float countdownStartBeats = 2f;
     [Tooltip("카운트다운 숫자(3, 2, 1)가 몇 박자 간격으로 바뀔지. 각 숫자마다 countdown 효과음이 재생된다.")]
-    [SerializeField, Min(0.01f)] float countdownBeatInterval = 1f;
+    [SerializeField, Min(0.01f)] private float countdownBeatInterval = 1f;
     [Tooltip("카운트다운이 끝난 뒤 몇 박자 후에 정답 미리보기를 보여줄지.")]
-    [SerializeField, Min(0f)] float previewDelayBeats = 1f;
+    [SerializeField, Min(0f)] private float previewDelayBeats = 1f;
 
-    const string BestScoreKey = "phd.memory.best";
-    const float MaxTimeStep = 0.1f;      // 한 프레임에 인정할 최대 경과시간
+    private const string BestScoreKey = "phd.memory.best";
+    private const float MaxTimeStep = 0.1f;      // 한 프레임에 인정할 최대 경과시간
 
-    readonly MemorySequence _sequence = new MemorySequence();
+    private readonly MemorySequence _sequence = new MemorySequence();
 
-    GamePhase _phase = GamePhase.Ready;
-    Coroutine _loop;
-    bool _paused;
-    bool _failed;
-    bool _replayRequested;
-    int _round;
-    int _score;
-    int _best;
-    int _mistakes;        // 이번 판에서 지금까지 틀린 횟수
-    float _inputElapsed;
+    private GamePhase _phase = GamePhase.Ready;
+    private Coroutine _loop;
+    private bool _paused;
+    private bool _failed;
+    private bool _replayRequested;
+    private int _round;
+    private int _score;
+    private int _best;
+    private int _mistakes;        // 이번 판에서 지금까지 틀린 횟수
+    private float _inputElapsed;
 
     public GamePhase Phase => _phase;
     public int Score => _score;
@@ -81,7 +81,7 @@ public class GameFlow : MonoBehaviour
 
     // ------------------------------------------------------------ 수명주기
 
-    void Awake()
+    private void Awake()
     {
         if (pads != null)
         {
@@ -94,7 +94,7 @@ public class GameFlow : MonoBehaviour
         ValidateReferences();
     }
 
-    void ValidateReferences()
+    private void ValidateReferences()
     {
         if (pads == null || pads.Length == 0) Debug.LogError("[PHD] GameFlow: pads 가 비어 있습니다.", this);
         if (padInput == null) Debug.LogError("[PHD] GameFlow: padInput 이 없습니다.", this);
@@ -102,7 +102,7 @@ public class GameFlow : MonoBehaviour
         if (hud == null) Debug.LogError("[PHD] GameFlow: hud 가 없습니다.", this);
     }
 
-    void OnDestroy()
+    private void OnDestroy()
     {
         // 씬이 내려가는데 결과창만 남아 화면을 덮고 있는 상황을 막는다.
         ResultShare.Hide();
@@ -114,9 +114,9 @@ public class GameFlow : MonoBehaviour
         }
     }
 
-    void Start() => EnterReady();
+    private void Start() => EnterReady();
 
-    void Update()
+    private void Update()
     {
         if (_phase == GamePhase.AwaitInput && !_paused)
         {
@@ -135,11 +135,11 @@ public class GameFlow : MonoBehaviour
 
     // 브라우저 탭이 가려지면 일시정지된다. 포커스(canvas 클릭 해제)로는 멈추지 않는다 —
     // 페이지의 다른 곳을 클릭했다고 게임이 멈춰 보이면 오히려 고장처럼 느껴진다.
-    void OnApplicationPause(bool paused) => _paused = paused;
+    private void OnApplicationPause(bool paused) => _paused = paused;
 
     // ------------------------------------------------------------ 입력
 
-    void OnPadPressed(int index)
+    private void OnPadPressed(int index)
     {
         switch (_phase)
         {
@@ -153,7 +153,7 @@ public class GameFlow : MonoBehaviour
         }
     }
 
-    void HandleInput(int index)
+    private void HandleInput(int index)
     {
         if (_sequence.Submit(index))
         {
@@ -188,7 +188,7 @@ public class GameFlow : MonoBehaviour
 
     // ------------------------------------------------------------ 루프
 
-    void EnterReady()
+    private void EnterReady()
     {
         _phase = GamePhase.Ready;
         _round = 0;
@@ -207,7 +207,7 @@ public class GameFlow : MonoBehaviour
         if (sound != null) sound.PlayBgm(BgmId.Ready, sound.ReadyBgmFade);
     }
 
-    void StartGame()
+    private void StartGame()
     {
         if (_loop != null) StopCoroutine(_loop);
         BeginRun();
@@ -215,7 +215,7 @@ public class GameFlow : MonoBehaviour
     }
 
     /// <summary>한 판을 시작할 수 있는 상태로 되돌린다.</summary>
-    void BeginRun()
+    private void BeginRun()
     {
         _round = 1;
         _score = 0;
@@ -227,7 +227,7 @@ public class GameFlow : MonoBehaviour
         hud.SetScore(0);
     }
 
-    IEnumerator RunGame()
+    private IEnumerator RunGame()
     {
         bool again = true;
         while (again)
@@ -250,7 +250,7 @@ public class GameFlow : MonoBehaviour
         _loop = null;
     }
 
-    IEnumerator RunRound()
+    private IEnumerator RunRound()
     {
         padInput.InputEnabled = false;
         _phase = GamePhase.Countdown;
@@ -321,7 +321,7 @@ public class GameFlow : MonoBehaviour
     // play BGM 박자에 맞춰 3-2-1 카운트다운을 진행한다.
     // 정렬 → countdownStartBeats 대기(그동안 ROUND 표기) → 각 숫자를 countdownBeatInterval 간격으로(효과음 포함)
     // → previewDelayBeats 대기 순서다. 이후 순서 재생은 이 지점에서 바로 이어진다.
-    IEnumerator CountdownOnBeat(SoundManager sound)
+    private IEnumerator CountdownOnBeat(SoundManager sound)
     {
         float beat = sound.BgmBeatDuration;
 
@@ -345,7 +345,7 @@ public class GameFlow : MonoBehaviour
     }
 
     // 박자 정보가 없을 때의 카운트다운 폴백(초 기반).
-    IEnumerator CountdownFree()
+    private IEnumerator CountdownFree()
     {
         yield return Wait(roundTitleTime);
 
@@ -359,7 +359,7 @@ public class GameFlow : MonoBehaviour
 
     // play BGM의 박자에 맞춰 순서를 보여준다. 패드 1개 = 1박(템포 고정).
     // 정렬/미리보기 지연은 CountdownOnBeat에서 이미 처리했으므로 여기서는 바로 매 박자마다 공개한다.
-    IEnumerator ShowSequenceOnBeat(SoundManager sound)
+    private IEnumerator ShowSequenceOnBeat(SoundManager sound)
     {
         float beat = sound.BgmBeatDuration;
         float hold = beat * showBeatHoldRatio;
@@ -375,7 +375,7 @@ public class GameFlow : MonoBehaviour
     }
 
     // 박자 정보가 없을 때의 폴백. 라운드가 오를수록 조금씩 빨라지는 기존 방식이다.
-    IEnumerator ShowSequenceFree()
+    private IEnumerator ShowSequenceFree()
     {
         float show = Mathf.Max(showSecondsMin, showSecondsBase - showSecondsPerRound * (_round - 1));
         float gap = Mathf.Max(gapSecondsMin, gapSecondsBase - showSecondsPerRound * 0.5f * (_round - 1));
@@ -390,7 +390,7 @@ public class GameFlow : MonoBehaviour
         }
     }
 
-    IEnumerator FailFeedback()
+    private IEnumerator FailFeedback()
     {
         hud.SetMessage("WRONG!");
 
@@ -405,7 +405,7 @@ public class GameFlow : MonoBehaviour
         stageIcon.Hide();
     }
 
-    IEnumerator GameOver()
+    private IEnumerator GameOver()
     {
         _phase = GamePhase.GameOver;
         padInput.InputEnabled = false;
@@ -449,7 +449,7 @@ public class GameFlow : MonoBehaviour
 
     // ------------------------------------------------------------ 유틸
 
-    int CalcSpeedBonus(int length, float elapsed)
+    private int CalcSpeedBonus(int length, float elapsed)
     {
         // 한 개당 1.2초를 기준선으로, 빠를수록 보너스. 느려도 감점은 없다.
         float budget = length * 1.2f;
@@ -462,7 +462,7 @@ public class GameFlow : MonoBehaviour
     /// 델타타임 상한을 둔 대기. 브라우저 탭 복귀 시 한 프레임에 몇 초가 들어와도
     /// 연출이 통째로 건너뛰어지지 않는다.
     /// </summary>
-    IEnumerator Wait(float seconds)
+    private IEnumerator Wait(float seconds)
     {
         float elapsed = 0f;
         while (elapsed < seconds)
@@ -473,7 +473,7 @@ public class GameFlow : MonoBehaviour
         }
     }
 
-    static int LoadBest()
+    private static int LoadBest()
     {
         try
         {
@@ -486,7 +486,7 @@ public class GameFlow : MonoBehaviour
         }
     }
 
-    static void SaveBest(int value)
+    private static void SaveBest(int value)
     {
         try
         {

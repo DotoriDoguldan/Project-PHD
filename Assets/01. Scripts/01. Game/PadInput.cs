@@ -7,9 +7,9 @@ using UnityEngine.InputSystem;
 /// </summary>
 public class PadInput : MonoBehaviour
 {
-    [SerializeField] Camera targetCamera;
-    [SerializeField] LayerMask hitLayers = ~0;
-    [SerializeField] bool inputEnabled = true;
+    [SerializeField] private Camera targetCamera;
+    [SerializeField] private LayerMask hitLayers = ~0;
+    [SerializeField] private bool inputEnabled = true;
 
     public bool InputEnabled
     {
@@ -17,9 +17,9 @@ public class PadInput : MonoBehaviour
         set => inputEnabled = value;
     }
 
-    Camera Cam => targetCamera != null ? targetCamera : (targetCamera = Camera.main);
+    private Camera Cam => targetCamera != null ? targetCamera : (targetCamera = Camera.main);
 
-    void Update()
+    private void Update()
     {
         if (!inputEnabled) return;
 
@@ -29,7 +29,7 @@ public class PadInput : MonoBehaviour
         TryPress(pointer.position.ReadValue());
     }
 
-    void TryPress(Vector2 screenPosition)
+    private void TryPress(Vector2 screenPosition)
     {
         var cam = Cam;
         if (cam == null) return;

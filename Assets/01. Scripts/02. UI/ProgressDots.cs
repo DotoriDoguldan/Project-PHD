@@ -8,11 +8,11 @@ using UnityEngine.UI;
 /// </summary>
 public class ProgressDots : MonoBehaviour
 {
-    [SerializeField] float dotSize = 6f;
-    [SerializeField] Color emptyColor = new Color(1f, 1f, 1f, 0.18f);
-    [SerializeField] Color filledColor = new Color(0.49f, 0.55f, 1f, 1f);
+    [SerializeField] private float dotSize = 6f;
+    [SerializeField] private Color emptyColor = new Color(1f, 1f, 1f, 0.18f);
+    [SerializeField] private Color filledColor = new Color(0.49f, 0.55f, 1f, 1f);
 
-    readonly List<Image> _dots = new List<Image>(32);
+    private readonly List<Image> _dots = new List<Image>(32);
 
     /// <summary>점 개수를 맞추고 전부 비운 상태로 초기화한다.</summary>
     public void Setup(int count)
@@ -39,7 +39,7 @@ public class ProgressDots : MonoBehaviour
 
     public void Clear() => Setup(0);
 
-    void EnsureCapacity(int count)
+    private void EnsureCapacity(int count)
     {
         while (_dots.Count < count)
         {
