@@ -60,9 +60,6 @@ public sealed class SoundManager : MonoBehaviour
     /// <summary>대기(ready) BGM 전환 페이드 길이입니다. (SoundLibrary에서 설정)</summary>
     public float ReadyBgmFade => _library != null ? _library.ReadyFadeSeconds : 2f;
 
-    /// <summary>카운트다운(countdown) BGM 전환 페이드 길이입니다. (SoundLibrary에서 설정)</summary>
-    public float CountdownBgmFade => _library != null ? _library.CountdownFadeSeconds : 0.8f;
-
     /// <summary>플레이(play) BGM 전환 페이드 길이입니다. (SoundLibrary에서 설정)</summary>
     public float PlayBgmFade => _library != null ? _library.PlayFadeSeconds : 1f;
 

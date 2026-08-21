@@ -38,8 +38,6 @@ public sealed class SoundLibrary : ScriptableObject
     [Header("BGM Transition (크로스페이드 초)")]
     [SerializeField, Min(0f), Tooltip("대기(ready) BGM으로 전환할 때의 페이드 길이입니다.")]
     private float _readyFadeSeconds = 2f;
-    [SerializeField, Min(0f), Tooltip("카운트다운(countdown) BGM으로 전환할 때의 페이드 길이입니다.")]
-    private float _countdownFadeSeconds = 0.8f;
     [SerializeField, Min(0f), Tooltip("플레이(play) BGM으로 전환할 때의 페이드 길이입니다.")]
     private float _playFadeSeconds = 1f;
     [SerializeField, Min(0f), Tooltip("게임 오버 시 BGM을 페이드 아웃(정지)하는 길이입니다.")]
@@ -66,7 +64,6 @@ public sealed class SoundLibrary : ScriptableObject
     public string StartupBgmId => _startupBgmId;
 
     public float ReadyFadeSeconds => _readyFadeSeconds;
-    public float CountdownFadeSeconds => _countdownFadeSeconds;
     public float PlayFadeSeconds => _playFadeSeconds;
     public float GameOverFadeSeconds => _gameOverFadeSeconds;
 

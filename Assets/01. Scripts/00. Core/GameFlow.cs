@@ -217,10 +217,6 @@ public class GameFlow : MonoBehaviour
         _phase = GamePhase.Countdown;
         padInput.InputEnabled = false;
         hud.SetScore(0);
-
-        // 2) 시작 직후 카운트다운 BGM (첫 판/다시하기 모두 이 지점을 지난다)
-        var sound = SoundManager.Instance;
-        if (sound != null) sound.PlayBgm(BgmId.Countdown, sound.CountdownBgmFade);
     }
 
     IEnumerator RunGame()
@@ -257,6 +253,15 @@ public class GameFlow : MonoBehaviour
         hud.SetRound(_round);
         hud.Dots.Setup(length);
         hud.SetMessage("ROUND {0}", _round);
+
+        // 3) ROUND 표기 시점부터 플레이 BGM으로 전환. 첫 라운드에서만 전환하고 이후 라운드는 그대로 이어간다.
+        //    (패배로 대기/다시하기에 들어가기 전까지 계속 재생된다.)
+        if (_round == 1)
+        {
+            var sound = SoundManager.Instance;
+            if (sound != null) sound.PlayBgm(BgmId.Play, sound.PlayBgmFade);
+        }
+
         yield return Wait(roundTitleTime);
 
         for (int n = 3; n >= 1; n--)
@@ -266,14 +271,6 @@ public class GameFlow : MonoBehaviour
             yield return Wait(countdownStep);
         }
         hud.ClearMessage();
-
-        // 3) 카운트다운이 끝나면 플레이 BGM으로. 첫 라운드에서만 전환하고 이후 라운드는 그대로 이어간다.
-        //    (패배로 대기/다시하기에 들어가기 전까지 계속 재생된다.)
-        if (_round == 1)
-        {
-            var sound = SoundManager.Instance;
-            if (sound != null) sound.PlayBgm(BgmId.Play, sound.PlayBgmFade);
-        }
 
         // --- 순서 재생 ---
         _phase = GamePhase.Showing;

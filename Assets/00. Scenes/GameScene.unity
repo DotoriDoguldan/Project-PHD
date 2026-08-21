@@ -1250,6 +1250,7 @@ MonoBehaviour:
   firstRoundLength: 3
   pointsPerHit: 10
   roundClearBonus: 50
+  maxMistakes: 3
   roundTitleTime: 0.76
   countdownStep: 0.5
   showSecondsBase: 0.62
@@ -1258,6 +1259,7 @@ MonoBehaviour:
   gapSecondsBase: 0.2
   gapSecondsMin: 0.1
   resultTime: 1
+  showBeatHoldRatio: 0.7
 --- !u!4 &1408934206
 Transform:
   m_ObjectHideFlags: 0

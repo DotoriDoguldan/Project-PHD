@@ -22,13 +22,12 @@ MonoBehaviour:
   _sfxVolume: 1
   _startupBgmId: ready
   _readyFadeSeconds: 0
-  _countdownFadeSeconds: 0
-  _playFadeSeconds: 0.205
+  _playFadeSeconds: 0
   _gameOverFadeSeconds: 0.25
   _sfx:
   - _id: pad_0
     _clips:
-    - {fileID: 8300000, guid: be443cec1fd18504baed4c4321972797, type: 3}
+    - {fileID: 8300000, guid: fd2bcdfc69ca46d4e9c7ec86c48c2ba6, type: 3}
     _volume: 1
     _randomVolumeRange: {x: 1, y: 1}
     _pitch: 1
@@ -38,30 +37,30 @@ MonoBehaviour:
     _priority: 0
   - _id: pad_1
     _clips:
-    - {fileID: 8300000, guid: be443cec1fd18504baed4c4321972797, type: 3}
+    - {fileID: 8300000, guid: b235d067dce2e574da467021576e1d25, type: 3}
     _volume: 1
     _randomVolumeRange: {x: 1, y: 1}
-    _pitch: 1.122
+    _pitch: 1
     _randomPitchRange: {x: 1, y: 1}
     _cooldown: 0
     _maxSimultaneous: 4
     _priority: 0
   - _id: pad_2
     _clips:
-    - {fileID: 8300000, guid: be443cec1fd18504baed4c4321972797, type: 3}
+    - {fileID: 8300000, guid: 51d8e851ff455614b991dd20bbebd53f, type: 3}
     _volume: 1
     _randomVolumeRange: {x: 1, y: 1}
-    _pitch: 1.26
+    _pitch: 1
     _randomPitchRange: {x: 1, y: 1}
     _cooldown: 0
     _maxSimultaneous: 4
     _priority: 0
   - _id: pad_3
     _clips:
-    - {fileID: 8300000, guid: be443cec1fd18504baed4c4321972797, type: 3}
+    - {fileID: 8300000, guid: a6cdedfd2b2676d4a9f727483ba64f71, type: 3}
     _volume: 1
     _randomVolumeRange: {x: 1, y: 1}
-    _pitch: 1.335
+    _pitch: 1
     _randomPitchRange: {x: 1, y: 1}
     _cooldown: 0
     _maxSimultaneous: 4
@@ -86,6 +85,16 @@ MonoBehaviour:
     _cooldown: 0
     _maxSimultaneous: 4
     _priority: 0
+  - _id: countdown
+    _clips:
+    - {fileID: 8300000, guid: 9feeccd666e9f4748b65d6fa2f8be1c2, type: 3}
+    _volume: 1
+    _randomVolumeRange: {x: 1, y: 1}
+    _pitch: 1
+    _randomPitchRange: {x: 1, y: 1}
+    _cooldown: 0
+    _maxSimultaneous: 4
+    _priority: 0
   _bgm:
   - _id: ready
     _clips:
@@ -93,15 +102,9 @@ MonoBehaviour:
     _volume: 1
     _bpm: 0
     _firstBeatOffset: 0
-  - _id: countdown
-    _clips:
-    - {fileID: 8300000, guid: ad5d2430206dac94eb61ae3b6629caac, type: 3}
-    _volume: 1
-    _bpm: 0
-    _firstBeatOffset: 0
   - _id: play
     _clips:
-    - {fileID: 8300000, guid: a67b4f5f055900a4e9eaea2c777f4a70, type: 3}
+    - {fileID: 8300000, guid: ca8088f2458237148aa207554f2fec7d, type: 3}
     _volume: 1
-    _bpm: 73
+    _bpm: 60
     _firstBeatOffset: 0.25
