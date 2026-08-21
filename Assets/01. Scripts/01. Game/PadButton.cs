@@ -9,13 +9,13 @@ using UnityEngine;
 [RequireComponent(typeof(SpriteRenderer))]
 public class PadButton : MonoBehaviour
 {
-    [SerializeField] int index;
-    [SerializeField] float idleBrightness = 0.72f;
-    [SerializeField] float pressScale = 0.92f;
+    [SerializeField] private int index;
+    [SerializeField] private float idleBrightness = 0.72f;
+    [SerializeField] private float pressScale = 0.92f;
 
-    SpriteRenderer _renderer;
-    Coroutine _routine;
-    Vector3 _baseScale;
+    private SpriteRenderer _renderer;
+    private Coroutine _routine;
+    private Vector3 _baseScale;
 
     public int Index => index;
 
@@ -34,7 +34,7 @@ public class PadButton : MonoBehaviour
 
     public void SetIndex(int value) => index = value;
 
-    void Awake()
+    private void Awake()
     {
         _renderer = GetComponent<SpriteRenderer>();
         _baseScale = transform.localScale;
@@ -55,14 +55,14 @@ public class PadButton : MonoBehaviour
         Play(Flash(duration, 1.04f));
     }
 
-    void Play(IEnumerator routine)
+    private void Play(IEnumerator routine)
     {
         if (!isActiveAndEnabled) return;
         if (_routine != null) StopCoroutine(_routine);
         _routine = StartCoroutine(routine);
     }
 
-    IEnumerator Flash(float duration, float scaleTarget)
+    private IEnumerator Flash(float duration, float scaleTarget)
     {
         const float attack = 0.06f;
         float t = 0f;
@@ -85,7 +85,7 @@ public class PadButton : MonoBehaviour
         _routine = null;
     }
 
-    void ApplyBrightness(float value)
+    private void ApplyBrightness(float value)
     {
         if (_renderer == null) _renderer = GetComponent<SpriteRenderer>();
         _renderer.color = new Color(value, value, value, 1f);

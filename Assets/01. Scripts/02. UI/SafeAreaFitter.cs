@@ -8,17 +8,17 @@ using UnityEngine;
 [RequireComponent(typeof(RectTransform))]
 public class SafeAreaFitter : MonoBehaviour
 {
-    RectTransform _rt;
-    Rect _lastSafeArea;
-    Vector2Int _lastScreen;
+    private RectTransform _rt;
+    private Rect _lastSafeArea;
+    private Vector2Int _lastScreen;
 
-    void OnEnable()
+    private void OnEnable()
     {
         _rt = (RectTransform)transform;
         Apply();
     }
 
-    void Update()
+    private void Update()
     {
         if (Screen.safeArea != _lastSafeArea ||
             Screen.width != _lastScreen.x ||
@@ -28,7 +28,7 @@ public class SafeAreaFitter : MonoBehaviour
         }
     }
 
-    void Apply()
+    private void Apply()
     {
         if (_rt == null) _rt = (RectTransform)transform;
         if (Screen.width <= 0 || Screen.height <= 0) return;

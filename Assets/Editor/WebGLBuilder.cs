@@ -12,11 +12,11 @@ using UnityEngine;
 /// </summary>
 public static class WebGLBuilder
 {
-    const string OutputPath = "Build/WebGL";
+    private const string OutputPath = "Build/WebGL";
     // GitHub Pages 는 저장소 안의 폴더를 그대로 서빙한다(Settings > Pages > main /docs).
-    const string PagesOutputPath = "docs";
-    const string TemplateName = "PROJECT:PHDMobile";
-    const string GameScenePath = "Assets/00. Scenes/GameScene.unity";
+    private const string PagesOutputPath = "docs";
+    private const string TemplateName = "PROJECT:PHDMobile";
+    private const string GameScenePath = "Assets/00. Scenes/GameScene.unity";
 
     [MenuItem("Tools/PHD/WebGL 빌드 (로컬 확인용)")]
     public static void BuildMenu() => Build(OutputPath, false);
@@ -36,7 +36,7 @@ public static class WebGLBuilder
         EditorApplication.Exit(ok ? 0 : 1);
     }
 
-    static bool Build(string outputPath, bool forPages)
+    private static bool Build(string outputPath, bool forPages)
     {
         ApplyWebSettings(forPages);
 
@@ -78,7 +78,7 @@ public static class WebGLBuilder
     /// URP/Pipeline 의 빌드 전처리기가 그 경로를 열려다 빌드 전체가 실패한다.
     /// 그래서 실제로 존재하는 씬만 남기고 목록 자체를 고쳐 쓴다.
     /// </summary>
-    static string[] ResolveScenes()
+    private static string[] ResolveScenes()
     {
         var valid = EditorBuildSettings.scenes
             .Where(s => System.IO.File.Exists(s.path))
@@ -105,7 +105,7 @@ public static class WebGLBuilder
     /// GitHub Pages 는 Jekyll 로 사이트를 처리하는데, 밑줄로 시작하는 파일을 무시하고
     /// 빌드 시간도 늘어난다. .nojekyll 을 두면 폴더를 그대로 정적 서빙한다.
     /// </summary>
-    static void WritePagesFiles(string outputPath)
+    private static void WritePagesFiles(string outputPath)
     {
         System.IO.File.WriteAllText(System.IO.Path.Combine(outputPath, ".nojekyll"), string.Empty);
         StampCacheBuster(outputPath);
@@ -124,7 +124,7 @@ public static class WebGLBuilder
     /// 주소가 배포마다 달라지면 한 index.html 이 가리키는 네 파일이 항상 같은 빌드가 된다.
     /// (index.html 자체가 캐시돼 옛 버전이 떠도, 그 안의 주소는 옛 빌드로 일관된다)
     /// </summary>
-    static void StampCacheBuster(string outputPath)
+    private static void StampCacheBuster(string outputPath)
     {
         string indexPath = System.IO.Path.Combine(outputPath, "index.html");
         if (!System.IO.File.Exists(indexPath))
@@ -145,7 +145,7 @@ public static class WebGLBuilder
     }
 
     /// <summary>웹에서 미니게임처럼 동작하기 위한 플레이어 설정.</summary>
-    static void ApplyWebSettings(bool forPages)
+    private static void ApplyWebSettings(bool forPages)
     {
         PlayerSettings.WebGL.template = TemplateName;
 

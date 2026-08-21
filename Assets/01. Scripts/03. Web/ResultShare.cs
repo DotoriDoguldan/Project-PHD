@@ -24,10 +24,10 @@ public static class ResultShare
     }
 
 #if UNITY_WEBGL && !UNITY_EDITOR
-    [DllImport("__Internal")] static extern int PHDResultSupported();
-    [DllImport("__Internal")] static extern void PHDResultShow(string json);
-    [DllImport("__Internal")] static extern int PHDResultTakeAction();
-    [DllImport("__Internal")] static extern void PHDResultHide();
+    [DllImport("__Internal")] private static extern int PHDResultSupported();
+    [DllImport("__Internal")] private static extern void PHDResultShow(string json);
+    [DllImport("__Internal")] private static extern int PHDResultTakeAction();
+    [DllImport("__Internal")] private static extern void PHDResultHide();
 
     public static bool IsAvailable => PHDResultSupported() == 1;
 
@@ -53,7 +53,7 @@ public static class ResultShare
     /// 공유 문구는 JS 쪽에서 만든다. 여기서는 숫자만 넘긴다.
     /// (문구를 고칠 때 Unity 리빌드가 필요 없게 하려는 의도)
     /// </summary>
-    static string BuildJson(int round, int score, int best, bool newBest)
+    private static string BuildJson(int round, int score, int best, bool newBest)
         => string.Format(CultureInfo.InvariantCulture,
             "{{\"round\":{0},\"score\":{1},\"best\":{2},\"newBest\":{3}}}",
             round, score, best, newBest ? "true" : "false");

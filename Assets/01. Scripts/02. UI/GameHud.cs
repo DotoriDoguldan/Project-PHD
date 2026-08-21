@@ -7,10 +7,10 @@ using UnityEngine;
 /// </summary>
 public class GameHud : MonoBehaviour
 {
-    [SerializeField] TMP_Text roundText;
-    [SerializeField] TMP_Text scoreText;
-    [SerializeField] TMP_Text messageText;
-    [SerializeField] ProgressDots dots;
+    [SerializeField] private TMP_Text roundText;
+    [SerializeField] private TMP_Text scoreText;
+    [SerializeField] private TMP_Text messageText;
+    [SerializeField] private ProgressDots dots;
 
     public ProgressDots Dots => dots;
 
