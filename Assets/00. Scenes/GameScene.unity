@@ -1260,6 +1260,9 @@ MonoBehaviour:
   gapSecondsMin: 0.1
   resultTime: 1
   showBeatHoldRatio: 0.7
+  countdownStartBeats: 1.5
+  countdownBeatInterval: 0.5
+  previewDelayBeats: 0.5
 --- !u!4 &1408934206
 Transform:
   m_ObjectHideFlags: 0

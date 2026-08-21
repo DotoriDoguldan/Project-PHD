@@ -50,6 +50,14 @@ public class GameFlow : MonoBehaviour
     [Tooltip("박자 동기화 재생 시, 한 박 중 패드가 켜져 있는 비율(나머지는 여백).")]
     [SerializeField, Range(0.1f, 1f)] float showBeatHoldRatio = 0.7f;
 
+    [Header("박자 타이밍 (play BGM에 BPM이 있을 때만 적용, 단위: 박)")]
+    [Tooltip("play 음악이 시작(첫 박자에 정렬)된 뒤 몇 박자 후에 3-2-1 카운트다운을 시작할지.")]
+    [SerializeField, Min(0f)] float countdownStartBeats = 2f;
+    [Tooltip("카운트다운 숫자(3, 2, 1)가 몇 박자 간격으로 바뀔지. 각 숫자마다 countdown 효과음이 재생된다.")]
+    [SerializeField, Min(0.01f)] float countdownBeatInterval = 1f;
+    [Tooltip("카운트다운이 끝난 뒤 몇 박자 후에 정답 미리보기를 보여줄지.")]
+    [SerializeField, Min(0f)] float previewDelayBeats = 1f;
+
     const string BestScoreKey = "phd.memory.best";
     const float MaxTimeStep = 0.1f;      // 한 프레임에 인정할 최대 경과시간
 
@@ -254,31 +262,27 @@ public class GameFlow : MonoBehaviour
         hud.Dots.Setup(length);
         hud.SetMessage("ROUND {0}", _round);
 
+        var sound = SoundManager.Instance;
+
         // 3) ROUND 표기 시점부터 플레이 BGM으로 전환. 첫 라운드에서만 전환하고 이후 라운드는 그대로 이어간다.
         //    (패배로 대기/다시하기에 들어가기 전까지 계속 재생된다.)
-        if (_round == 1)
-        {
-            var sound = SoundManager.Instance;
-            if (sound != null) sound.PlayBgm(BgmId.Play, sound.PlayBgmFade);
-        }
+        if (_round == 1 && sound != null)
+            sound.PlayBgm(BgmId.Play, sound.PlayBgmFade);
 
-        yield return Wait(roundTitleTime);
+        // play BGM에 박자 정보(BPM)가 있으면 카운트다운·미리보기를 박자에 맞추고, 없으면 초 기반으로 진행한다.
+        bool onBeat = sound != null && sound.BgmHasBeat;
 
-        for (int n = 3; n >= 1; n--)
-        {
-            hud.SetMessage("{0}", n);
-            SoundManager.Instance?.PlaySfx(SfxId.Countdown);
-            yield return Wait(countdownStep);
-        }
+        // --- 카운트다운 ---
+        if (onBeat)
+            yield return CountdownOnBeat(sound);
+        else
+            yield return CountdownFree();
         hud.ClearMessage();
 
-        // --- 순서 재생 ---
+        // --- 순서 재생(정답 미리보기) ---
         _phase = GamePhase.Showing;
-
-        // play BGM에 박자 정보(BPM)가 있으면 박자에 맞춰, 없으면 기존 show/gap 방식으로 보여준다.
-        var showSound = SoundManager.Instance;
-        if (showSound != null && showSound.BgmHasBeat)
-            yield return ShowSequenceOnBeat(showSound);
+        if (onBeat)
+            yield return ShowSequenceOnBeat(sound);
         else
             yield return ShowSequenceFree();
 
@@ -314,15 +318,51 @@ public class GameFlow : MonoBehaviour
         yield return Wait(resultTime);
     }
 
+    // play BGM 박자에 맞춰 3-2-1 카운트다운을 진행한다.
+    // 정렬 → countdownStartBeats 대기(그동안 ROUND 표기) → 각 숫자를 countdownBeatInterval 간격으로(효과음 포함)
+    // → previewDelayBeats 대기 순서다. 이후 순서 재생은 이 지점에서 바로 이어진다.
+    IEnumerator CountdownOnBeat(SoundManager sound)
+    {
+        float beat = sound.BgmBeatDuration;
+
+        // play BGM 박자 그리드에 정렬한다. (1라운드는 첫 박자, 이후 라운드는 현재 위치의 다음 박자)
+        yield return Wait(sound.SecondsToNextBeat());
+
+        // 음악(정렬 지점) 이후 지정 박자만큼 기다렸다 카운트다운 시작. 그동안 ROUND 타이틀이 보인다.
+        if (countdownStartBeats > 0f)
+            yield return Wait(beat * countdownStartBeats);
+
+        for (int n = 3; n >= 1; n--)
+        {
+            hud.SetMessage("{0}", n);
+            SoundManager.Instance?.PlaySfx(SfxId.Countdown);
+            yield return Wait(beat * countdownBeatInterval);
+        }
+
+        // 카운트다운이 끝나고 지정 박자 이후 정답 미리보기를 시작한다.
+        if (previewDelayBeats > 0f)
+            yield return Wait(beat * previewDelayBeats);
+    }
+
+    // 박자 정보가 없을 때의 카운트다운 폴백(초 기반).
+    IEnumerator CountdownFree()
+    {
+        yield return Wait(roundTitleTime);
+
+        for (int n = 3; n >= 1; n--)
+        {
+            hud.SetMessage("{0}", n);
+            SoundManager.Instance?.PlaySfx(SfxId.Countdown);
+            yield return Wait(countdownStep);
+        }
+    }
+
     // play BGM의 박자에 맞춰 순서를 보여준다. 패드 1개 = 1박(템포 고정).
-    // 먼저 다음 박자 경계까지 정렬한 뒤, 매 박자마다 패드를 하나씩 공개한다.
+    // 정렬/미리보기 지연은 CountdownOnBeat에서 이미 처리했으므로 여기서는 바로 매 박자마다 공개한다.
     IEnumerator ShowSequenceOnBeat(SoundManager sound)
     {
         float beat = sound.BgmBeatDuration;
         float hold = beat * showBeatHoldRatio;
-
-        // 시작을 다음 박자에 맞춘다.
-        yield return Wait(sound.SecondsToNextBeat());
 
         for (int i = 0; i < _sequence.Length; i++)
         {
