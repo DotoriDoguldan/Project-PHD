@@ -27,7 +27,12 @@ public class PixelPerfectUIScaler : MonoBehaviour
     {
         _pixelPerfect = GetComponent<PixelPerfectCamera>();
         _lastRatio = -1;
-        Apply();
+
+        // 여기서 배율을 읽지 않는다.
+        // PixelPerfectCamera 는 내부 상태(m_Internal)를 Awake 에서 만드는데,
+        // 씬 로드·도메인 리로드 순서에 따라 이 OnEnable 이 그보다 먼저 돌 수 있다.
+        // 그 상태에서 pixelRatio 를 읽으면 URP 내부에서 NullReferenceException 이 난다.
+        // Apply 는 LateUpdate 가 어차피 매 프레임 호출하므로, 첫 프레임 안에 반영된다.
     }
 
     private void LateUpdate() => Apply();

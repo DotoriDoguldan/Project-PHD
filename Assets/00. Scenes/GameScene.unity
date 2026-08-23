@@ -1622,7 +1622,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1567095528}
   - component: {fileID: 1567095527}
-  - component: {fileID: 1567095526}
   - component: {fileID: 1567095525}
   m_Layer: 0
   m_Name: Stage Icon
@@ -1645,21 +1644,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PHD.Game.StageIcon
   popScale: 1.12
   popTime: 0.09
---- !u!114 &1567095526
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1567095524}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8eb34ff2502e0bf4596741698fae7b36, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PHD.Core.ScreenAnchor
-  edge: 0
-  offset: {x: 0, y: 1}
-  useSafeArea: 1
 --- !u!212 &1567095527
 SpriteRenderer:
   serializedVersion: 2
@@ -1964,7 +1948,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1805118247}
-  - component: {fileID: 1805118248}
   m_Layer: 0
   m_Name: Pad
   m_TagString: Untagged
@@ -1991,21 +1974,6 @@ Transform:
   - {fileID: 49726903}
   m_Father: {fileID: 968711243}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1805118248
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1805118246}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8eb34ff2502e0bf4596741698fae7b36, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PHD.Core.ScreenAnchor
-  edge: 1
-  offset: {x: 0, y: 3.84375}
-  useSafeArea: 1
 --- !u!1 &1907052794
 GameObject:
   m_ObjectHideFlags: 0
