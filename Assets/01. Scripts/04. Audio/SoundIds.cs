@@ -23,17 +23,26 @@ public static class SfxId
     public const string Pad1 = "pad_1";
     public const string Pad2 = "pad_2";
     public const string Pad3 = "pad_3";
-    // 6라운드부터 열리는 추가 패드(LT/RT).
-    public const string Pad4 = "pad_4";
-    public const string Pad5 = "pad_5";
 
     // 패드 인덱스로 위 ID를 순서대로 매핑합니다. 정의된 개수를 벗어나면 null(무음)입니다.
-    private static readonly string[] PadIds = { Pad0, Pad1, Pad2, Pad3, Pad4, Pad5 };
+    private static readonly string[] PadIds = { Pad0, Pad1, Pad2, Pad3 };
 
     /// <summary>패드 인덱스에 해당하는 SFX ID를 돌려줍니다. 범위를 벗어나면 null입니다.</summary>
     public static string Pad(int index)
     {
         return index >= 0 && index < PadIds.Length ? PadIds[index] : null;
+    }
+
+    // 누르면 안 되는 함정 문양. 패드와 구분되는 소리라야 플레이어가 귀로도 걸러낼 수 있습니다.
+    public const string Trap0 = "trap_0";
+    public const string Trap1 = "trap_1";
+
+    private static readonly string[] TrapIds = { Trap0, Trap1 };
+
+    /// <summary>함정 인덱스에 해당하는 SFX ID를 돌려줍니다. 범위를 벗어나면 null입니다.</summary>
+    public static string Trap(int index)
+    {
+        return index >= 0 && index < TrapIds.Length ? TrapIds[index] : null;
     }
 
     // 3-2-1 카운트다운 틱

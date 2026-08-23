@@ -27,6 +27,8 @@ public class GameFlow : MonoBehaviour
 {
     [Header("참조")]
     [SerializeField] private PadButton[] pads;
+    [Tooltip("순서에 섞여 나오지만 누르면 안 되는 함정 문양들. 비워두면 함정이 나오지 않는다.")]
+    [SerializeField] private Sprite[] trapSprites;
     [SerializeField] private PadInput padInput;
     [SerializeField] private StageIcon stageIcon;
     [SerializeField] private GameHud hud;
@@ -39,10 +41,12 @@ public class GameFlow : MonoBehaviour
     [SerializeField] private int mistakePenaltyStep = 10;
     [Tooltip("한 판에서 허용하는 실수 횟수. 이 횟수째 실수에서 게임오버. 1이면 한 번에 게임오버. HUD 의 목숨 칸 수도 이 값을 따라간다.")]
     [SerializeField] private int maxMistakes = 3;
-    [Tooltip("확장 전에 사용할 패드 수. pads 배열의 앞에서부터 이 개수만 보이고, 시퀀스도 이 범위에서만 나온다.")]
-    [SerializeField] private int basePadCount = 4;
-    [Tooltip("이 라운드부터 pads 전체(추가 패드 포함)를 사용한다. 6이면 5라운드를 깬 뒤 6라운드부터 늘어난다.")]
-    [SerializeField] private int padExpandRound = 6;
+    [Tooltip("이 라운드부터 함정 문양이 순서에 섞인다. 0 이하면 함정을 쓰지 않는다.")]
+    [SerializeField] private int trapStartRound = 3;
+    [Tooltip("함정이 처음 등장하는 라운드에 섞이는 함정 칸 수.")]
+    [SerializeField] private int trapsAtStart = 1;
+    [Tooltip("몇 라운드마다 함정이 1칸씩 늘어나는지. 0 이하면 늘어나지 않는다.")]
+    [SerializeField] private int roundsPerExtraTrap = 2;
 
     [Header("연출 시간(초)")]
     [SerializeField] private float roundTitleTime = 0.76f;
@@ -107,8 +111,8 @@ public class GameFlow : MonoBehaviour
         if (padInput == null) Debug.LogError("[PHD] GameFlow: padInput 이 없습니다.", this);
         if (stageIcon == null) Debug.LogError("[PHD] GameFlow: stageIcon 이 없습니다.", this);
         if (hud == null) Debug.LogError("[PHD] GameFlow: hud 가 없습니다.", this);
-        if (pads != null && basePadCount > pads.Length)
-            Debug.LogWarning("[PHD] GameFlow: basePadCount 가 pads 개수보다 큽니다. pads 개수로 잘라 씁니다.", this);
+        if (trapStartRound > 0 && (trapSprites == null || trapSprites.Length == 0))
+            Debug.LogWarning("[PHD] GameFlow: trapSprites 가 비어 있어 함정이 나오지 않습니다.", this);
     }
 
     private void OnDestroy()
@@ -202,7 +206,6 @@ public class GameFlow : MonoBehaviour
         _mistakes = 0;
 
         stageIcon.Hide();
-        ApplyPadCount(PadCountForRound(_round));
         hud.SetRound(0);
         hud.SetScore(0);
         hud.Dots.Clear();
@@ -232,7 +235,6 @@ public class GameFlow : MonoBehaviour
         // 코루틴이 시작되기 전에 상태를 넘겨, 같은 프레임의 추가 입력으로 중복 시작되지 않게 한다.
         _phase = GamePhase.Countdown;
         padInput.InputEnabled = false;
-        ApplyPadCount(PadCountForRound(_round));
         hud.SetupLives(maxMistakes);
         hud.SetScore(0);
     }
@@ -266,12 +268,12 @@ public class GameFlow : MonoBehaviour
         _phase = GamePhase.Countdown;
 
         int length = firstRoundLength + (_round - 1);
-        int padCount = PadCountForRound(_round);
-        ApplyPadCount(padCount);
-        _sequence.Generate(length, padCount);
+        int trapChoices = trapSprites != null ? trapSprites.Length : 0;
+        _sequence.Generate(length, pads.Length, trapChoices, TrapCountForRound(_round, length));
 
         hud.SetRound(_round);
-        hud.Dots.Setup(length);
+        // 점은 "눌러야 하는 횟수"를 뜻한다. 함정 칸은 입력이 없으므로 세지 않는다.
+        hud.Dots.Setup(_sequence.AnswerLength);
         hud.SetMessage("ROUND {0}", _round);
 
         var sound = SoundManager.Instance;
@@ -375,10 +377,7 @@ public class GameFlow : MonoBehaviour
 
         for (int i = 0; i < _sequence.Length; i++)
         {
-            int step = _sequence[i];
-            stageIcon.Show(pads[step].Sprite, hold);
-            pads[step].Highlight(hold);
-            SoundManager.Instance?.PlaySfx(SfxId.Pad(step));
+            ShowStep(_sequence[i], hold);
             yield return Wait(beat);
         }
     }
@@ -391,10 +390,7 @@ public class GameFlow : MonoBehaviour
 
         for (int i = 0; i < _sequence.Length; i++)
         {
-            int step = _sequence[i];
-            stageIcon.Show(pads[step].Sprite, show);
-            pads[step].Highlight(show);
-            SoundManager.Instance?.PlaySfx(SfxId.Pad(step));
+            ShowStep(_sequence[i], show);
             yield return Wait(show + gap);
         }
     }
@@ -456,31 +452,40 @@ public class GameFlow : MonoBehaviour
         _replayRequested = action == ResultShare.Action.Replay;
     }
 
-    // ------------------------------------------------------------ 패드 확장
-
-    /// <summary>해당 라운드에서 사용할 패드 수. <see cref="padExpandRound"/> 부터 pads 전체를 쓴다.</summary>
-    private int PadCountForRound(int round)
-    {
-        if (pads == null || pads.Length == 0) return 0;
-        int baseCount = Mathf.Clamp(basePadCount, 1, pads.Length);
-        return round >= padExpandRound ? pads.Length : baseCount;
-    }
+    // ------------------------------------------------------------ 함정
 
     /// <summary>
-    /// 앞에서부터 <paramref name="count"/> 개만 켠다. 꺼진 패드는 보이지도 않고
-    /// 콜라이더도 함께 꺼지므로 <see cref="PadInput"/> 이 집어내지 못한다.
+    /// 순서의 한 칸을 보여준다.
+    /// 패드는 중앙 무대 + 해당 버튼이 함께 켜지지만, 함정은 <b>중앙 무대에만</b> 뜬다.
+    /// 누를 버튼이 없다는 것 자체가 "건너뛰어라"라는 신호다.
     /// </summary>
-    private void ApplyPadCount(int count)
+    private void ShowStep(int step, float hold)
     {
-        if (pads == null) return;
-        for (int i = 0; i < pads.Length; i++)
+        int trap = _sequence.TrapIndex(step);
+        if (trap >= 0)
         {
-            var pad = pads[i];
-            if (pad == null) continue;
+            if (trapSprites == null || trap >= trapSprites.Length) return;
 
-            bool on = i < count;
-            if (pad.gameObject.activeSelf != on) pad.gameObject.SetActive(on);
+            stageIcon.Show(trapSprites[trap], hold);
+            SoundManager.Instance?.PlaySfx(SfxId.Trap(trap));
+            return;
         }
+
+        stageIcon.Show(pads[step].Sprite, hold);
+        pads[step].Highlight(hold);
+        SoundManager.Instance?.PlaySfx(SfxId.Pad(step));
+    }
+
+    /// <summary>이 라운드의 순서에 섞을 함정 칸 수. 최소 1칸은 패드로 남긴다.</summary>
+    private int TrapCountForRound(int round, int length)
+    {
+        if (trapStartRound <= 0 || round < trapStartRound) return 0;
+        if (trapSprites == null || trapSprites.Length == 0) return 0;
+
+        int count = trapsAtStart;
+        if (roundsPerExtraTrap > 0) count += (round - trapStartRound) / roundsPerExtraTrap;
+
+        return Mathf.Clamp(count, 0, Mathf.Max(0, length - 1));
     }
 
     // ------------------------------------------------------------ 유틸

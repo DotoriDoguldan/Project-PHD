@@ -65,7 +65,7 @@ MonoBehaviour:
     _cooldown: 0
     _maxSimultaneous: 4
     _priority: 0
-  - _id: pad_4
+  - _id: trap_0
     _clips:
     - {fileID: 8300000, guid: be443cec1fd18504baed4c4321972797, type: 3}
     _volume: 1
@@ -75,7 +75,7 @@ MonoBehaviour:
     _cooldown: 0
     _maxSimultaneous: 4
     _priority: 0
-  - _id: pad_5
+  - _id: trap_1
     _clips:
     - {fileID: 8300000, guid: be443cec1fd18504baed4c4321972797, type: 3}
     _volume: 1
