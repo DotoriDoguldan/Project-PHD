@@ -1404,8 +1404,8 @@ MonoBehaviour:
   stageIcon: {fileID: 1567095525}
   hud: {fileID: 2137011925}
   firstRoundLength: 3
-  pointsPerHit: 10
-  roundClearBonus: 50
+  roundClearScore: 10
+  mistakePenaltyStep: 10
   maxMistakes: 3
   basePadCount: 4
   padExpandRound: 3

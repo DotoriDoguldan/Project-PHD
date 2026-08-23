@@ -33,8 +33,10 @@ public class GameFlow : MonoBehaviour
 
     [Header("규칙")]
     [SerializeField] private int firstRoundLength = 3;
-    [SerializeField] private int pointsPerHit = 10;
-    [SerializeField] private int roundClearBonus = 50;
+    [Tooltip("패턴(라운드) 하나를 끝까지 성공했을 때 더해지는 점수.")]
+    [SerializeField] private int roundClearScore = 10;
+    [Tooltip("실수 1회마다 차감되는 점수의 단위. 첫 실수 -10, 두 번째 -20, 세 번째 -30 처럼 실수 횟수에 비례해 커진다.")]
+    [SerializeField] private int mistakePenaltyStep = 10;
     [Tooltip("한 판에서 허용하는 실수 횟수. 이 횟수째 실수에서 게임오버. 1이면 한 번에 게임오버. HUD 의 목숨 칸 수도 이 값을 따라간다.")]
     [SerializeField] private int maxMistakes = 3;
     [Tooltip("확장 전에 사용할 패드 수. pads 배열의 앞에서부터 이 개수만 보이고, 시퀀스도 이 범위에서만 나온다.")]
@@ -76,7 +78,6 @@ public class GameFlow : MonoBehaviour
     private int _score;
     private int _best;
     private int _mistakes;        // 이번 판에서 지금까지 틀린 횟수
-    private float _inputElapsed;
 
     public GamePhase Phase => _phase;
     /// <summary>이번 판에 남은 기회(목숨). HUD 표시와 같은 값이다.</summary>
@@ -126,12 +127,6 @@ public class GameFlow : MonoBehaviour
 
     private void Update()
     {
-        if (_phase == GamePhase.AwaitInput && !_paused)
-        {
-            _inputElapsed += Mathf.Min(Time.unscaledDeltaTime, MaxTimeStep);
-            return;
-        }
-
         // 대기 화면에서는 버튼이 아닌 곳을 눌러도 시작된다.
         // (웹 미니게임에서 "화면 아무 데나 탭"은 사실상 기본 동작이다)
         if (_phase == GamePhase.Ready)
@@ -165,13 +160,14 @@ public class GameFlow : MonoBehaviour
     {
         if (_sequence.Submit(index))
         {
-            _score += pointsPerHit * _round;
-            hud.SetScore(_score);
             hud.Dots.SetFilled(_sequence.Progress);
         }
         else
         {
             _mistakes++;
+            // 실수할수록 차감량이 커진다. 첫 실수 -10, 두 번째 -20, 세 번째 -30 ...
+            _score -= mistakePenaltyStep * _mistakes;
+            hud.SetScore(_score);
             hud.SetLives(RemainingLives);
             var sound = SoundManager.Instance;
 
@@ -306,7 +302,6 @@ public class GameFlow : MonoBehaviour
 
         // --- 입력 ---
         _phase = GamePhase.AwaitInput;
-        _inputElapsed = 0f;
         hud.SetMessage("YOUR TURN");
         padInput.InputEnabled = true;
 
@@ -325,11 +320,9 @@ public class GameFlow : MonoBehaviour
 
         // --- 라운드 성공 ---
         _phase = GamePhase.RoundClear;
-        int speedBonus = CalcSpeedBonus(length, _inputElapsed);
-        int bonus = roundClearBonus * _round + speedBonus;
-        _score += bonus;
+        _score += roundClearScore;
         hud.SetScore(_score);
-        hud.SetMessage("PERFECT +{0}", bonus);
+        hud.SetMessage("PERFECT +{0}", roundClearScore);
         SoundManager.Instance?.PlaySfx(SfxId.RoundClear);
         yield return Wait(resultTime);
     }
@@ -491,15 +484,6 @@ public class GameFlow : MonoBehaviour
     }
 
     // ------------------------------------------------------------ 유틸
-
-    private int CalcSpeedBonus(int length, float elapsed)
-    {
-        // 한 개당 1.2초를 기준선으로, 빠를수록 보너스. 느려도 감점은 없다.
-        float budget = length * 1.2f;
-        float saved = budget - elapsed;
-        if (saved <= 0f) return 0;
-        return Mathf.RoundToInt(saved * 5f * _round);
-    }
 
     /// <summary>
     /// 델타타임 상한을 둔 대기. 브라우저 탭 복귀 시 한 프레임에 몇 초가 들어와도
