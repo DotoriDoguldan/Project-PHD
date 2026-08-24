@@ -1,0 +1,112 @@
+using System.Collections;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+
+/// <summary>
+/// 타이틀 화면 — 로고 연출, 최고점수, 시작 안내. 씬 이동은 SceneLoadButton 이 맡는다 —
+/// 어느 씬으로 갈지는 UI 가 알 일이 아니고, 인스펙터에서 바꿀 수 있어야 한다.
+/// </summary>
+public class TitleScreen : UIScreen
+{
+    [Header("구성")]
+    [Tooltip("등장할 때 튀어오르는 로고 이미지.")]
+    [SerializeField] private RectTransform logo;
+    [Tooltip("게임 씬으로 넘어가는 버튼. 로고 연출이 끝날 때까지 잠긴다.")]
+    [SerializeField] private Button playButton;
+    [Tooltip("최고점수 표시. 기록이 없으면(0) 통째로 숨긴다.")]
+    [SerializeField] private TMP_Text bestText;
+    [Tooltip("\"TAP TO START\" 같은 안내. 천천히 깜빡인다.")]
+    [SerializeField] private CanvasGroup hint;
+
+    [Header("연출")]
+    [Tooltip("로고가 제자리를 찾는 데 걸리는 시간(초).")]
+    [SerializeField, Min(0f)] private float logoPopTime = 0.34f;
+    [Tooltip("로고가 등장을 시작하는 배율. 1이면 연출하지 않는다.")]
+    [SerializeField, Range(0f, 1f)] private float logoPopFrom = 0.72f;
+    [Tooltip("안내 문구가 한 번 밝아졌다 어두워지는 데 걸리는 시간(초). 0이면 깜빡이지 않는다.")]
+    [SerializeField, Min(0f)] private float hintBlinkCycle = 1.4f;
+    [SerializeField, Range(0f, 1f)] private float hintMinAlpha = 0.35f;
+
+    [Header("기록")]
+    [Tooltip("최고점수 저장 키. GameFlow 가 쓰는 키와 반드시 같아야 한다.")]
+    [SerializeField] private string bestScoreKey = "phd.memory.best";
+
+    private Coroutine _intro;
+    // 인트로가 로고 팝 중간에 끊기면(OnHidden) 스케일이 중간값으로 남는다.
+    // 다음 등장이 그 값을 원본으로 잡지 않도록 원래 크기를 기억해 둔다.
+    private Vector3 _logoBaseScale = Vector3.one;
+
+    protected override void Awake()
+    {
+        // base.Awake() 가 visibleOnStart 화면에서는 OnShown → 인트로의 첫 스텝까지
+        // 동기로 실행한다. 그 전에 원본 크기를 읽어야 팝이 건드린 값을 잡지 않는다.
+        if (logo != null) _logoBaseScale = logo.localScale;
+        base.Awake();
+    }
+
+    protected override void OnShown()
+    {
+        RefreshBest();
+
+        if (!isActiveAndEnabled) return;
+        if (_intro != null) StopCoroutine(_intro);
+        _intro = StartCoroutine(Intro());
+    }
+
+    protected override void OnHidden()
+    {
+        if (_intro == null) return;
+        StopCoroutine(_intro);
+        _intro = null;
+    }
+
+    public void RefreshBest()
+    {
+        if (bestText == null) return;
+
+        int best = LoadBest();
+        // 아직 한 판도 안 한 사람에게 "BEST 0" 은 알려주는 게 없다. 그냥 숨긴다.
+        bestText.gameObject.SetActive(best > 0);
+        if (best > 0) bestText.SetText("BEST {0}", best);
+    }
+
+    private IEnumerator Intro()
+    {
+        if (playButton != null) playButton.interactable = false;
+
+        if (logo != null)
+        {
+            logo.localScale = _logoBaseScale;
+            yield return UITween.Pop(logo, logoPopFrom, logoPopTime);
+        }
+
+        if (playButton != null) playButton.interactable = true;
+
+        if (hint == null || hintBlinkCycle <= 0f) yield break;
+
+        // 깜빡임은 화면이 살아 있는 동안 계속 돈다. Hide 되면 OnHidden 이 코루틴을 멈춘다.
+        float t = 0f;
+        while (true)
+        {
+            t += Time.unscaledDeltaTime;
+            float k = (Mathf.Sin(t / hintBlinkCycle * Mathf.PI * 2f) + 1f) * 0.5f;
+            hint.alpha = Mathf.Lerp(hintMinAlpha, 1f, k);
+            yield return null;
+        }
+    }
+
+    private int LoadBest()
+    {
+        try
+        {
+            return PlayerPrefs.GetInt(bestScoreKey, 0);
+        }
+        catch (System.Exception e)
+        {
+            // 시크릿 모드나 저장소 차단 브라우저에서는 읽기 자체가 실패할 수 있다.
+            Debug.LogWarning("[PHD] 최고점수를 읽지 못했습니다: " + e.Message);
+            return 0;
+        }
+    }
+}

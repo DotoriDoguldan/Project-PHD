@@ -1,44 +1,38 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 /// <summary>
-/// 마우스·터치 입력을 월드 좌표로 변환해 <see cref="PadButton"/> 을 누른다.
-/// 새 Input System 의 Pointer 를 쓰므로 PC/모바일/WebGL 모두 동일하게 동작한다.
+/// 패드 입력을 통째로 켜고 끄는 스위치. 차단은 CanvasGroup.blocksRaycasts 한 곳에서 한다.
 /// </summary>
+[RequireComponent(typeof(CanvasGroup))]
 public class PadInput : MonoBehaviour
 {
-    [SerializeField] private Camera targetCamera;
-    [SerializeField] private LayerMask hitLayers = ~0;
+    [Tooltip("꺼두면 자식 패드가 포인터 이벤트를 받지 않는다.")]
     [SerializeField] private bool inputEnabled = true;
+
+    private CanvasGroup _group;
 
     public bool InputEnabled
     {
         get => inputEnabled;
-        set => inputEnabled = value;
+        set
+        {
+            inputEnabled = value;
+            Apply();
+        }
     }
 
-    private Camera Cam => targetCamera != null ? targetCamera : (targetCamera = Camera.main);
+    private void Awake() => Apply();
 
-    private void Update()
+#if UNITY_EDITOR
+    private void OnValidate() => Apply();
+#endif
+
+    private void Apply()
     {
-        if (!inputEnabled) return;
+        if (_group == null) _group = GetComponent<CanvasGroup>();
+        if (_group == null) return;
 
-        var pointer = Pointer.current;
-        if (pointer == null || !pointer.press.wasPressedThisFrame) return;
-
-        TryPress(pointer.position.ReadValue());
-    }
-
-    private void TryPress(Vector2 screenPosition)
-    {
-        var cam = Cam;
-        if (cam == null) return;
-
-        Vector3 world = cam.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, 0f));
-        var hit = Physics2D.OverlapPoint(world, hitLayers);
-        if (hit == null) return;
-
-        var button = hit.GetComponentInParent<PadButton>();
-        if (button != null) button.Press();
+        _group.interactable = inputEnabled;
+        _group.blocksRaycasts = inputEnabled;
     }
 }

@@ -1,19 +1,24 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 /// <summary>
-/// 월드 공간의 입력 패드 버튼 1개. 스프라이트 + 콜라이더로 구성되며
-/// 눌렸을 때와 시퀀스 재생 중 강조될 때의 연출을 담당한다.
+/// 입력 패드 버튼 1개 — 눌림·강조 연출. 박자에 맞춰 누르는 게임이라
+/// 포인터 업(onClick)이 아니라 닿는 순간(IPointerDownHandler) 판정한다.
 /// </summary>
-[RequireComponent(typeof(SpriteRenderer))]
-public class PadButton : MonoBehaviour
+[RequireComponent(typeof(Image))]
+public class PadButton : MonoBehaviour, IPointerDownHandler
 {
+    [Tooltip("이 패드의 번호. 순서 생성·판정·효과음이 전부 이 번호를 따른다.")]
     [SerializeField] private int index;
-    [SerializeField] private float idleBrightness = 0.72f;
-    [SerializeField] private float pressScale = 0.92f;
+    [Tooltip("눌리지 않은 평소 밝기. 1이면 원본 색 그대로다.")]
+    [SerializeField, Range(0f, 1f)] private float idleBrightness = 0.72f;
+    [Tooltip("눌렸을 때 줄어드는 배율.")]
+    [SerializeField, Range(0.5f, 1f)] private float pressScale = 0.92f;
 
-    private SpriteRenderer _renderer;
+    private Image _image;
     private Coroutine _routine;
     private Vector3 _baseScale;
 
@@ -24,24 +29,24 @@ public class PadButton : MonoBehaviour
     {
         get
         {
-            if (_renderer == null) _renderer = GetComponent<SpriteRenderer>();
-            return _renderer != null ? _renderer.sprite : null;
+            if (_image == null) _image = GetComponent<Image>();
+            return _image != null ? _image.sprite : null;
         }
     }
 
-    /// <summary>버튼이 눌렸을 때(인덱스 전달).</summary>
     public event Action<int> Pressed;
-
-    public void SetIndex(int value) => index = value;
 
     private void Awake()
     {
-        _renderer = GetComponent<SpriteRenderer>();
+        _image = GetComponent<Image>();
+        _image.raycastTarget = true;      // 이 이미지가 곧 클릭 판정 영역이다
         _baseScale = transform.localScale;
         ApplyBrightness(idleBrightness);
     }
 
     /// <summary>플레이어 입력. PadInput 이 호출한다.</summary>
+    public void OnPointerDown(PointerEventData eventData) => Press();
+
     public void Press()
     {
         SoundManager.Instance?.PlaySfx(SfxId.Pad(index));
@@ -87,7 +92,7 @@ public class PadButton : MonoBehaviour
 
     private void ApplyBrightness(float value)
     {
-        if (_renderer == null) _renderer = GetComponent<SpriteRenderer>();
-        _renderer.color = new Color(value, value, value, 1f);
+        if (_image == null) _image = GetComponent<Image>();
+        _image.color = new Color(value, value, value, 1f);
     }
 }

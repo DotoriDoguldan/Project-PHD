@@ -1,8 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// 노치·홈 인디케이터를 피하도록 RectTransform 을 Screen.safeArea 에 맞춘다.
-/// 모바일 브라우저(WebGL)와 네이티브 모두에서 동작한다.
+/// 노치·홈 인디케이터를 피하도록 RectTransform 을 Screen.safeArea 에 맞춘다. WebGL·네이티브 공용.
 /// </summary>
 [ExecuteAlways]
 [RequireComponent(typeof(RectTransform))]

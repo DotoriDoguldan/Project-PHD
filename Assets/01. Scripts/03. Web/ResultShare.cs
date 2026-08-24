@@ -3,19 +3,11 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 
 /// <summary>
-/// 게임오버 결과·공유 시트. 실제 UI 는 브라우저 오버레이(WebGL 템플릿의 window.PHDResult)다.
-///
-/// 캔버스 안에 그리지 않고 HTML 로 띄우는 이유
-///  - 클립보드 복사, 시스템 공유 시트(navigator.share), 카카오톡 공유는 모두 웹 API 라
-///    어차피 JS 를 거쳐야 한다. 버튼까지 HTML 로 두면 문구/디자인을 리빌드 없이 고칠 수 있다.
-///  - 오버레이가 캔버스를 덮으므로 결과창이 떠 있는 동안 게임 입력이 자동으로 막힌다.
-///
-/// 에디터·스탠드얼론에서는 사용할 수 없으므로(<see cref="IsAvailable"/> = false)
-/// 호출부는 기존 흐름(잠깐 보여주고 대기화면)으로 빠져야 한다.
+/// 게임오버 결과·공유 창구. 1순위는 브라우저 오버레이(WebGL 템플릿의 window.PHDResult),
+/// 없으면 씬의 ResultScreen, 둘 다 없으면 IsAvailable=false 로 게임 로직이 결과창 없이 진행한다.
 /// </summary>
 public static class ResultShare
 {
-    /// <summary>결과창에서 플레이어가 고른 것.</summary>
     public enum Action
     {
         None = 0,     // 아직 선택 전 (공유만 눌렀거나 그대로 보고 있는 중)
@@ -29,25 +21,52 @@ public static class ResultShare
     [DllImport("__Internal")] private static extern int PHDResultTakeAction();
     [DllImport("__Internal")] private static extern void PHDResultHide();
 
-    public static bool IsAvailable => PHDResultSupported() == 1;
+    private static bool OverlayAvailable => PHDResultSupported() == 1;
+#else
+    private static bool OverlayAvailable => false;
 
-    public static void Show(int round, int score, int best, bool newBest)
-        => PHDResultShow(BuildJson(round, score, best, newBest));
+    private static void PHDResultShow(string json) { }
+    private static int PHDResultTakeAction() => (int)Action.Dismiss;
+    private static void PHDResultHide() { }
+#endif
 
     /// <summary>선택을 한 번만 꺼내온다(읽으면 JS 쪽 값은 비워진다).</summary>
-    public static Action Poll() => (Action)PHDResultTakeAction();
+    public static bool IsAvailable => OverlayAvailable || Screen != null;
 
-    public static void Hide() => PHDResultHide();
-#else
-    public static bool IsAvailable => false;
+    private static ResultScreen Screen => UIRoot.Find<ResultScreen>();
 
     public static void Show(int round, int score, int best, bool newBest)
-        => Debug.Log($"[PHD] (에디터) 결과창 — ROUND {round} / SCORE {score} / BEST {best}{(newBest ? " (신기록)" : "")}");
+    {
+        if (OverlayAvailable)
+        {
+            PHDResultShow(BuildJson(round, score, best, newBest));
+            return;
+        }
 
-    public static Action Poll() => Action.Dismiss;
+        var screen = Screen;
+        if (screen != null) screen.Present(round, score, best, newBest);
+    }
 
-    public static void Hide() { }
-#endif
+    public static Action Poll()
+    {
+        if (OverlayAvailable) return (Action)PHDResultTakeAction();
+
+        var screen = Screen;
+        // 띄울 곳이 없는데 기다리게 두면 게임이 멈춘 것처럼 보인다. 바로 닫힌 것으로 친다.
+        return screen != null ? screen.TakeAction() : Action.Dismiss;
+    }
+
+    public static void Hide()
+    {
+        if (OverlayAvailable)
+        {
+            PHDResultHide();
+            return;
+        }
+
+        var screen = Screen;
+        if (screen != null) screen.Dismiss();
+    }
 
     /// <summary>
     /// 공유 문구는 JS 쪽에서 만든다. 여기서는 숫자만 넘긴다.

@@ -1,0 +1,572 @@
+fileFormatVersion: 2
+guid: c82e4d36abc00504286a93b6240c779e
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 1663781596634821586
+    second: Logo_Blue
+  - first:
+      213: -7677418445444376689
+    second: Base_sheet2_1
+  - first:
+      213: 4518423617547922768
+    second: Base_sheet2_2
+  - first:
+      213: -2048618790175421648
+    second: Icon_Heart
+  - first:
+      213: -1224293788581440257
+    second: Base_sheet2_4
+  - first:
+      213: -3847051046360460455
+    second: Base_sheet2_5
+  - first:
+      213: -71904859616317799
+    second: Device_Frame
+  - first:
+      213: 4257077369993043581
+    second: Base_sheet2_7
+  - first:
+      213: -3679439933585993887
+    second: Base_sheet2_8
+  - first:
+      213: -6656233782668050664
+    second: Base_sheet2_9
+  - first:
+      213: -4323297099404076026
+    second: Base_sheet2_10
+  - first:
+      213: 3180275830140854506
+    second: Base_sheet2_11
+  - first:
+      213: -3170086128691677125
+    second: Base_sheet2_12
+  - first:
+      213: 1452232172129509514
+    second: Pad_Triangle
+  - first:
+      213: -4416033289912204192
+    second: Base_sheet2_14
+  - first:
+      213: 4624332073247750090
+    second: Pad_Square
+  - first:
+      213: -4368158675638073194
+    second: Pad_Circle
+  - first:
+      213: -8884762521141704316
+    second: Base_sheet2_17
+  - first:
+      213: 1893840975374041672
+    second: Base_sheet2_18
+  - first:
+      213: -967449072792460259
+    second: Base_sheet2_19
+  - first:
+      213: -9029379680289792692
+    second: Pad_Cross
+  - first:
+      213: 6224204661736213546
+    second: Icon_Play_Red
+  - first:
+      213: 2564448125320458137
+    second: Logo_Orange
+  - first:
+      213: 1632145257602887662
+    second: Base_sheet2_23
+  - first:
+      213: -8900139814134877730
+    second: Base_sheet2_24
+  - first:
+      213: 2197056740046238893
+    second: Btn_Base_Peach
+  - first:
+      213: -2943191682774285042
+    second: Base_sheet2_26
+  - first:
+      213: 2562977020769175069
+    second: Base_sheet2_27
+  - first:
+      213: 1678575300530513447
+    second: Base_sheet2_28
+  - first:
+      213: 3503072075641974019
+    second: Base_sheet2_29
+  - first:
+      213: 2810313655538317493
+    second: Base_sheet2_30
+  - first:
+      213: 8678610695549963354
+    second: Base_sheet2_31
+  - first:
+      213: 7710405088405096999
+    second: Btn_Base_Blue
+  - first:
+      213: 7687116600406729917
+    second: Base_sheet2_33
+  - first:
+      213: 2157760309494652559
+    second: Base_sheet2_34
+  - first:
+      213: -7852842711542199591
+    second: Base_sheet2_35
+  - first:
+      213: -4064856131705926927
+    second: Base_sheet2_36
+  - first:
+      213: 1712214826995948481
+    second: Icon_Arrow_Solid
+  - first:
+      213: 1858881590674276471
+    second: Icon_Arrow_Light
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 32
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 0
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Logo_Blue
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 247
+        width: 183
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2d3304b0c80f61710800000000000000
+      internalID: 1663781596634821586
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icon_Heart
+      rect:
+        serializedVersion: 2
+        x: 279
+        y: 387
+        width: 14
+        height: 13
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 03b476b7018d193e0800000000000000
+      internalID: -2048618790175421648
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Device_Frame
+      rect:
+        serializedVersion: 2
+        x: 378
+        y: 34
+        width: 218
+        height: 386
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 99ee1f049ea800ff0800000000000000
+      internalID: -71904859616317799
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pad_Triangle
+      rect:
+        serializedVersion: 2
+        x: 283
+        y: 340
+        width: 29
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a806c2f577d572410800000000000000
+      internalID: 1452232172129509514
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pad_Square
+      rect:
+        serializedVersion: 2
+        x: 252
+        y: 309
+        width: 29
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ac7b065158dec2040800000000000000
+      internalID: 4624332073247750090
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pad_Circle
+      rect:
+        serializedVersion: 2
+        x: 315
+        y: 309
+        width: 29
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6984d08f3de2163c0800000000000000
+      internalID: -4368158675638073194
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pad_Cross
+      rect:
+        serializedVersion: 2
+        x: 283
+        y: 278
+        width: 29
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c4d523e350331b280800000000000000
+      internalID: -9029379680289792692
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icon_Play_Red
+      rect:
+        serializedVersion: 2
+        x: 291
+        y: 233
+        width: 11
+        height: 17
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a2c0e10a921d06650800000000000000
+      internalID: 6224204661736213546
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Logo_Orange
+      rect:
+        serializedVersion: 2
+        x: 28
+        y: 33
+        width: 183
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 99f64a2abffb69320800000000000000
+      internalID: 2564448125320458137
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Btn_Base_Peach
+      rect:
+        serializedVersion: 2
+        x: 261
+        y: 182
+        width: 76
+        height: 27
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: da475dde6738d7e10800000000000000
+      internalID: 2197056740046238893
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Btn_Base_Blue
+      rect:
+        serializedVersion: 2
+        x: 261
+        y: 126
+        width: 76
+        height: 27
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 72a00c0939cd00b60800000000000000
+      internalID: 7710405088405096999
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icon_Arrow_Solid
+      rect:
+        serializedVersion: 2
+        x: 262
+        y: 64
+        width: 24
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1cb104e305203c710800000000000000
+      internalID: 1712214826995948481
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icon_Arrow_Light
+      rect:
+        serializedVersion: 2
+        x: 315
+        y: 66
+        width: 22
+        height: 30
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 77047ab35f21cc910800000000000000
+      internalID: 1858881590674276471
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 9aa03155d61472f4bb367bc1cd53050f
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Base_sheet2_0: 1663781596634821586
+      Base_sheet2_1: -7677418445444376689
+      Base_sheet2_10: -4323297099404076026
+      Base_sheet2_11: 3180275830140854506
+      Base_sheet2_12: -3170086128691677125
+      Base_sheet2_13: 1452232172129509514
+      Base_sheet2_14: -4416033289912204192
+      Base_sheet2_15: 4624332073247750090
+      Base_sheet2_16: -4368158675638073194
+      Base_sheet2_17: -8884762521141704316
+      Base_sheet2_18: 1893840975374041672
+      Base_sheet2_19: -967449072792460259
+      Base_sheet2_2: 4518423617547922768
+      Base_sheet2_20: -9029379680289792692
+      Base_sheet2_21: 6224204661736213546
+      Base_sheet2_22: 2564448125320458137
+      Base_sheet2_23: 1632145257602887662
+      Base_sheet2_24: -8900139814134877730
+      Base_sheet2_25: 2197056740046238893
+      Base_sheet2_26: -2943191682774285042
+      Base_sheet2_27: 2562977020769175069
+      Base_sheet2_28: 1678575300530513447
+      Base_sheet2_29: 3503072075641974019
+      Base_sheet2_3: -2048618790175421648
+      Base_sheet2_30: 2810313655538317493
+      Base_sheet2_31: 8678610695549963354
+      Base_sheet2_32: 7710405088405096999
+      Base_sheet2_33: 7687116600406729917
+      Base_sheet2_34: 2157760309494652559
+      Base_sheet2_35: -7852842711542199591
+      Base_sheet2_36: -4064856131705926927
+      Base_sheet2_37: 1712214826995948481
+      Base_sheet2_38: 1858881590674276471
+      Base_sheet2_4: -1224293788581440257
+      Base_sheet2_5: -3847051046360460455
+      Base_sheet2_6: -71904859616317799
+      Base_sheet2_7: 4257077369993043581
+      Base_sheet2_8: -3679439933585993887
+      Base_sheet2_9: -6656233782668050664
+      Btn_Base_Blue: 7710405088405096999
+      Btn_Base_Peach: 2197056740046238893
+      Device_Frame: -71904859616317799
+      Icon_Arrow_Light: 1858881590674276471
+      Icon_Arrow_Solid: 1712214826995948481
+      Icon_Heart: -2048618790175421648
+      Icon_Play_Red: 6224204661736213546
+      Logo_Blue: 1663781596634821586
+      Logo_Orange: 2564448125320458137
+      Pad_Circle: -4368158675638073194
+      Pad_Cross: -9029379680289792692
+      Pad_Square: 4624332073247750090
+      Pad_Triangle: 1452232172129509514
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
