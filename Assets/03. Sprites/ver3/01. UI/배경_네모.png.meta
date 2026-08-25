@@ -1,13 +1,13 @@
 fileFormatVersion: 2
-guid: d2a68a952001db044872d659eebdcc4a
+guid: ccb06b3891c78354d8cf4f7612dff992
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1239123939539815051
-    second: "\uBC30\uACBD_\uC138\uBAA8_0"
+      213: 6386023266512308308
+    second: "\uBC30\uACBD_\uB124\uBAA8_0"
   - first:
-      213: -3851162411978154553
-    second: "\uBC30\uACBD_\uC138\uBAA8_1"
+      213: -419687732624475684
+    second: "\uBC30\uACBD_\uB124\uBAA8_1"
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   cubemapConvolution: 0
   seamlessCubemap: 0
   textureFormat: 1
-  maxTextureSize: 2048
+  maxTextureSize: 512
   textureSettings:
     serializedVersion: 2
     filterMode: 1
@@ -49,7 +49,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -75,7 +75,7 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 2048
+    maxTextureSize: 512
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
@@ -88,7 +88,7 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
     buildTarget: Standalone
-    maxTextureSize: 2048
+    maxTextureSize: 512
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
@@ -101,7 +101,7 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
     buildTarget: WebGL
-    maxTextureSize: 2048
+    maxTextureSize: 512
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
@@ -116,13 +116,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: "\uBC30\uACBD_\uC138\uBAA8_0"
+      name: "\uBC30\uACBD_\uB124\uBAA8_0"
       rect:
         serializedVersion: 2
-        x: 0
+        x: 64
         y: 0
-        width: 1241
-        height: 1171
+        width: 1395
+        height: 1024
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -131,20 +131,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: b8a04f868a0423110800000000000000
-      internalID: 1239123939539815051
+      spriteID: 45888d78356bf9850800000000000000
+      internalID: 6386023266512308308
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: "\uBC30\uACBD_\uC138\uBAA8_1"
+      name: "\uBC30\uACBD_\uB124\uBAA8_1"
       rect:
         serializedVersion: 2
-        x: 940
-        y: 95
-        width: 10
-        height: 10
+        x: 102
+        y: 383
+        width: 9
+        height: 15
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -153,8 +153,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 7cd94bdc03ced8ac0800000000000000
-      internalID: -3851162411978154553
+      spriteID: cd934541b38fc2af0800000000000000
+      internalID: -419687732624475684
       vertices: []
       indices: 
       edges: []
@@ -163,7 +163,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -173,8 +173,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      "\uBC30\uACBD_\uC138\uBAA8_0": 1239123939539815051
-      "\uBC30\uACBD_\uC138\uBAA8_1": -3851162411978154553
+      "\uBC30\uACBD_\uB124\uBAA8_0": 6386023266512308308
+      "\uBC30\uACBD_\uB124\uBAA8_1": -419687732624475684
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
