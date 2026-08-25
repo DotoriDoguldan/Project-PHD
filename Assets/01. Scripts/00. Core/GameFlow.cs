@@ -171,6 +171,7 @@ public class GameFlow : MonoBehaviour
             _mistakes++;
             // 실수할수록 차감량이 커진다. 첫 실수 -10, 두 번째 -20, 세 번째 -30 ...
             _score -= mistakePenaltyStep * _mistakes;
+            if (_score < 0) _score = 0;
             hud.SetScore(_score);
             hud.SetLives(RemainingLives);
             var sound = SoundManager.Instance;
