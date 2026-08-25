@@ -39,10 +39,13 @@ public static class SfxId
 
     private static readonly string[] TrapIds = { Trap0, Trap1 };
 
-    /// <summary>함정 인덱스에 해당하는 SFX ID를 돌려줍니다. 범위를 벗어나면 null입니다.</summary>
+    /// <summary>
+    /// 함정 인덱스에 해당하는 SFX ID를 돌려줍니다. 음수면 null입니다.
+    /// 함정 이미지가 효과음 종류보다 많을 수 있어, 넘치는 인덱스는 순환해서 재사용합니다.
+    /// </summary>
     public static string Trap(int index)
     {
-        return index >= 0 && index < TrapIds.Length ? TrapIds[index] : null;
+        return index >= 0 ? TrapIds[index % TrapIds.Length] : null;
     }
 
     // 3-2-1 카운트다운 틱
