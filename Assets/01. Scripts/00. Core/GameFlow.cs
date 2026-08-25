@@ -31,6 +31,7 @@ public class GameFlow : MonoBehaviour
     [SerializeField] private Sprite[] trapSprites;
     [SerializeField] private PadInput padInput;
     [SerializeField] private StageIcon stageIcon;
+    [SerializeField] private QtePrompt qtePrompt;
     [SerializeField] private GameHud hud;
 
     [Header("규칙")]
@@ -207,6 +208,7 @@ public class GameFlow : MonoBehaviour
         _mistakes = 0;
 
         stageIcon.Hide();
+        qtePrompt.Hide();
         hud.SetRound(0);
         hud.SetScore(0);
         hud.Dots.Clear();
@@ -306,6 +308,8 @@ public class GameFlow : MonoBehaviour
         // --- 입력 ---
         _phase = GamePhase.AwaitInput;
         hud.SetMessage("YOUR TURN");
+        // 입력 중에는 무슨 키인지 보여주지 않는다 — 줄어드는 링만 박자(없으면 기본 주기)에 맞춰 반복한다.
+        qtePrompt.ShowInputRing(onBeat ? sound.BgmBeatDuration : 0f);
         padInput.InputEnabled = true;
 
         while (_phase == GamePhase.AwaitInput && !_sequence.IsComplete)
@@ -314,6 +318,7 @@ public class GameFlow : MonoBehaviour
         }
 
         padInput.InputEnabled = false;
+        qtePrompt.Hide();
 
         if (_failed)
         {
@@ -404,11 +409,11 @@ public class GameFlow : MonoBehaviour
         int expected = _sequence.Expected;
         if (expected >= 0 && expected < pads.Length)
         {
-            stageIcon.Show(pads[expected].Sprite, 0.6f);
+            qtePrompt.ShowStep(expected, pads[expected].Sprite, 0.6f);
             pads[expected].Highlight(0.6f);
         }
         yield return Wait(0.9f);
-        stageIcon.Hide();
+        qtePrompt.Hide();
     }
 
     private IEnumerator GameOver()
@@ -457,8 +462,8 @@ public class GameFlow : MonoBehaviour
 
     /// <summary>
     /// 순서의 한 칸을 보여준다.
-    /// 패드는 중앙 무대 + 해당 버튼이 함께 켜지지만, 함정은 <b>중앙 무대에만</b> 뜬다.
-    /// 누를 버튼이 없다는 것 자체가 "건너뛰어라"라는 신호다.
+    /// 패드는 QTE 프롬프트(제임스 + 버튼 문양 + 줄어드는 링) + 해당 버튼이 함께 켜지지만,
+    /// 함정은 <b>중앙 무대에만</b> 뜬다. 누를 버튼이 없다는 것 자체가 "건너뛰어라"라는 신호다.
     /// </summary>
     private void ShowStep(int step, float hold)
     {
@@ -472,7 +477,7 @@ public class GameFlow : MonoBehaviour
             return;
         }
 
-        stageIcon.Show(pads[step].Sprite, hold);
+        qtePrompt.ShowStep(step, pads[step].Sprite, hold);
         pads[step].Highlight(hold);
         SoundManager.Instance?.PlaySfx(SfxId.Pad(step));
     }
