@@ -30,6 +30,8 @@ public class QtePrompt : MonoBehaviour
     [SerializeField] private Vector2 inputRingPosition = Vector2.zero;
 
     [Header("버튼 배치")]
+    [Tooltip("버튼 문양 표시 크기(아트 픽셀, 긴 변 기준). 스프라이트 원본 크기·PPU 와 무관하게 이 크기로 맞춘다.")]
+    [SerializeField, Min(1f)] private float keySize = 30f;
     [Tooltip("출제 중 버튼 문양이 제임스(중심)에서 떨어져 랜덤 배치되는 거리.")]
     [SerializeField] private float keyOrbitRadius = 34f;
     [Tooltip("입력 대기 중 버튼 문양을 덮는 색. 누를 자리만 보여주고 무슨 키인지는 숨긴다.")]
@@ -55,10 +57,8 @@ public class QtePrompt : MonoBehaviour
         Hide();
     }
 
-    /// <summary>
-    /// 출제 한 칸. 정가운데 제임스 + 주변 랜덤 위치의 버튼 문양이 켜지고,
-    /// hold 동안 링이 버튼 위로 줄어든 뒤 꺼진다.
-    /// </summary>
+    // 출제 한 칸. 정가운데 제임스 + 주변 랜덤 위치의 버튼 문양이 켜지고,
+    // hold 동안 링이 버튼 위로 줄어든 뒤 꺼진다.
     public void ShowStep(int padIndex, Sprite keySprite, float hold)
     {
         if (keySprite == null) return;
@@ -73,7 +73,7 @@ public class QtePrompt : MonoBehaviour
         }
 
         keyImage.sprite = keySprite;
-        keyImage.SetNativeSize();
+        ApplyKeySize(keySprite);
         keyImage.color = Color.white;
 
         // 버튼은 제임스 주변 랜덤 방향에 놓고, 링도 같은 자리에서 줄어든다.
@@ -85,11 +85,9 @@ public class QtePrompt : MonoBehaviour
         Restart(ShowStepRoutine(hasJames, hold));
     }
 
-    /// <summary>
-    /// 입력 대기 연출. Hide 나 다음 ShowStep 까지 검게 덮인 버튼 위로 줄어드는 링을 반복해서 보여준다.
-    /// 버튼을 덮어 무슨 키인지는 숨기되, 누를 자리와 타이밍은 보이게 한다.
-    /// </summary>
-    /// <param name="period">링이 한 번 줄어드는 시간(초). 0 이하면 인스펙터 기본 주기를 쓴다.</param>
+    // 입력 대기 연출. Hide 나 다음 ShowStep 까지 검게 덮인 버튼 위로 줄어드는 링을 반복해서 보여준다.
+    // 버튼을 덮어 무슨 키인지는 숨기되, 누를 자리와 타이밍은 보이게 한다.
+    // period: 링이 한 번 줄어드는 시간(초). 0 이하면 인스펙터 기본 주기를 쓴다.
     public void ShowInputRing(float period)
     {
         keyImage.color = hiddenKeyColor;
@@ -107,6 +105,15 @@ public class QtePrompt : MonoBehaviour
         }
         SetVisible(false, false, false);
         _ringRect.localScale = Vector3.one;
+    }
+
+    // 버튼 문양을 keySize(긴 변) 기준으로 비율을 지키며 맞춘다.
+    // SetNativeSize 는 스프라이트 원본 픽셀·PPU 를 그대로 쓰기 때문에
+    // 아트 교체·메타 재설정 때마다 표시 크기가 널뛰어서 쓰지 않는다.
+    private void ApplyKeySize(Sprite sprite)
+    {
+        Vector2 size = sprite.rect.size;
+        _keyRect.sizeDelta = size * (keySize / Mathf.Max(size.x, size.y));
     }
 
     private void Restart(IEnumerator routine)

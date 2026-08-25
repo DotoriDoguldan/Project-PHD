@@ -1,22 +1,25 @@
 fileFormatVersion: 2
-guid: f8950ee9889c5bc449842424aabe2339
+guid: 1e05221f0fa137b4296400694e2d51bf
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 5695038162218722097
-    second: BG_Star_A
+      213: -2619131124038913317
+    second: "\uBC30\uACBD_\uC6D0_0"
   - first:
-      213: 3545731116992467869
-    second: BG_Star_B
+      213: -7852630414358104562
+    second: "\uBC30\uACBD_\uC6D0_1"
   - first:
-      213: 8571320261753454259
-    second: BG_Gradient_Blue
+      213: -857191573631818401
+    second: "\uBC30\uACBD_\uC6D0_2"
   - first:
-      213: 7532607786659414751
-    second: BG_Star_Big
+      213: 5394324598779687393
+    second: "\uBC30\uACBD_\uC6D0_3"
   - first:
-      213: -5091206409953340087
-    second: BG_Deco_A
+      213: -4038908507728337141
+    second: "\uBC30\uACBD_\uC6D0_4"
+  - first:
+      213: -3372014068478425250
+    second: "\uBC30\uACBD_\uC6D0_5"
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -49,7 +52,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -63,7 +66,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 32
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -87,7 +90,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -113,7 +116,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -125,221 +128,133 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: BG_Star_A
+      name: "\uBC30\uACBD_\uC6D0_0"
       rect:
         serializedVersion: 2
         x: 0
-        y: 214
-        width: 97
-        height: 153
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 1332751f807d80f40800000000000000
-      internalID: 5695038162218722097
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: BG_Star_B
-      rect:
-        serializedVersion: 2
-        x: 184
-        y: 347
-        width: 86
-        height: 133
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: d9392613aa7f43130800000000000000
-      internalID: 3545731116992467869
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: BG_Gradient_Blue
-      rect:
-        serializedVersion: 2
-        x: 540
-        y: 0
-        width: 270
-        height: 480
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 3be3ce18d5273f670800000000000000
-      internalID: 8571320261753454259
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: BG_Star_Big
-      rect:
-        serializedVersion: 2
-        x: 115
-        y: 0
-        width: 154
-        height: 183
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: fd20d2c5fd2398860800000000000000
-      internalID: 7532607786659414751
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: BG_Deco_A
-      rect:
-        serializedVersion: 2
-        x: 294
-        y: 0
-        width: 78
-        height: 43
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 9451a889eb66859b0800000000000000
-      internalID: -5091206409953340087
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Background_0
-      rect:
-        serializedVersion: 2
-        x: 269
-        y: 138
-        width: 65
-        height: 149
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 40cbb57cba33cd04fb802e71dd039c88
-      internalID: 55198689
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Background_1
-      rect:
-        serializedVersion: 2
-        x: 469
-        y: 114
-        width: 71
-        height: 96
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 9d243d8e2509f054fa2048c486a2126c
-      internalID: 13296284
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Background_2
-      rect:
-        serializedVersion: 2
-        x: 432
-        y: 344
-        width: 108
-        height: 136
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 2a0572d342f421d44aa65ceb52eb0bad
-      internalID: -1931681121
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Background_3
-      rect:
-        serializedVersion: 2
-        x: 419
-        y: 0
-        width: 121
-        height: 93
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 5d1c95d7e7dcef340af27acd211f3e70
-      internalID: 653437429
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Background_4
-      rect:
-        serializedVersion: 2
-        x: 269
-        y: 430
-        width: 60
-        height: 50
+        y: 39
+        width: 1225
+        height: 1193
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: e214d9a76200c4b4b9c927ce8302991c
-      internalID: -937677929
+      spriteID: bd2bd739e1af6abd0800000000000000
+      internalID: -2619131124038913317
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\uBC30\uACBD_\uC6D0_1"
+      rect:
+        serializedVersion: 2
+        x: 1206
+        y: 722
+        width: 17
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e06b1cf3e3ad50390800000000000000
+      internalID: -7852630414358104562
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\uBC30\uACBD_\uC6D0_2"
+      rect:
+        serializedVersion: 2
+        x: 30
+        y: 530
+        width: 17
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f55a73d2ec4aa14f0800000000000000
+      internalID: -857191573631818401
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\uBC30\uACBD_\uC6D0_3"
+      rect:
+        serializedVersion: 2
+        x: 922
+        y: 70
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1e13a6964ad7cda40800000000000000
+      internalID: 5394324598779687393
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\uBC30\uACBD_\uC6D0_4"
+      rect:
+        serializedVersion: 2
+        x: 926
+        y: 73
+        width: 8
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b07ac8c7c1ae2f7c0800000000000000
+      internalID: -4038908507728337141
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\uBC30\uACBD_\uC6D0_5"
+      rect:
+        serializedVersion: 2
+        x: 898
+        y: 55
+        width: 13
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e5749b602133431d0800000000000000
+      internalID: -3372014068478425250
       vertices: []
       indices: 
       edges: []
@@ -348,7 +263,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: ad88ce9c362bbad488492bbd7d4e8b49
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -358,21 +273,12 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      BG_Deco_A: -5091206409953340087
-      BG_Gradient_Blue: 8571320261753454259
-      BG_Star_A: 5695038162218722097
-      BG_Star_B: 3545731116992467869
-      BG_Star_Big: 7532607786659414751
-      Back ground_0: 5695038162218722097
-      Back ground_1: 3545731116992467869
-      Back ground_2: 8571320261753454259
-      Back ground_3: 7532607786659414751
-      Back ground_4: -5091206409953340087
-      Background_0: 55198689
-      Background_1: 13296284
-      Background_2: -1931681121
-      Background_3: 653437429
-      Background_4: -937677929
+      "\uBC30\uACBD_\uC6D0_0": -2619131124038913317
+      "\uBC30\uACBD_\uC6D0_1": -7852630414358104562
+      "\uBC30\uACBD_\uC6D0_2": -857191573631818401
+      "\uBC30\uACBD_\uC6D0_3": 5394324598779687393
+      "\uBC30\uACBD_\uC6D0_4": -4038908507728337141
+      "\uBC30\uACBD_\uC6D0_5": -3372014068478425250
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

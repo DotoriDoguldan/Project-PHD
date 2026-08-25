@@ -1,22 +1,31 @@
 fileFormatVersion: 2
-guid: f8950ee9889c5bc449842424aabe2339
+guid: 4740bad155e7d0d47aca63438f5d4951
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 5695038162218722097
-    second: BG_Star_A
+      213: 8007235590392648330
+    second: "\uB85C\uACE02_0"
   - first:
-      213: 3545731116992467869
-    second: BG_Star_B
+      213: -1415079256082644093
+    second: "\uB85C\uACE02_1"
   - first:
-      213: 8571320261753454259
-    second: BG_Gradient_Blue
+      213: -1691548249448441438
+    second: "\uB85C\uACE02_2"
   - first:
-      213: 7532607786659414751
-    second: BG_Star_Big
+      213: -9007709066977935038
+    second: "\uB85C\uACE02_3"
   - first:
-      213: -5091206409953340087
-    second: BG_Deco_A
+      213: -4562091112340040596
+    second: "\uB85C\uACE02_4"
+  - first:
+      213: 4846990675904960006
+    second: "\uB85C\uACE02_5"
+  - first:
+      213: -7653078388327498261
+    second: "\uB85C\uACE02_6"
+  - first:
+      213: -8524974678160259330
+    second: "\uB85C\uACE02_7"
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -49,7 +58,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -63,7 +72,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 32
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -87,7 +96,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -113,7 +122,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -125,221 +134,177 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: BG_Star_A
+      name: "\uB85C\uACE02_0"
       rect:
         serializedVersion: 2
         x: 0
-        y: 214
-        width: 97
-        height: 153
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 1332751f807d80f40800000000000000
-      internalID: 5695038162218722097
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: BG_Star_B
-      rect:
-        serializedVersion: 2
-        x: 184
-        y: 347
-        width: 86
-        height: 133
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: d9392613aa7f43130800000000000000
-      internalID: 3545731116992467869
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: BG_Gradient_Blue
-      rect:
-        serializedVersion: 2
-        x: 540
         y: 0
-        width: 270
-        height: 480
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 3be3ce18d5273f670800000000000000
-      internalID: 8571320261753454259
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: BG_Star_Big
-      rect:
-        serializedVersion: 2
-        x: 115
-        y: 0
-        width: 154
-        height: 183
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: fd20d2c5fd2398860800000000000000
-      internalID: 7532607786659414751
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: BG_Deco_A
-      rect:
-        serializedVersion: 2
-        x: 294
-        y: 0
-        width: 78
-        height: 43
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 9451a889eb66859b0800000000000000
-      internalID: -5091206409953340087
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Background_0
-      rect:
-        serializedVersion: 2
-        x: 269
-        y: 138
-        width: 65
-        height: 149
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 40cbb57cba33cd04fb802e71dd039c88
-      internalID: 55198689
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Background_1
-      rect:
-        serializedVersion: 2
-        x: 469
-        y: 114
-        width: 71
-        height: 96
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 9d243d8e2509f054fa2048c486a2126c
-      internalID: 13296284
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Background_2
-      rect:
-        serializedVersion: 2
-        x: 432
-        y: 344
-        width: 108
-        height: 136
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 2a0572d342f421d44aa65ceb52eb0bad
-      internalID: -1931681121
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Background_3
-      rect:
-        serializedVersion: 2
-        x: 419
-        y: 0
-        width: 121
-        height: 93
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 5d1c95d7e7dcef340af27acd211f3e70
-      internalID: 653437429
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Background_4
-      rect:
-        serializedVersion: 2
-        x: 269
-        y: 430
-        width: 60
-        height: 50
+        width: 1241
+        height: 1234
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: e214d9a76200c4b4b9c927ce8302991c
-      internalID: -937677929
+      spriteID: a821836685a6f1f60800000000000000
+      internalID: 8007235590392648330
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\uB85C\uACE02_1"
+      rect:
+        serializedVersion: 2
+        x: 920
+        y: 1217
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3838b2cf9e0ac5ce0800000000000000
+      internalID: -1415079256082644093
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\uB85C\uACE02_2"
+      rect:
+        serializedVersion: 2
+        x: 924
+        y: 1204
+        width: 7
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2a9113f44d96688e0800000000000000
+      internalID: -1691548249448441438
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\uB85C\uACE02_3"
+      rect:
+        serializedVersion: 2
+        x: 929
+        y: 1209
+        width: 15
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 24107b614503ef280800000000000000
+      internalID: -9007709066977935038
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\uB85C\uACE02_4"
+      rect:
+        serializedVersion: 2
+        x: 946
+        y: 1213
+        width: 8
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c645108ed4230b0c0800000000000000
+      internalID: -4562091112340040596
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\uB85C\uACE02_5"
+      rect:
+        serializedVersion: 2
+        x: 949
+        y: 1217
+        width: 9
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60612fad658f34340800000000000000
+      internalID: 4846990675904960006
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\uB85C\uACE02_6"
+      rect:
+        serializedVersion: 2
+        x: 930
+        y: 1203
+        width: 6
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bed3589e0cdcac590800000000000000
+      internalID: -7653078388327498261
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\uB85C\uACE02_7"
+      rect:
+        serializedVersion: 2
+        x: 480
+        y: 21
+        width: 9
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ef6ce0d82b431b980800000000000000
+      internalID: -8524974678160259330
       vertices: []
       indices: 
       edges: []
@@ -348,7 +313,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: ad88ce9c362bbad488492bbd7d4e8b49
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -358,21 +323,14 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      BG_Deco_A: -5091206409953340087
-      BG_Gradient_Blue: 8571320261753454259
-      BG_Star_A: 5695038162218722097
-      BG_Star_B: 3545731116992467869
-      BG_Star_Big: 7532607786659414751
-      Back ground_0: 5695038162218722097
-      Back ground_1: 3545731116992467869
-      Back ground_2: 8571320261753454259
-      Back ground_3: 7532607786659414751
-      Back ground_4: -5091206409953340087
-      Background_0: 55198689
-      Background_1: 13296284
-      Background_2: -1931681121
-      Background_3: 653437429
-      Background_4: -937677929
+      "\uB85C\uACE02_0": 8007235590392648330
+      "\uB85C\uACE02_1": -1415079256082644093
+      "\uB85C\uACE02_2": -1691548249448441438
+      "\uB85C\uACE02_3": -9007709066977935038
+      "\uB85C\uACE02_4": -4562091112340040596
+      "\uB85C\uACE02_5": 4846990675904960006
+      "\uB85C\uACE02_6": -7653078388327498261
+      "\uB85C\uACE02_7": -8524974678160259330
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -28,21 +28,30 @@ public class PixelPerfectUIScaler : MonoBehaviour
         _pixelPerfect = GetComponent<PixelPerfectCamera>();
         _lastRatio = -1;
 
-        // 여기서 배율을 읽지 않는다.
-        // PixelPerfectCamera 는 내부 상태(m_Internal)를 Awake 에서 만드는데,
-        // 씬 로드·도메인 리로드 순서에 따라 이 OnEnable 이 그보다 먼저 돌 수 있다.
-        // 그 상태에서 pixelRatio 를 읽으면 URP 내부에서 NullReferenceException 이 난다.
-        // Apply 는 LateUpdate 가 어차피 매 프레임 호출하므로, 첫 프레임 안에 반영된다.
+        // 씬 로드 직후 첫 렌더보다 먼저 배율을 맞춰야 한다.
+        // 늦으면 직렬화된 scaleFactor 로 한 프레임이 그려져서 UI 가 잠깐 커지거나 어긋나 보인다.
+        Apply();
     }
 
     private void LateUpdate() => Apply();
+
+    // PixelPerfectCamera 와 같은 규칙(화면/기준해상도 정수 몫의 최솟값, 최소 1)으로 배율을 직접 계산한다.
+    // pixelRatio 프로퍼티는 카메라가 한 번 렌더링해야 채워지는 내부 상태를 읽으므로
+    // (그 전엔 NullReferenceException 이 나거나 이전 값이 나온다) 씬 로드 직후엔 쓸 수 없다.
+    private int CalcRatio()
+    {
+        int refW = _pixelPerfect.refResolutionX;
+        int refH = _pixelPerfect.refResolutionY;
+        if (refW <= 0 || refH <= 0 || Screen.width <= 0 || Screen.height <= 0) return 1;
+        return Mathf.Max(1, Mathf.Min(Screen.width / refW, Screen.height / refH));
+    }
 
     private void Apply()
     {
         if (_pixelPerfect == null) _pixelPerfect = GetComponent<PixelPerfectCamera>();
         if (_pixelPerfect == null) return;
 
-        int ratio = Mathf.Max(1, _pixelPerfect.pixelRatio);
+        int ratio = CalcRatio();
         if (ratio == _lastRatio) return;
         _lastRatio = ratio;
 
