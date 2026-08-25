@@ -60,7 +60,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 32
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -122,81 +122,15 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: "\uD504\uB808\uC784_\uAC00\uB85C (1)_0"
-      rect:
-        serializedVersion: 2
-        x: 507
-        y: 917
-        width: 184
-        height: 56
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 2eaba6ac55c339850800000000000000
-      internalID: 6382511436080003810
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: "\uD504\uB808\uC784_\uAC00\uB85C (1)_1"
-      rect:
-        serializedVersion: 2
-        x: 690
-        y: 921
-        width: 53
-        height: 27
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 85d14dfb42326e400800000000000000
-      internalID: 353008261539306840
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: "\uD504\uB808\uC784_\uAC00\uB85C (1)_2"
-      rect:
-        serializedVersion: 2
-        x: 780
-        y: 933
-        width: 26
-        height: 9
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 1e25278f5baa84620800000000000000
-      internalID: 2758642470298473185
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: "\uD504\uB808\uC784_\uAC00\uB85C (1)_3"
       rect:
         serializedVersion: 2
         x: 0
-        y: 88
+        y: 339
         width: 1448
-        height: 844
+        height: 431
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -213,7 +147,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: a7e5599cfaed4cc41a60eca791cc6003
     internalID: 0
     vertices: []
     indices: 

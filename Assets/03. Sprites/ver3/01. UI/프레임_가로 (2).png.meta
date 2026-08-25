@@ -57,7 +57,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 32
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -123,11 +123,11 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 19
-        y: 80
+        y: 90
         width: 1412
-        height: 986
+        height: 911
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -149,7 +149,7 @@ TextureImporter:
         width: 29
         height: 65
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -171,7 +171,7 @@ TextureImporter:
         width: 6
         height: 10
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -188,7 +188,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 4febd39fa8e65b840874e0595aeda27c
     internalID: 0
     vertices: []
     indices: 
@@ -201,6 +201,7 @@ TextureImporter:
       "\uD504\uB808\uC784_\uAC00\uB85C (2)_0": -618702024043961974
       "\uD504\uB808\uC784_\uAC00\uB85C (2)_1": -1051725182233563819
       "\uD504\uB808\uC784_\uAC00\uB85C (2)_2": -549816382373501343
+      "\uD504\uB808\uC784_\uAC00\uB85C (2)_3": -345951786
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
