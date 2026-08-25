@@ -15,8 +15,10 @@ public class UIButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     [Tooltip("눌렸을 때 내려가는 거리(아트 픽셀).")]
     [SerializeField] private float pressDrop = 2f;
     [SerializeField, Range(0.8f, 1f)] private float pressScale = 0.96f;
-    [Tooltip("손을 뗀 뒤 제자리로 돌아오는 시간(초).")]
+    [Tooltip("손을 뗀 뒤 제자리로 돌아오는 시간(초). 반동이 있으면 출렁일 시간까지 2배로 쓴다.")]
     [SerializeField, Min(0f)] private float releaseTime = 0.07f;
+    [Tooltip("손을 뗐을 때 원래 크기를 지나쳤다 돌아오는 반동 세기. 0이면 반동 없이 복귀한다.")]
+    [SerializeField, Range(0f, 8f)] private float releaseBounce = 4f;
 
     [Header("소리")]
     [Tooltip("비우면 소리를 내지 않는다.")]
@@ -79,10 +81,13 @@ public class UIButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     private IEnumerator Release()
     {
+        // BackOut 이 1을 넘겼다 돌아오는 구간에서 amount 가 잠깐 음수가 된다 —
+        // 눌렸던 반동으로 원래보다 살짝 커졌다(위로 떴다가) 가라앉는 탄성.
+        float duration = releaseBounce > 0f ? releaseTime * 2f : releaseTime;
         float elapsed = 0f;
-        while (elapsed < releaseTime)
+        while (elapsed < duration)
         {
-            ApplyPress(1f - Mathf.Clamp01(elapsed / releaseTime));
+            ApplyPress(1f - UITween.BackOut(Mathf.Clamp01(elapsed / duration), releaseBounce));
             yield return null;
             elapsed += Mathf.Min(Time.unscaledDeltaTime, 0.1f);
         }
@@ -96,7 +101,7 @@ public class UIButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (_rect == null) return;
 
         _rect.anchoredPosition = _basePosition + Vector2.down * (pressDrop * amount);
-        _rect.localScale = _baseScale * Mathf.Lerp(1f, pressScale, amount);
+        _rect.localScale = _baseScale * Mathf.LerpUnclamped(1f, pressScale, amount);
     }
 
     private void StopRoutine()

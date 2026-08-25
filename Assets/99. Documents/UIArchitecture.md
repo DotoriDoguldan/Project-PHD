@@ -22,7 +22,9 @@ UIRoot (씬당 1개, Canvas 에 붙는다)     ← 스크린 찾기 / 팝업 스
                   └── ProgressDots
 ```
 
-보조 도구: `UITween`(페이드·팝), `SafeAreaFitter`(노치), `SceneLoadButton`(씬 이동).
+보조 도구: `UITween`(페이드·팝), `SafeAreaFitter`(노치), `SceneLoadButton`(씬 이동),
+`ScreenFader`(씬 전환 페이드 — 씬을 넘어 살아남아야 해서 "인스펙터 연결" 규칙의 예외로,
+`SoundManager` 처럼 처음 쓸 때 스스로 만들어진다).
 
 ---
 

@@ -53,7 +53,12 @@ public static class UITween
 
     public static float BackOut(float t)
     {
-        const float overshoot = 1.70158f;
+        return BackOut(t, 1.70158f); // 표준 계수 — 목표를 10% 지나쳤다 돌아온다.
+    }
+
+    // overshoot 이 클수록 목표를 크게 지나쳤다 돌아온다(4 ≈ 38%). 0이면 넘침 없는 부드러운 감속.
+    public static float BackOut(float t, float overshoot)
+    {
         t -= 1f;
         return t * t * ((overshoot + 1f) * t + overshoot) + 1f;
     }
