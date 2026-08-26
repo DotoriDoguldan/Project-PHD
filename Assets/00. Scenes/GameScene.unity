@@ -2281,7 +2281,7 @@ Camera:
   far clip plane: 100
   field of view: 60
   orthographic: 1
-  orthographic size: 12.34375
+  orthographic size: 8.333333
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -3297,6 +3297,7 @@ MonoBehaviour:
   gapSecondsMin: 0.1
   resultTime: 1
   showBeatHoldRatio: 0.7
+  bpm: 60
   countdownStartBeats: 1
   countdownBeatInterval: 1
   previewDelayBeats: 0
