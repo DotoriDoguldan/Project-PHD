@@ -90,8 +90,10 @@ public class GameFlow : MonoBehaviour
     };
     [Tooltip("백킹 킥 사용 여부. 켜면 게임 내내 매 박자(정박)마다 kick 효과음이 울려 그루브의 뼈대를 잡는다. (BPM이 0보다 클 때만 동작)")]
     [SerializeField] private bool useBackingKick = true;
-    [Tooltip("킥의 박자별 볼륨 강약(%). 박자 순서대로 순환한다. 예: {100,60,80,60} → 강·약·중·약.")]
-    [SerializeField] private KickAccentPattern kickAccents = new KickAccentPattern();
+    [Tooltip("킥 패턴을 한 박(1비트)에 몇 칸으로 쪼갤지. 1=4분음표, 2=8분음표, 4=16분음표. 킥+하이햇 그루브는 보통 2(8분음표).")]
+    [SerializeField, Min(1)] private int kickStepsPerBeat = 2;
+    [Tooltip("킥/하이햇의 칸별 {음원 + 볼륨%} 패턴. 칸 순서대로 순환한다. soundId를 비우거나 볼륨 0이면 그 칸은 쉼표(무음).")]
+    [SerializeField] private KickPattern kickPattern = new KickPattern();
 
     private const string BestScoreKey = "phd.memory.best";
     private const float MaxTimeStep = 0.1f;      // 한 프레임에 인정할 최대 경과시간
@@ -109,9 +111,9 @@ public class GameFlow : MonoBehaviour
     private GamePhase _phase = GamePhase.Ready;
     private Coroutine _loop;
     private Coroutine _backingKick;
-    private float _beatTime;      // 킥(박자 그리드) 시작 이후 누적된 박자 시계. 카운트다운 정렬의 위상 기준.
-    private int _beatsFired;      // 지금까지 친 킥 수.
-    private bool _beatClockOn;    // 박자 시계가 도는 중인지.
+    private float _beatTime;        // 킥(박자 그리드) 시작 이후 누적된 박자 시계. 카운트다운 정렬의 위상 기준.
+    private int _kickStepsFired;    // 지금까지 친 킥 '칸' 수(8분음표 등 세분 단위).
+    private bool _beatClockOn;      // 박자 시계가 도는 중인지.
     private bool _paused;
     private bool _failed;
     private bool _replayRequested;
@@ -474,22 +476,28 @@ public class GameFlow : MonoBehaviour
     // 박자 경계를 '넘길 때'만 치므로, 프레임이 크게 밀려도(탭 복귀 등) 몰아서 여러 번 치지 않는다.
     private IEnumerator BackingKickLoop()
     {
-        float beat = BeatDuration;
-        if (beat <= 0f) { _backingKick = null; yield break; }
+        // 킥 한 칸의 길이. kickStepsPerBeat=2면 8분음표(한 박을 둘로 쪼갬).
+        float stepDur = BeatDuration / Mathf.Max(1, kickStepsPerBeat);
+        if (stepDur <= 0f) { _backingKick = null; yield break; }
 
         _beatTime = 0f;
-        _beatsFired = 0;
+        _kickStepsFired = 0;
         _beatClockOn = true;
 
         while (_phase != GamePhase.GameOver && _phase != GamePhase.Ready)
         {
-            // 도달한 박자 경계마다 한 번씩 친다(보통 프레임당 1회). t=0, beat, 2·beat, ...
-            // 볼륨은 박자 순서대로 액센트 패턴을 순환 적용한다(강·약).
-            while (_beatsFired * beat <= _beatTime + 0.0001f)
+            // 도달한 칸 경계마다 한 번씩(보통 프레임당 1회). 칸마다 패턴에서 {음원 + 볼륨%}를 순환 조회한다.
+            // 음원이 비었거나 볼륨 0이면 그 칸은 쉼표(무음).
+            while (_kickStepsFired * stepDur <= _beatTime + 0.0001f)
             {
-                float volume = kickAccents != null ? kickAccents.VolumeAt(_beatsFired) : 1f;
-                SoundManager.Instance?.PlaySfx(SfxId.Kick, volume, 1f);
-                _beatsFired++;
+                KickPattern.Step step = kickPattern != null
+                    ? kickPattern.StepAt(_kickStepsFired)
+                    : new KickPattern.Step { soundId = SfxId.Kick, volumePercent = 100 };
+
+                if (!string.IsNullOrEmpty(step.soundId) && step.volumePercent > 0)
+                    SoundManager.Instance?.PlaySfx(step.soundId, step.volumePercent / 100f, 1f);
+
+                _kickStepsFired++;
             }
 
             yield return null;

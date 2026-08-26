@@ -135,6 +135,16 @@ MonoBehaviour:
     _cooldown: 0
     _maxSimultaneous: 4
     _priority: 0
+  - _id: hat_closed
+    _clips:
+    - {fileID: 8300000, guid: d7147689395cc4542b06cd79cf0b5021, type: 3}
+    _volume: 1
+    _randomVolumeRange: {x: 1, y: 1}
+    _pitch: 1
+    _randomPitchRange: {x: 1, y: 1}
+    _cooldown: 0
+    _maxSimultaneous: 4
+    _priority: 0
   _bgm:
   - _id: ready
     _clips:
