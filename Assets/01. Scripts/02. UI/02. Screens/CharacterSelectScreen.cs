@@ -46,6 +46,9 @@ public class CharacterSelectScreen : UIScreen
 
     private Coroutine _intro;
     private Coroutine _namePop;
+    // 인트로가 도는 중인지. _intro 로는 알 수 없다 — StartCoroutine 은 첫 yield 까지 몸통을 먼저 돌리고
+    // 그 뒤에야 핸들을 돌려주므로, 인트로 안에서 보면 _intro 는 아직 비어 있다.
+    private bool _introRunning;
     // 인트로 팝이 중간에 끊기면 스케일이 중간값으로 남는다.
     // 다음 등장이 그 값을 원본으로 잡지 않도록 원래 크기를 기억해 둔다(타이틀과 같은 이유).
     private Vector3 _stageBaseScale = Vector3.one;
@@ -91,6 +94,7 @@ public class CharacterSelectScreen : UIScreen
             StopCoroutine(_intro);
             _intro = null;
         }
+        _introRunning = false;
         if (_namePop != null)
         {
             StopCoroutine(_namePop);
@@ -104,6 +108,7 @@ public class CharacterSelectScreen : UIScreen
 
     private IEnumerator Intro()
     {
+        _introRunning = true;
         SetControlsLocked(true);
 
         if (carousel != null)
@@ -112,6 +117,7 @@ public class CharacterSelectScreen : UIScreen
             yield return UITween.Pop(carousel.transform, introPopFrom, introPopTime);
         }
 
+        _introRunning = false;
         SetControlsLocked(false);
         _intro = null;
     }
@@ -120,11 +126,14 @@ public class CharacterSelectScreen : UIScreen
     {
         if (leftArrow != null) leftArrow.interactable = !locked;
         if (rightArrow != null) rightArrow.interactable = !locked;
-        if (playButton != null)
-        {
-            bool unlocked = carousel == null || carousel.FrontIndex == unlockedSlot;
-            playButton.interactable = !locked && unlocked;
-        }
+        RefreshPlayButton(carousel == null || carousel.FrontIndex == unlockedSlot);
+    }
+
+    // PLAY 가 눌리는 조건은 한 곳에서만 정한다 — 풀린 캐릭터가 정면이고, 인트로가 끝났을 때.
+    private void RefreshPlayButton(bool unlocked)
+    {
+        if (playButton != null) playButton.interactable = unlocked && !_introRunning;
+        if (playGroup != null) playGroup.alpha = unlocked ? 1f : lockedPlayAlpha;
     }
 
     private void StepLeft() { TryStep(-1); }
@@ -162,8 +171,7 @@ public class CharacterSelectScreen : UIScreen
         if (counterText != null && carousel != null)
             counterText.SetText("{0} / {1}", frontIndex + 1, carousel.Count);
 
-        if (playButton != null) playButton.interactable = unlocked && _intro == null;
-        if (playGroup != null) playGroup.alpha = unlocked ? 1f : lockedPlayAlpha;
+        RefreshPlayButton(unlocked);
     }
 
     private IEnumerator NamePop()

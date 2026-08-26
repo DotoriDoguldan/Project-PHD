@@ -53,8 +53,13 @@ public class CharacterCarousel : MonoBehaviour
     private float[] _depths;   // 깊이 정렬 버퍼 — 매 프레임 할당하지 않는다.
     private int[] _drawOrder;
     private int[] _appliedOrder;
-    private Graphic[] _graphics;  // 흐림(알파) 적용 대상 — 매 프레임 GetComponent 하지 않는다.
-    private Color[] _baseColors;  // 실루엣의 검정 틴트를 잃지 않도록 원래 색을 기억해 둔다.
+    private Graphic[] _graphics;       // 흐림(알파) 적용 대상 — 매 프레임 GetComponent 하지 않는다.
+    private Color[] _baseColors;       // 실루엣의 검정 틴트를 잃지 않도록 원래 색을 기억해 둔다.
+    private Vector2[] _orbitPositions; // 떠다니기를 뺀, 궤도만으로 정해지는 위치.
+    private float[] _bobWeights;       // 슬롯별 떠다니기 가중치. 정면 1, 맨 뒤 0.
+    // 마지막으로 반영한 값. NaN 으로 시작해 첫 프레임은 반드시 한 번 계산한다.
+    private float _laidOutTurn = float.NaN;
+    private float _appliedBob = float.NaN;
 
     private void Awake()
     {
@@ -70,6 +75,8 @@ public class CharacterCarousel : MonoBehaviour
         _appliedOrder = new int[slots.Length];
         _graphics = new Graphic[slots.Length];
         _baseColors = new Color[slots.Length];
+        _orbitPositions = new Vector2[slots.Length];
+        _bobWeights = new float[slots.Length];
         for (int i = 0; i < slots.Length; i++)
         {
             _appliedOrder[i] = -1;
@@ -126,13 +133,39 @@ public class CharacterCarousel : MonoBehaviour
         Layout();
     }
 
+    // 궤도는 도는 동안에만 다시 잰다. 멈춰 있으면 각도·배율·흐림·그리는 순서가 그대로라
+    // 떠다니기로 움직인 만큼만 다시 얹으면 된다 — 가만히 있는 프레임에 캔버스를 흔들지 않는다.
     private void Layout()
     {
-        int count = slots.Length;
-        float step = Mathf.PI * 2f / count;
+        bool orbitChanged = _laidOutTurn != _turn;
+        if (orbitChanged)
+        {
+            _laidOutTurn = _turn;
+            UpdateOrbit();
+        }
+
         float bob = floatAmplitude > 0f
             ? Mathf.Sin(_floatTime / floatPeriod * Mathf.PI * 2f) * floatAmplitude
             : 0f;
+        // 궤도도 그대로고 떠다니기도 제자리면 건드릴 것이 없다(떠다니기를 끄면 여기서 늘 멈춘다).
+        if (!orbitChanged && bob == _appliedBob) return;
+        _appliedBob = bob;
+
+        for (int i = 0; i < slots.Length; i++)
+        {
+            RectTransform rt = slots[i];
+            if (rt == null) continue;
+
+            Vector2 position = _orbitPositions[i];
+            position.y += bob * _bobWeights[i];
+            rt.anchoredPosition = position;
+        }
+    }
+
+    private void UpdateOrbit()
+    {
+        int count = slots.Length;
+        float step = Mathf.PI * 2f / count;
 
         for (int i = 0; i < count; i++)
         {
@@ -143,17 +176,20 @@ public class CharacterCarousel : MonoBehaviour
             float depth = (1f - Mathf.Cos(angle)) * 0.5f; // 정면 0, 맨 뒤 1
             _depths[i] = depth;
 
+            // 뒤로 갈수록 중앙으로 끌려 들어가고(backPull) 바닥에서 떠오른다(depthRise).
+            _orbitPositions[i] = new Vector2(
+                Mathf.Sin(angle) * radiusX * (1f - backPull * depth),
+                depth * depthRise);
+
             // 떠다니기는 정면에서만 뚜렷하게 — 깊이에 따라 급하게 줄인다.
             float weight = 1f - depth;
-            rt.anchoredPosition = new Vector2(
-                Mathf.Sin(angle) * radiusX * (1f - backPull * depth),
-                depth * depthRise + bob * weight * weight);
+            _bobWeights[i] = weight * weight;
 
             float scale = Mathf.Lerp(1f, backScale, depth);
             rt.localScale = new Vector3(scale, scale, 1f);
 
             // 흐림은 sqrt(depth)로 — 옆자리(depth ≈ 0.35)부터 이미 눈에 띄게 흐려져
-            // "정면만 선명하다"가 읽힌다. 색이 같으면 setter 가 일찍 나가므로 멈춘 프레임엔 비용이 없다.
+            // "정면만 선명하다"가 읽힌다.
             Graphic graphic = _graphics[i];
             if (graphic != null)
             {
