@@ -70,8 +70,12 @@ public class GameFlow : MonoBehaviour
     [SerializeField, Range(0.1f, 1f)] private float showBeatHoldRatio = 0.7f;
 
     [Header("박자 타이밍 (킥·연출 템포, 단위: 박)")]
-    [Tooltip("분당 박자 수(BPM). 킥과 박자 연출(카운트다운·순서 재생)의 템포가 이 값으로 정해진다. 0 이하면 박자 기능을 끄고 초 기반 폴백으로 진행한다.")]
+    [Tooltip("시작 BPM. 킥과 박자 연출(카운트다운·순서 재생)의 템포가 이 값에서 시작한다. 0 이하면 박자 기능을 끄고 초 기반 폴백으로 진행한다.")]
     [SerializeField, Min(0f)] private float bpm = 120f;
+    [Tooltip("모든 그루브 셀을 한 바퀴(레벨 하나) 다 쓰면 BPM이 이만큼 증가한다. 0이면 증가하지 않는다.")]
+    [SerializeField, Min(0f)] private float bpmIncreasePerCycle = 8f;
+    [Tooltip("BPM 상한. 이 값에 도달하면 더 이상 증가하지 않는다. 0 이하면 상한 없음.")]
+    [SerializeField, Min(0f)] private float maxBpm = 180f;
     [Tooltip("첫 박자 정렬 후 몇 박자를 기다렸다 3-2-1 카운트다운을 시작할지. 그동안 ROUND 타이틀이 보인다.")]
     [SerializeField, Min(0f)] private float countdownStartBeats = 2f;
     [Tooltip("카운트다운 숫자(3, 2, 1)가 몇 박자 간격으로 바뀔지. 각 숫자마다 countdown 효과음이 재생된다.")]
@@ -84,9 +88,10 @@ public class GameFlow : MonoBehaviour
              "각 값 = '이 음 이후 다음 음까지의 16분음표 칸 수'(합 16 = 1마디). 비워두면 내장 기본 셀을 쓴다.")]
     [SerializeField] private GrooveCell[] grooveCells =
     {
-        new GrooveCell { steps = new[] { 3, 3, 2, 2, 3, 3 } },   // 당김음 신스팝
-        new GrooveCell { steps = new[] { 2, 2, 4, 2, 2, 4 } },   // 4 온더 플로어
-        new GrooveCell { steps = new[] { 3, 1, 2, 2, 3, 1, 4 } },// 잘게 쪼갠 펑키
+        new GrooveCell { steps = new[] { 4, 4, 4, 4 } },             // ★    정박 4분음표(쉬움, 브리더)
+        new GrooveCell { steps = new[] { 2, 2, 4, 2, 2, 4 } },       // ★★   8분 바운스
+        new GrooveCell { steps = new[] { 3, 3, 2, 3, 3, 2 } },       // ★★★  당김음(점8분)
+        new GrooveCell { steps = new[] { 3, 1, 2, 2, 3, 1, 2, 2 } }, // ★★★★ 16분 스탭 섞인 촘촘함
     };
     [Tooltip("백킹 킥 사용 여부. 켜면 게임 내내 매 박자(정박)마다 kick 효과음이 울려 그루브의 뼈대를 잡는다. (BPM이 0보다 클 때만 동작)")]
     [SerializeField] private bool useBackingKick = true;
@@ -101,9 +106,10 @@ public class GameFlow : MonoBehaviour
     // grooveCells 를 비워둬도 항상 리듬이 붙도록 하는 내장 기본 셀들.
     private static readonly int[][] DefaultGrooves =
     {
-        new[] { 3, 3, 2, 2, 3, 3 },
-        new[] { 2, 2, 4, 2, 2, 4 },
-        new[] { 3, 1, 2, 2, 3, 1, 4 },
+        new[] { 4, 4, 4, 4 },             // ★    정박(쉬움)
+        new[] { 2, 2, 4, 2, 2, 4 },       // ★★   8분 바운스
+        new[] { 3, 3, 2, 3, 3, 2 },       // ★★★  당김음
+        new[] { 3, 1, 2, 2, 3, 1, 2, 2 }, // ★★★★ 16분 스탭
     };
 
     private readonly MemorySequence _sequence = new MemorySequence();
@@ -112,6 +118,7 @@ public class GameFlow : MonoBehaviour
     private Coroutine _loop;
     private Coroutine _backingKick;
     private float _beatTime;        // 킥(박자 그리드) 시작 이후 누적된 박자 시계. 카운트다운 정렬의 위상 기준.
+    private float _nextStepTime;    // 다음 킥 '칸'이 울릴 시각(_beatTime 기준). 매 칸마다 현재 BPM으로 갱신.
     private int _kickStepsFired;    // 지금까지 친 킥 '칸' 수(8분음표 등 세분 단위).
     private bool _beatClockOn;      // 박자 시계가 도는 중인지.
     private bool _paused;
@@ -129,8 +136,27 @@ public class GameFlow : MonoBehaviour
     public int Round => _round;
     public int BestScore => _best;
 
-    /// <summary>인스펙터 BPM 기준 한 박 길이(초). BPM이 0 이하면 0(박자 기능 꺼짐).</summary>
-    private float BeatDuration => bpm > 0f ? 60f / bpm : 0f;
+    /// <summary>레벨 진행에 쓰는 그루브 셀 개수(인스펙터가 비었으면 내장 기본 셀 개수).</summary>
+    private int GrooveCellCount =>
+        (grooveCells != null && grooveCells.Length > 0) ? grooveCells.Length : DefaultGrooves.Length;
+
+    /// <summary>
+    /// 이번 라운드의 BPM. 그루브 셀을 한 바퀴(= GrooveCellCount 라운드) 다 쓸 때마다
+    /// <see cref="bpmIncreasePerCycle"/> 만큼 오르고, <see cref="maxBpm"/> 에서 멈춘다.
+    /// </summary>
+    private float CurrentBpm
+    {
+        get
+        {
+            int cyclesDone = Mathf.Max(0, _round - 1) / Mathf.Max(1, GrooveCellCount);
+            float result = bpm + cyclesDone * bpmIncreasePerCycle;
+            if (maxBpm > 0f) result = Mathf.Min(result, maxBpm);
+            return Mathf.Max(0f, result);
+        }
+    }
+
+    /// <summary>현재 BPM 기준 한 박 길이(초). BPM이 0 이하면 0(박자 기능 꺼짐).</summary>
+    private float BeatDuration => CurrentBpm > 0f ? 60f / CurrentBpm : 0f;
 
     // ------------------------------------------------------------ 수명주기
 
@@ -476,11 +502,10 @@ public class GameFlow : MonoBehaviour
     // 박자 경계를 '넘길 때'만 치므로, 프레임이 크게 밀려도(탭 복귀 등) 몰아서 여러 번 치지 않는다.
     private IEnumerator BackingKickLoop()
     {
-        // 킥 한 칸의 길이. kickStepsPerBeat=2면 8분음표(한 박을 둘로 쪼갬).
-        float stepDur = BeatDuration / Mathf.Max(1, kickStepsPerBeat);
-        if (stepDur <= 0f) { _backingKick = null; yield break; }
+        if (BeatDuration <= 0f) { _backingKick = null; yield break; }
 
         _beatTime = 0f;
+        _nextStepTime = 0f;
         _kickStepsFired = 0;
         _beatClockOn = true;
 
@@ -488,7 +513,7 @@ public class GameFlow : MonoBehaviour
         {
             // 도달한 칸 경계마다 한 번씩(보통 프레임당 1회). 칸마다 패턴에서 {음원 + 볼륨%}를 순환 조회한다.
             // 음원이 비었거나 볼륨 0이면 그 칸은 쉼표(무음).
-            while (_kickStepsFired * stepDur <= _beatTime + 0.0001f)
+            while (_beatTime + 0.0001f >= _nextStepTime)
             {
                 KickPattern.Step step = kickPattern != null
                     ? kickPattern.StepAt(_kickStepsFired)
@@ -498,6 +523,9 @@ public class GameFlow : MonoBehaviour
                     SoundManager.Instance?.PlaySfx(step.soundId, step.volumePercent / 100f, 1f);
 
                 _kickStepsFired++;
+                // 다음 칸 시각은 '현재' BPM으로 잡는다 → 라운드가 올라 BPM이 바뀌면 곧바로 새 템포를 따른다.
+                float stepDur = BeatDuration / Mathf.Max(1, kickStepsPerBeat);
+                _nextStepTime += stepDur > 0f ? stepDur : 0.001f;
             }
 
             yield return null;
@@ -510,15 +538,23 @@ public class GameFlow : MonoBehaviour
         _backingKick = null;
     }
 
-    /// <summary>박자 시계 기준, 다음 박자 경계까지 남은 시간(초). 시계가 멈춰 있으면 0.</summary>
+    /// <summary>
+    /// 킥 스케줄러 기준, 다음 '박(1비트) 경계'까지 남은 시간(초). 시계가 멈춰 있으면 0.
+    /// 박 경계 = 칸 index가 kickStepsPerBeat의 배수인 지점이라, 카운트다운이 킥과 같은 박에 떨어진다.
+    /// _nextStepTime 로 계산하므로 BPM이 바뀌어도 올바르게 정렬된다.
+    /// </summary>
     private float SecondsToNextBeat()
     {
-        float beat = BeatDuration;
-        if (!_beatClockOn || beat <= 0f) return 0f;
+        if (!_beatClockOn || BeatDuration <= 0f) return 0f;
 
-        float into = _beatTime - Mathf.Floor(_beatTime / beat) * beat;   // 0..beat
-        if (into < beat * 0.02f) return 0f;                              // 거의 박자 위 → 바로
-        return beat - into;
+        int kspb = Mathf.Max(1, kickStepsPerBeat);
+        float stepDur = BeatDuration / kspb;
+
+        // 다음 칸(_kickStepsFired)은 _nextStepTime 에 울린다. 거기서 다음 박 경계까지 남은 칸 수.
+        int rem = _kickStepsFired % kspb;
+        int stepsToBoundary = rem == 0 ? 0 : kspb - rem;
+        float tNextBeat = _nextStepTime + stepsToBoundary * stepDur;
+        return Mathf.Max(0f, tNextBeat - _beatTime);
     }
 
     // 박자 정보가 없을 때의 폴백. 라운드가 오를수록 조금씩 빨라지는 기존 방식이다.
