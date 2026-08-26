@@ -3285,7 +3285,7 @@ MonoBehaviour:
   roundClearScore: 10
   mistakePenaltyStep: 10
   maxMistakes: 3
-  trapStartRound: 3
+  trapStartRound: -1
   trapsAtStart: 2
   roundsPerExtraTrap: 0
   roundTitleTime: 0.76
@@ -3298,13 +3298,16 @@ MonoBehaviour:
   resultTime: 1
   showBeatHoldRatio: 0.7
   bpm: 60
+  bpmIncreasePerCycle: 8
+  maxBpm: 180
   countdownStartBeats: 1
   countdownBeatInterval: 1
   previewDelayBeats: 0
   grooveCells:
-  - steps: 030000000300000002000000020000000300000003000000
+  - steps: 04000000040000000400000004000000
   - steps: 020000000200000004000000020000000200000004000000
-  - steps: 030000000100000002000000030000000300000004000000
+  - steps: 030000000300000002000000030000000300000002000000
+  - steps: 0300000001000000020000000200000003000000010000000200000002000000
   useBackingKick: 1
   kickStepsPerBeat: 2
   kickPattern:
