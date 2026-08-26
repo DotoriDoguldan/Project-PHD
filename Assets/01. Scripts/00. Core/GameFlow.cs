@@ -88,8 +88,10 @@ public class GameFlow : MonoBehaviour
         new GrooveCell { steps = new[] { 2, 2, 4, 2, 2, 4 } },   // 4 온더 플로어
         new GrooveCell { steps = new[] { 3, 1, 2, 2, 3, 1, 4 } },// 잘게 쪼갠 펑키
     };
-    [Tooltip("백킹 킥 사용 여부. 켜면 데모·입력 내내 매 박자(정박)마다 kick 효과음이 울려 그루브의 뼈대를 잡는다. (BGM에 BPM이 있을 때만 동작)")]
+    [Tooltip("백킹 킥 사용 여부. 켜면 게임 내내 매 박자(정박)마다 kick 효과음이 울려 그루브의 뼈대를 잡는다. (BPM이 0보다 클 때만 동작)")]
     [SerializeField] private bool useBackingKick = true;
+    [Tooltip("킥의 박자별 볼륨 강약(%). 박자 순서대로 순환한다. 예: {100,60,80,60} → 강·약·중·약.")]
+    [SerializeField] private KickAccentPattern kickAccents = new KickAccentPattern();
 
     private const string BestScoreKey = "phd.memory.best";
     private const float MaxTimeStep = 0.1f;      // 한 프레임에 인정할 최대 경과시간
@@ -482,9 +484,11 @@ public class GameFlow : MonoBehaviour
         while (_phase != GamePhase.GameOver && _phase != GamePhase.Ready)
         {
             // 도달한 박자 경계마다 한 번씩 친다(보통 프레임당 1회). t=0, beat, 2·beat, ...
+            // 볼륨은 박자 순서대로 액센트 패턴을 순환 적용한다(강·약).
             while (_beatsFired * beat <= _beatTime + 0.0001f)
             {
-                SoundManager.Instance?.PlaySfx(SfxId.Kick);
+                float volume = kickAccents != null ? kickAccents.VolumeAt(_beatsFired) : 1f;
+                SoundManager.Instance?.PlaySfx(SfxId.Kick, volume, 1f);
                 _beatsFired++;
             }
 
