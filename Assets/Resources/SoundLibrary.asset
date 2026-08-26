@@ -125,6 +125,16 @@ MonoBehaviour:
     _cooldown: 0
     _maxSimultaneous: 4
     _priority: 0
+  - _id: kick
+    _clips:
+    - {fileID: 8300000, guid: caed35ee98a73e74f858fe64213c3eba, type: 3}
+    _volume: 1
+    _randomVolumeRange: {x: 1, y: 1}
+    _pitch: 1
+    _randomPitchRange: {x: 1, y: 1}
+    _cooldown: 0
+    _maxSimultaneous: 4
+    _priority: 0
   _bgm:
   - _id: ready
     _clips:
@@ -134,7 +144,7 @@ MonoBehaviour:
     _firstBeatOffset: 0
   - _id: play
     _clips:
-    - {fileID: 8300000, guid: ca8088f2458237148aa207554f2fec7d, type: 3}
+    - {fileID: 8300000, guid: 47c7d17f6989e684abf354eb4640efb9, type: 3}
     _volume: 1
     _bpm: 73
     _firstBeatOffset: 0.25

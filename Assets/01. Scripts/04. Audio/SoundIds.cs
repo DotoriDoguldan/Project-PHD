@@ -33,6 +33,10 @@ public static class SfxId
         return index >= 0 && index < PadIds.Length ? PadIds[index] : null;
     }
 
+    // 백킹 드럼 킥. 데모/입력 중 매 박자(정박)마다 울려 그루브의 뼈대를 잡습니다.
+    // 4개 패드는 셀에 따라 당김음으로, 킥은 항상 정박으로 — 이 대비가 리듬감을 만듭니다.
+    public const string Kick = "kick";
+
     // 누르면 안 되는 함정 문양. 패드와 구분되는 소리라야 플레이어가 귀로도 걸러낼 수 있습니다.
     public const string Trap0 = "trap_0";
     public const string Trap1 = "trap_1";

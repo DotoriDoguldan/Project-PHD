@@ -144,8 +144,11 @@ public sealed class SoundManager : MonoBehaviour
         WarmSfxPool();
         ApplyAllVolumes();
 
-        if (!string.IsNullOrWhiteSpace(library.StartupBgmId))
-            PlayBgm(library.StartupBgmId, fadeSeconds: 0.01f);
+        // 배경음악 제거: 시작 시 자동 재생(StartupBgm)을 하지 않는다.
+        // BGM 재생 기능(PlayBgm/StopBgm)과 SoundId(BgmId)는 남겨두되 호출하지 않는다.
+        // (되살리려면 아래 두 줄의 주석을 해제하면 된다.)
+        // if (!string.IsNullOrWhiteSpace(library.StartupBgmId))
+        //     PlayBgm(library.StartupBgmId, fadeSeconds: 0.01f);
     }
 
     private void OnDestroy()
