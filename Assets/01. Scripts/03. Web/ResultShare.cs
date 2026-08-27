@@ -1,6 +1,7 @@
 /// <summary>
 /// 게임오버 결과창 창구. 화면은 씬의 <see cref="ResultScreen"/>(Unity UI)이 그린다.
-/// 그 안의 공유 버튼 두 개만 웹에서 브라우저 DOM 으로 뜨는데, 그건 <see cref="WebShare"/> 담당이다.
+/// 그 안의 공유 버튼도 그림은 Unity 가 그린다. 웹에서는 투명한 DOM 버튼이 그 위에 겹쳐 클릭만 받는데,
+/// 그건 <see cref="WebShare"/> 담당이다.
 /// 결과창이 씬에 없으면 IsAvailable=false 라 게임 로직이 결과창 없이 진행한다.
 /// </summary>
 public static class ResultShare

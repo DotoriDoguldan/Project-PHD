@@ -5,9 +5,9 @@ using UnityEngine.UI;
 /// <summary>
 /// 캔버스 결과창. 웹·에디터·스탠드얼론 모두 이 화면이 결과를 그린다.
 ///
-/// 공유 버튼 두 개만 예외다. navigator.share 와 카카오 SDK 는 사용자 제스처 안에서 불려야 해서
-/// 웹 빌드에서는 <see cref="WebShare"/> 를 통해 브라우저 DOM 버튼으로 띄우고,
-/// 이 화면은 그 버튼이 놓일 자리(<see cref="shareArea"/>)만 알려준다.
+/// 공유 버튼도 그림은 이 화면이 그린다. 다만 navigator.share 와 카카오 SDK 는 사용자 제스처 안에서
+/// 불려야 해서, 웹 빌드에서는 <see cref="WebShare"/> 가 <b>투명한 DOM 버튼</b>을 그 위에 겹쳐 놓고
+/// 클릭만 그쪽이 받는다. 이 화면은 그 판이 놓일 자리(<see cref="shareArea"/>)를 알려준다.
 /// </summary>
 public class ResultScreen : UIScreen
 {
@@ -15,14 +15,14 @@ public class ResultScreen : UIScreen
     [Tooltip("카드 맨 위 제목. 신기록이면 문구가 바뀐다.")]
     [SerializeField] private TMP_Text headingText;
     [Tooltip("평소 제목 문구.")]
-    [SerializeField] private string headingNormal = "RESULT";
+    [SerializeField] private string headingNormal = "GAME OVER";
     [Tooltip("최고 기록을 깼을 때의 제목 문구. 좁은 카드에 배지를 따로 두는 대신 제목을 바꿔 알린다.")]
     [SerializeField] private string headingNewBest = "NEW BEST!";
-    [Tooltip("도달한 라운드 수를 표시할 텍스트.")]
+    [Tooltip("도달한 라운드 수. 라벨을 따로 두지 않고 'round 3' 처럼 한 덩어리로 찍는다.")]
     [SerializeField] private TMP_Text roundText;
-    [Tooltip("이번 판 점수를 표시할 텍스트.")]
+    [Tooltip("이번 판 점수. 창 한가운데 크게 놓이는 숫자라 라벨이 없다.")]
     [SerializeField] private TMP_Text scoreText;
-    [Tooltip("최고 점수를 표시할 텍스트.")]
+    [Tooltip("최고 점수. 라운드와 나란히 'Best 120' 처럼 찍힌다.")]
     [SerializeField] private TMP_Text bestText;
 
     [Header("버튼")]
@@ -30,8 +30,8 @@ public class ResultScreen : UIScreen
     [SerializeField] private Button replayButton;
 
     [Header("공유")]
-    [Tooltip("웹 빌드에서 공유 버튼 두 개(카카오톡 공유 / 공유하기)가 겹쳐 놓일 빈 자리. " +
-             "그리는 것은 브라우저라 여기에는 아무것도 붙이지 않는다. 비워두면 공유 버튼이 나오지 않는다.")]
+    [Tooltip("공유 버튼(Btn_Kakao / Btn_Share)이 들어 있는 칸. 웹 빌드에서는 이 자리에 투명한 DOM " +
+             "버튼이 겹쳐 클릭을 대신 받는다. 비워두면 웹에서 공유 버튼이 눌리지 않는다.")]
     [SerializeField] private RectTransform shareArea;
 
     [Header("연출")]
@@ -60,7 +60,7 @@ public class ResultScreen : UIScreen
 
     private void OnDestroy()
     {
-        // 씬이 내려가는데 DOM 버튼만 페이지에 남는 상황을 막는다.
+        // 씬이 내려가는데 DOM 클릭 판만 페이지에 남는 상황을 막는다.
         HideShare();
 
         if (replayButton != null) replayButton.onClick.RemoveListener(OnReplay);
@@ -71,9 +71,11 @@ public class ResultScreen : UIScreen
         _action = ResultShare.Action.None;
 
         if (headingText != null) headingText.SetText(newBest ? headingNewBest : headingNormal);
-        if (roundText != null) roundText.SetText("{0}", round);
+        // 라벨과 값을 따로 두지 않고 한 줄로 찍는다. SetText 오버로드라 문자열을 새로 만들지 않는다
+        // (WebGL 은 단일 스레드라 GC 가 프레임에 그대로 보인다).
+        if (roundText != null) roundText.SetText("round {0}", round);
         if (scoreText != null) scoreText.SetText("{0}", score);
-        if (bestText != null) bestText.SetText("{0}", best);
+        if (bestText != null) bestText.SetText("Best {0}", best);
 
         var root = UIRoot.Current;
         if (root != null) root.OpenPopup(this);
@@ -83,8 +85,8 @@ public class ResultScreen : UIScreen
         transform.localScale = _baseScale;
         if (isActiveAndEnabled && popFrom < 1f) _pop = StartCoroutine(UITween.Pop(transform, popFrom, popTime));
 
-        // 공유 버튼은 브라우저가 그린다. 자리는 LateUpdate 가 이어서 맞춘다.
-        // 웹이 아니면(에디터·스탠드얼론) 띄울 곳이 없으니 매 프레임 자리를 재지도 않는다.
+        // 버튼 그림은 이 화면이 이미 그렸다. 그 위에 겹칠 DOM 클릭 판의 자리는 LateUpdate 가 맞춘다.
+        // 웹이 아니면(에디터·스탠드얼론) 겹칠 것이 없으니 매 프레임 자리를 재지도 않는다.
         if (shareArea != null && WebShare.IsAvailable)
         {
             _shareOn = true;
@@ -125,7 +127,8 @@ public class ResultScreen : UIScreen
 
     public void Dismiss()
     {
-        // 공유 버튼은 캔버스 밖(DOM)이라 결과창 페이드를 따라오지 못한다. 먼저 걷어낸다.
+        // 투명한 DOM 클릭 판은 캔버스 밖이라 결과창 페이드를 따라오지 못한다.
+        // 두면 사라진 카드 위에서 클릭이 계속 먹힌다. 먼저 걷어낸다.
         HideShare();
 
         var root = UIRoot.Current;

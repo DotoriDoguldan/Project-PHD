@@ -21,7 +21,7 @@ public abstract class UIIconStrip : MonoBehaviour
 
     protected virtual void Awake() => ValidateSetup();
 
-    public void Setup(int count)
+    public virtual void Setup(int count)
     {
         count = Mathf.Max(0, count);
         EnsureCapacity(count);
