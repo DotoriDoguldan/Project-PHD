@@ -356,17 +356,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3850375570593584367, guid: 9882fae70798be247a9fb08409c064c4, type: 3}
   m_PrefabInstance: {fileID: 414895866}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &414895868 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2935389107766219971, guid: 9882fae70798be247a9fb08409c064c4, type: 3}
-  m_PrefabInstance: {fileID: 414895866}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1 &446960027
 GameObject:
   m_ObjectHideFlags: 0
@@ -2480,7 +2469,7 @@ MonoBehaviour:
   fadeSeconds: 0.18
   layer: 200
   dimsBackground: 1
-  headingText: {fileID: 414895868}
+  headingText: {fileID: 0}
   headingNormal: RESULT
   headingNewBest: NEW BEST!
   roundText: {fileID: 890617004}
@@ -2605,7 +2594,7 @@ Camera:
   far clip plane: 100
   field of view: 60
   orthographic: 1
-  orthographic size: 7.5
+  orthographic size: 8.333333
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -3620,8 +3609,10 @@ MonoBehaviour:
   previewDelayBeats: 0
   grooveCells:
   - steps: 04000000040000000400000004000000
+  - steps: 0400000004000000020000000200000004000000
   - steps: 020000000200000004000000020000000200000004000000
   - steps: 030000000300000002000000030000000300000002000000
+  - steps: 0200000002000000020000000200000002000000020000000200000002000000
   - steps: 0300000001000000020000000200000003000000010000000200000002000000
   useBackingKick: 1
   kickStepsPerBeat: 2
