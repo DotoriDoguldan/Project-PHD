@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -5,6 +6,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// 캐릭터 선택 화면 — 회전판을 돌려 캐릭터를 고르고, 잠긴 슬롯이 정면이면 PLAY 를 잠근다.
+/// 정면 캐릭터의 이름·난이도 표시와, 슬롯 아트의 잠금 모습 적용도 여기서 한다.
 /// 씬 이동은 PLAY 의 SceneLoadButton 이 맡는다 — 어느 씬으로 갈지는 UI 가 알 일이 아니다(타이틀과 같은 방식).
 /// </summary>
 public class CharacterSelectScreen : UIScreen
@@ -24,12 +26,14 @@ public class CharacterSelectScreen : UIScreen
     [SerializeField] private TMP_Text nameText;
     [Tooltip("몇 번째 캐릭터인지 표시(\"1 / 5\").")]
     [SerializeField] private TMP_Text counterText;
+    [Tooltip("정면 캐릭터의 난이도 이름 표시.")]
+    [SerializeField] private TMP_Text difficultyText;
+    [Tooltip("난이도 별. 왼쪽부터 켜지고 남는 것은 꺼진다.")]
+    [SerializeField] private Image[] difficultyStars;
 
     [Header("캐릭터")]
-    [Tooltip("풀려 있는 슬롯 번호. 지금은 JAMES(0번) 하나뿐이다.")]
-    [SerializeField, Min(0)] private int unlockedSlot;
-    [Tooltip("풀린 캐릭터의 이름.")]
-    [SerializeField] private string unlockedName = "JAMES";
+    [Tooltip("회전판 슬롯 순서대로의 캐릭터. 슬롯과 개수가 같아야 한다.")]
+    [SerializeField] private Character[] characters;
     [Tooltip("잠긴 슬롯이 정면일 때 이름 자리에 보여줄 문구.")]
     [SerializeField] private string lockedName = "LOCKED";
 
@@ -43,6 +47,24 @@ public class CharacterSelectScreen : UIScreen
     [SerializeField, Range(0f, 1f)] private float namePopFrom = 0.75f;
     [Tooltip("잠긴 캐릭터가 정면일 때 PLAY 버튼의 밝기.")]
     [SerializeField, Range(0f, 1f)] private float lockedPlayAlpha = 0.45f;
+
+    /// <summary>슬롯 하나에 세우는 캐릭터. 잠금 여부는 unlocked 한 곳에서만 정하고, 슬롯 아트·이름·PLAY 가 모두 그걸 따라간다.</summary>
+    [Serializable]
+    private struct Character
+    {
+        [Tooltip("풀린 캐릭터의 이름.")]
+        public string name;
+        [Tooltip("난이도 이름. 적은 그대로 나온다.")]
+        public string difficulty;
+        [Tooltip("난이도 별 개수.")]
+        [Range(0, 3)] public int stars;
+        [Tooltip("켜면 이 캐릭터로 PLAY 할 수 있다. 슬롯 아트도 이 값을 따라간다.")]
+        public bool unlocked;
+        [Tooltip("풀렸을 때 보여줄 슬롯 아트.")]
+        public GameObject unlockedArt;
+        [Tooltip("잠겼을 때 보여줄 슬롯 아트(실루엣 + 자물쇠).")]
+        public GameObject lockedArt;
+    }
 
     private Coroutine _intro;
     private Coroutine _namePop;
@@ -67,6 +89,13 @@ public class CharacterSelectScreen : UIScreen
 
         if (leftArrow != null) leftArrow.onClick.AddListener(StepLeft);
         if (rightArrow != null) rightArrow.onClick.AddListener(StepRight);
+
+        // 슬롯과 캐릭터가 어긋나면 이름·난이도가 한 칸씩 밀린다. 씬 구성이 깨진 것이라 바로 알린다.
+        int count = characters != null ? characters.Length : 0;
+        if (carousel != null && count != carousel.Count)
+            Debug.LogError($"[PHD] CharacterSelectScreen: Characters {count}개가 회전판 슬롯 {carousel.Count}개와 맞지 않습니다.", this);
+
+        ApplyLockArt();
 
         base.Awake();
     }
@@ -126,7 +155,7 @@ public class CharacterSelectScreen : UIScreen
     {
         if (leftArrow != null) leftArrow.interactable = !locked;
         if (rightArrow != null) rightArrow.interactable = !locked;
-        RefreshPlayButton(carousel == null || carousel.FrontIndex == unlockedSlot);
+        RefreshPlayButton(carousel == null || CharacterAt(carousel.FrontIndex).unlocked);
     }
 
     // PLAY 가 눌리는 조건은 한 곳에서만 정한다 — 풀린 캐릭터가 정면이고, 인트로가 끝났을 때.
@@ -154,11 +183,11 @@ public class CharacterSelectScreen : UIScreen
 
     private void Refresh(int frontIndex, bool popName)
     {
-        bool unlocked = frontIndex == unlockedSlot;
+        Character character = CharacterAt(frontIndex);
 
         if (nameText != null)
         {
-            nameText.SetText(unlocked ? unlockedName : lockedName);
+            nameText.SetText(character.unlocked ? character.name : lockedName);
 
             if (popName && namePopTime > 0f && isActiveAndEnabled)
             {
@@ -171,7 +200,42 @@ public class CharacterSelectScreen : UIScreen
         if (counterText != null && carousel != null)
             counterText.SetText("{0} / {1}", frontIndex + 1, carousel.Count);
 
-        RefreshPlayButton(unlocked);
+        if (difficultyText != null) difficultyText.SetText(character.difficulty);
+        SetStars(character.stars);
+
+        RefreshPlayButton(character.unlocked);
+    }
+
+    // 실루엣·자물쇠를 unlocked 에 맞춰 켜고 끈다. 해금은 실행 중에 바뀌지 않으므로 한 번만 한다 —
+    // 이걸 두면 잠금 상태를 씬 아트와 데이터 두 곳에 따로 적어 둘 일이 없다.
+    private void ApplyLockArt()
+    {
+        if (characters == null) return;
+
+        for (int i = 0; i < characters.Length; i++)
+        {
+            Character character = characters[i];
+            if (character.unlockedArt != null) character.unlockedArt.SetActive(character.unlocked);
+            if (character.lockedArt != null) character.lockedArt.SetActive(!character.unlocked);
+        }
+    }
+
+    // 범위를 벗어나면 잠긴 빈 캐릭터로 다룬다 — 구성이 어긋나도 화면이 예외로 죽지는 않게.
+    private Character CharacterAt(int index)
+    {
+        return characters != null && index >= 0 && index < characters.Length
+            ? characters[index]
+            : default;
+    }
+
+    private void SetStars(int count)
+    {
+        if (difficultyStars == null) return;
+
+        for (int i = 0; i < difficultyStars.Length; i++)
+        {
+            if (difficultyStars[i] != null) difficultyStars[i].gameObject.SetActive(i < count);
+        }
     }
 
     private IEnumerator NamePop()

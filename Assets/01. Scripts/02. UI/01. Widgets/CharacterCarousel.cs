@@ -1,10 +1,10 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
 
 /// <summary>
 /// 캐릭터 선택 회전판. 슬롯들을 타원 궤도에 세워 정면이 크고 뒤가 작은 원근을 만든다.
+/// 정면과 양옆만 보이고, 그 너머로 물러나는 슬롯은 흐려지는 대신 작아져 사라진다.
 /// 화살표가 Step 을 부르면 한 칸 돌고, 멈추면 Arrived 로 정면 슬롯 번호를 알린다.
 /// 누가 잠겼는지는 모른다 — 잠금 표시와 PLAY 제어는 CharacterSelectScreen 이 맡는다.
 /// </summary>
@@ -14,7 +14,7 @@ public class CharacterCarousel : MonoBehaviour
     private const float MaxTimeStep = 0.1f;
 
     [Header("구성")]
-    [Tooltip("궤도에 세울 슬롯. 0번이 처음 정면에 오고, 번호가 늘수록 오른쪽으로 이어진다. 피벗은 발끝(0.5, 0) 기준.")]
+    [Tooltip("궤도에 세울 슬롯. 0번이 처음 정면에 오고, 번호가 늘수록 오른쪽으로 이어진다. 크기 없는 발끝 점이고, 그림은 자식이 들고 있다.")]
     [SerializeField] private RectTransform[] slots;
 
     [Header("궤도")]
@@ -24,6 +24,10 @@ public class CharacterCarousel : MonoBehaviour
     [SerializeField, Min(0f)] private float depthRise = 72f;
     [Tooltip("맨 뒤 슬롯의 배율. 정면은 1이다.")]
     [SerializeField, Range(0.1f, 1f)] private float backScale = 0.26f;
+    [Tooltip("배율이 줄어드는 속도. 1이면 깊이에 그대로 비례하고, 크게 잡을수록 양옆은 정면과 비슷하게 두고 뒤에서만 급히 작아진다.")]
+    [SerializeField, Range(1f, 3f)] private float scaleFalloff = 1.5f;
+    [Tooltip("정면 좌우로 몇 칸까지 보일지. 1이면 정면과 양옆 하나씩, 모두 세 칸만 보인다.")]
+    [SerializeField, Min(0)] private int visibleSides = 1;
     [Tooltip("뒤로 갈수록 중앙으로 끌려 들어가는 정도. 0이면 순수한 타원 궤도, 클수록 소실점으로 모여 원근이 강조된다.")]
     [SerializeField, Range(0f, 1f)] private float backPull = 0.35f;
 
@@ -36,8 +40,6 @@ public class CharacterCarousel : MonoBehaviour
     [SerializeField, Min(0f)] private float floatAmplitude = 1.5f;
     [Tooltip("정면 슬롯이 한 번 오르내리는 시간(초). 배경 데코(4초)와 어긋나게 잡는다.")]
     [SerializeField, Min(0.1f)] private float floatPeriod = 2.8f;
-    [Tooltip("맨 뒤 슬롯의 불투명도. 정면에서 멀어질수록 이 값을 향해 흐려진다. 1이면 흐려지지 않는다.")]
-    [SerializeField, Range(0f, 1f)] private float backAlpha = 0.3f;
 
     /// <summary>회전이 멈춰 새 슬롯이 정면에 도착했을 때. 인자는 정면 슬롯 번호.</summary>
     public event Action<int> Arrived;
@@ -53,8 +55,6 @@ public class CharacterCarousel : MonoBehaviour
     private float[] _depths;   // 깊이 정렬 버퍼 — 매 프레임 할당하지 않는다.
     private int[] _drawOrder;
     private int[] _appliedOrder;
-    private Graphic[] _graphics;       // 흐림(알파) 적용 대상 — 매 프레임 GetComponent 하지 않는다.
-    private Color[] _baseColors;       // 실루엣의 검정 틴트를 잃지 않도록 원래 색을 기억해 둔다.
     private Vector2[] _orbitPositions; // 떠다니기를 뺀, 궤도만으로 정해지는 위치.
     private float[] _bobWeights;       // 슬롯별 떠다니기 가중치. 정면 1, 맨 뒤 0.
     // 마지막으로 반영한 값. NaN 으로 시작해 첫 프레임은 반드시 한 번 계산한다.
@@ -73,19 +73,19 @@ public class CharacterCarousel : MonoBehaviour
         _depths = new float[slots.Length];
         _drawOrder = new int[slots.Length];
         _appliedOrder = new int[slots.Length];
-        _graphics = new Graphic[slots.Length];
-        _baseColors = new Color[slots.Length];
         _orbitPositions = new Vector2[slots.Length];
         _bobWeights = new float[slots.Length];
-        for (int i = 0; i < slots.Length; i++)
-        {
-            _appliedOrder[i] = -1;
-            _graphics[i] = slots[i] != null ? slots[i].GetComponent<Graphic>() : null;
-            _baseColors[i] = _graphics[i] != null ? _graphics[i].color : Color.white;
-        }
+        for (int i = 0; i < slots.Length; i++) _appliedOrder[i] = -1;
 
         Layout();
+        RefreshVisibility(hideFar: true);
     }
+
+#if UNITY_EDITOR
+    // 궤도 값은 도는 동안에만 다시 재므로, 인스펙터에서 만진 값이 멈춰 있을 때는 반영되지 않는다.
+    // 다음 프레임에 한 번 다시 재도록 표시만 해 둔다.
+    private void OnValidate() => _laidOutTurn = float.NaN;
+#endif
 
     private void OnDisable()
     {
@@ -96,6 +96,10 @@ public class CharacterCarousel : MonoBehaviour
         StopCoroutine(_spin);
         _spin = null;
         _turn = Mathf.Repeat(_spinTarget, Count);
+        // 자른 각도로 한 번 다시 재고 끈다. 배율이 줄어들다 만 값으로 굳으면
+        // 다음에 그 슬롯이 다시 켜질 때 한 프레임 튄다.
+        Layout();
+        RefreshVisibility(hideFar: true);
     }
 
     /// <summary>한 칸 돌린다. +1이면 오른쪽 슬롯이 정면으로 온다. 이미 도는 중이면 거절한다.</summary>
@@ -106,6 +110,8 @@ public class CharacterCarousel : MonoBehaviour
         float from = _turn;
         _spinTarget = Mathf.Round(_turn) + Mathf.Sign(direction);
         FrontIndex = Wrap(Mathf.RoundToInt(_spinTarget));
+        // 들어오는 슬롯은 지금 켠다. 나가는 슬롯은 정면 뒤로 숨은 뒤(도착 시점) 꺼야 사라지는 게 눈에 띄지 않는다.
+        RefreshVisibility(hideFar: false);
         _spin = StartCoroutine(Spin(from, _spinTarget));
         return true;
     }
@@ -123,6 +129,7 @@ public class CharacterCarousel : MonoBehaviour
         // 한 방향으로만 계속 돌려도 값이 커지지 않게 한 바퀴(Count) 안으로 접는다. 각도는 같다.
         _turn = Mathf.Repeat(to, Count);
         _spin = null;
+        RefreshVisibility(hideFar: true);
         Arrived?.Invoke(FrontIndex);
     }
 
@@ -133,7 +140,7 @@ public class CharacterCarousel : MonoBehaviour
         Layout();
     }
 
-    // 궤도는 도는 동안에만 다시 잰다. 멈춰 있으면 각도·배율·흐림·그리는 순서가 그대로라
+    // 궤도는 도는 동안에만 다시 잰다. 멈춰 있으면 각도·배율·그리는 순서가 그대로라
     // 떠다니기로 움직인 만큼만 다시 얹으면 된다 — 가만히 있는 프레임에 캔버스를 흔들지 않는다.
     private void Layout()
     {
@@ -167,6 +174,12 @@ public class CharacterCarousel : MonoBehaviour
         int count = slots.Length;
         float step = Mathf.PI * 2f / count;
 
+        // 보이는 맨 바깥 자리와 그 너머 자리의 깊이. 그 사이를 지나는 동안 배율이 0까지 줄어들어,
+        // 슬롯을 꺼도 이미 크기가 없다 — 눈앞에서 뚝 끊기지 않는다.
+        bool vanishes = visibleSides * 2 + 1 < count;
+        float visibleDepth = DepthAt(visibleSides, step);
+        float hiddenDepth = DepthAt(visibleSides + 1, step);
+
         for (int i = 0; i < count; i++)
         {
             RectTransform rt = slots[i];
@@ -185,22 +198,20 @@ public class CharacterCarousel : MonoBehaviour
             float weight = 1f - depth;
             _bobWeights[i] = weight * weight;
 
-            float scale = Mathf.Lerp(1f, backScale, depth);
+            // 배율은 depth 를 그대로 쓰지 않고 한 번 눌러서 — 양옆(depth ≈ 0.35)은 정면보다
+            // 조금만 작고, 사라질 뒷자리에서만 급히 줄어든다.
+            float scale = Mathf.Lerp(1f, backScale, Mathf.Pow(depth, scaleFalloff));
+            // 사라지는 구간은 끝으로 갈수록 급하게 — 마지막 몇 프레임은 이미 크기가 거의 없어
+            // 슬롯이 꺼지는 순간이 눈에 남지 않는다.
+            if (vanishes) scale *= Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(hiddenDepth, visibleDepth, depth));
             rt.localScale = new Vector3(scale, scale, 1f);
-
-            // 흐림은 sqrt(depth)로 — 옆자리(depth ≈ 0.35)부터 이미 눈에 띄게 흐려져
-            // "정면만 선명하다"가 읽힌다.
-            Graphic graphic = _graphics[i];
-            if (graphic != null)
-            {
-                Color color = _baseColors[i];
-                color.a *= Mathf.Lerp(1f, backAlpha, Mathf.Sqrt(depth));
-                graphic.color = color;
-            }
         }
 
         SortDrawOrder(count);
     }
+
+    /// <summary>정면에서 ring 칸 떨어져 멈춰 선 슬롯의 깊이. 정면 0, 맨 뒤 1.</summary>
+    private static float DepthAt(int ring, float step) => (1f - Mathf.Cos(ring * step)) * 0.5f;
 
     // 깊은(뒤) 슬롯부터 그리도록 형제 순서를 맞춘다. 순서가 실제로 바뀔 때만 건드린다 —
     // SetSiblingIndex 는 캔버스를 다시 그리게 하므로 가만히 있는 프레임에 부르지 않는다.
@@ -232,6 +243,20 @@ public class CharacterCarousel : MonoBehaviour
         {
             _appliedOrder[i] = _drawOrder[i];
             if (slots[_drawOrder[i]] != null) slots[_drawOrder[i]].SetSiblingIndex(i);
+        }
+    }
+
+    // 정면에서 visibleSides 칸 넘게 떨어진 슬롯은 꺼둔다.
+    // hideFar 가 false 면 켜기만 한다 — 도는 중에 물러나는 슬롯이 화면 한복판에서 사라지지 않게.
+    private void RefreshVisibility(bool hideFar)
+    {
+        for (int i = 0; i < slots.Length; i++)
+        {
+            if (slots[i] == null) continue;
+
+            int gap = Mathf.Abs(i - FrontIndex);
+            bool near = Mathf.Min(gap, Count - gap) <= visibleSides;
+            if (near || hideFar) slots[i].gameObject.SetActive(near);
         }
     }
 
