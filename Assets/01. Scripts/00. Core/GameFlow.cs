@@ -158,6 +158,7 @@ public class GameFlow : MonoBehaviour
                 if (pads[i] != null) pads[i].Pressed += OnPadPressed;
             }
         }
+        if (qtePrompt != null) qtePrompt.InputRingExpired += OnInputRingExpired;
         _best = LoadBest();
         ValidateReferences();
     }
@@ -166,6 +167,7 @@ public class GameFlow : MonoBehaviour
     {
         if (pads == null || pads.Length == 0) Debug.LogError("[PHD] GameFlow: pads 가 비어 있습니다.", this);
         if (padInput == null) Debug.LogError("[PHD] GameFlow: padInput 이 없습니다.", this);
+        if (qtePrompt == null) Debug.LogError("[PHD] GameFlow: qtePrompt 가 없습니다.", this);
         if (hud == null) Debug.LogError("[PHD] GameFlow: hud 가 없습니다.", this);
     }
 
@@ -174,6 +176,7 @@ public class GameFlow : MonoBehaviour
         // 씬이 내려가는데 결과창만 남아 화면을 덮고 있는 상황을 막는다.
         ResultShare.Hide();
         StopBackingKick();
+        if (qtePrompt != null) qtePrompt.InputRingExpired -= OnInputRingExpired;
 
         if (pads == null) return;
         for (int i = 0; i < pads.Length; i++)
@@ -220,28 +223,45 @@ public class GameFlow : MonoBehaviour
         if (_sequence.Submit(index))
         {
             hud.Dots.SetFilled(_sequence.Progress);
+
+            // 다음 순서도 온전한 제한시간을 받는다. 마지막 입력이면 RunRound가 곧 링을 숨긴다.
+            if (!_sequence.IsComplete) qtePrompt.RestartInputRing();
         }
         else
         {
-            _mistakes++;
-            // 목숨만 하나 줄어든다. 이미 쌓은 점수는 깎지 않는다.
-            hud.SetLives(RemainingLives);
-            var sound = SoundManager.Instance;
+            ApplyMistake();
+        }
+    }
 
-            if (_mistakes >= maxMistakes)
-            {
-                // 마지막(치명적) 실수: 게임오버 효과음을 재생하고 정박 펄스(킥)를 즉시 멈춘다.
-                sound?.PlaySfx(SfxId.GameOver);
-                StopBackingKick();
-                _failed = true;
-                _phase = GamePhase.GameOver;
-            }
-            else
-            {
-                // 기회가 남음: wrong 효과음만 한 번 재생하고, 같은 입력을 다시 시도하게 둔다.
-                // (MemorySequence.Submit 이 실패 시 Progress를 올리지 않아 같은 순서를 재입력할 수 있다.)
-                sound?.PlaySfx(SfxId.Wrong);
-            }
+    /// <summary>하얀 링이 끝까지 줄어들 때 현재 입력을 놓친 것으로 처리한다.</summary>
+    private void OnInputRingExpired()
+    {
+        if (_phase != GamePhase.AwaitInput || _sequence.IsComplete) return;
+        ApplyMistake();
+    }
+
+    /// <summary>오답 또는 시간 초과로 목숨 하나를 잃고, 기회가 남으면 같은 입력의 타이머를 다시 시작한다.</summary>
+    private void ApplyMistake()
+    {
+        _mistakes++;
+        // 목숨만 하나 줄어든다. 이미 쌓은 점수는 깎지 않는다.
+        hud.SetLives(RemainingLives);
+        var sound = SoundManager.Instance;
+
+        if (_mistakes >= maxMistakes)
+        {
+            // 마지막(치명적) 실수: 게임오버 효과음을 재생하고 정박 펄스(킥)를 즉시 멈춘다.
+            sound?.PlaySfx(SfxId.GameOver);
+            StopBackingKick();
+            _failed = true;
+            _phase = GamePhase.GameOver;
+        }
+        else
+        {
+            // 기회가 남음: wrong 효과음만 한 번 재생하고, 같은 입력을 다시 시도하게 둔다.
+            // (MemorySequence.Submit 이 실패 시 Progress를 올리지 않아 같은 순서를 재입력할 수 있다.)
+            sound?.PlaySfx(SfxId.Wrong);
+            qtePrompt.RestartInputRing();
         }
     }
 

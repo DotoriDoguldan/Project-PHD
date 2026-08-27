@@ -11,6 +11,8 @@ using UnityEngine.UI;
 /// </summary>
 public class QtePrompt : MonoBehaviour
 {
+    public event System.Action InputRingExpired;
+
     [Header("참조")]
     [SerializeField] private Image jamesImage;
     [SerializeField] private Image keyImage;
@@ -40,6 +42,7 @@ public class QtePrompt : MonoBehaviour
     private RectTransform _ringRect;
     private RectTransform _keyRect;
     private Coroutine _routine;
+    private float _activeInputRingPeriod;
 
     private void Awake()
     {
@@ -90,10 +93,16 @@ public class QtePrompt : MonoBehaviour
     // period: 링이 한 번 줄어드는 시간(초). 0 이하면 인스펙터 기본 주기를 쓴다.
     public void ShowInputRing(float period)
     {
+        _activeInputRingPeriod = Mathf.Max(0.01f, period > 0f ? period : inputRingPeriod);
         keyImage.color = hiddenKeyColor;
         _keyRect.anchoredPosition = inputRingPosition;
         _ringRect.anchoredPosition = inputRingPosition;
-        Restart(InputRingRoutine(period > 0f ? period : inputRingPeriod));
+        Restart(InputRingRoutine(_activeInputRingPeriod));
+    }
+
+    public void RestartInputRing()
+    {
+        ShowInputRing(_activeInputRingPeriod > 0f ? _activeInputRingPeriod : inputRingPeriod);
     }
 
     public void Hide()
@@ -139,13 +148,17 @@ public class QtePrompt : MonoBehaviour
         // 입력 대기는 얼마나 길어질지 모른다 — 코루틴 중첩(yield return ShrinkRing)은 반복마다
         // 열거자를 새로 만들므로, 한 루프 안에서 시간을 되감아 할당 없이 반복한다(WebGL GC 대응).
         float t = 0f;
-        while (true)
+        while (t < period)
         {
             SetRingScale(Mathf.Clamp01(t / period));
             yield return null;
             t += Time.deltaTime;
-            if (t >= period) t %= period;
         }
+
+        SetRingScale(1f);
+        ringImage.enabled = false;
+        _routine = null;
+        InputRingExpired?.Invoke();
     }
 
     private IEnumerator ShrinkRing(float duration)
