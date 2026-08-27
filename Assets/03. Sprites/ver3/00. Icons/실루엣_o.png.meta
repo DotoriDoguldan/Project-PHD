@@ -1,13 +1,43 @@
 fileFormatVersion: 2
-guid: 1e8089d5ffdebcc4786059ece0b0eaff
+guid: e523df78c3d03644e9e4df5114cfca9b
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -448396501185140214
-    second: "\uBC30\uACBD\uC6A9 \uBCC4_0"
+      213: 8795482525657788758
+    second: "\uC2E4\uB8E8\uC5E3_o_0"
   - first:
-      213: -3828693588935597016
-    second: "\uBC30\uACBD\uC6A9 \uBCC4_1"
+      213: -5054376648954998584
+    second: "\uC2E4\uB8E8\uC5E3_o_1"
+  - first:
+      213: 8512365081231006548
+    second: "\uC2E4\uB8E8\uC5E3_o_2"
+  - first:
+      213: 6092050452714639190
+    second: "\uC2E4\uB8E8\uC5E3_o_3"
+  - first:
+      213: 6996775889268342541
+    second: "\uC2E4\uB8E8\uC5E3_o_4"
+  - first:
+      213: -353317165573269728
+    second: "\uC2E4\uB8E8\uC5E3_o_5"
+  - first:
+      213: -1266610989208358708
+    second: "\uC2E4\uB8E8\uC5E3_o_6"
+  - first:
+      213: 6783730443418584922
+    second: "\uC2E4\uB8E8\uC5E3_o_7"
+  - first:
+      213: -1696174201927908365
+    second: "\uC2E4\uB8E8\uC5E3_o_8"
+  - first:
+      213: -1885925626343862533
+    second: "\uC2E4\uB8E8\uC5E3_o_9"
+  - first:
+      213: 8873719813017481424
+    second: "\uC2E4\uB8E8\uC5E3_o_10"
+  - first:
+      213: -2991301931049716286
+    second: "\uC2E4\uB8E8\uC5E3_o_11"
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -54,7 +84,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 32
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -78,7 +108,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -116,13 +146,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: "\uBC30\uACBD\uC6A9 \uBCC4_0"
+      name: "\uC2E4\uB8E8\uC5E3_o_0"
       rect:
         serializedVersion: 2
-        x: 20
-        y: 21
-        width: 1203
-        height: 1213
+        x: 168
+        y: 35
+        width: 679
+        height: 1477
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -131,30 +161,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a0ae45402c9f6c9f0800000000000000
-      internalID: -448396501185140214
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: "\uBC30\uACBD\uC6A9 \uBCC4_1"
-      rect:
-        serializedVersion: 2
-        x: 715
-        y: 49
-        width: 12
-        height: 9
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 824ada5577fbddac0800000000000000
-      internalID: -3828693588935597016
+      spriteID: 651fcf1b1c4df0a70800000000000000
+      internalID: 8795482525657788758
       vertices: []
       indices: 
       edges: []
@@ -163,7 +171,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: a6a641bf268d13f44a936758e8ad00c4
     internalID: 0
     vertices: []
     indices: 
@@ -173,8 +181,18 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      "\uBC30\uACBD\uC6A9 \uBCC4_0": -448396501185140214
-      "\uBC30\uACBD\uC6A9 \uBCC4_1": -3828693588935597016
+      "\uC2E4\uB8E8\uC5E3_o_0": 8795482525657788758
+      "\uC2E4\uB8E8\uC5E3_o_1": -5054376648954998584
+      "\uC2E4\uB8E8\uC5E3_o_10": 8873719813017481424
+      "\uC2E4\uB8E8\uC5E3_o_11": -2991301931049716286
+      "\uC2E4\uB8E8\uC5E3_o_2": 8512365081231006548
+      "\uC2E4\uB8E8\uC5E3_o_3": 6092050452714639190
+      "\uC2E4\uB8E8\uC5E3_o_4": 6996775889268342541
+      "\uC2E4\uB8E8\uC5E3_o_5": -353317165573269728
+      "\uC2E4\uB8E8\uC5E3_o_6": -1266610989208358708
+      "\uC2E4\uB8E8\uC5E3_o_7": 6783730443418584922
+      "\uC2E4\uB8E8\uC5E3_o_8": -1696174201927908365
+      "\uC2E4\uB8E8\uC5E3_o_9": -1885925626343862533
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

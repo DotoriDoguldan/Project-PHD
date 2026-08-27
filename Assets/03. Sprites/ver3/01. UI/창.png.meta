@@ -1,13 +1,10 @@
 fileFormatVersion: 2
-guid: 1e8089d5ffdebcc4786059ece0b0eaff
+guid: e318d6cd7bbb35f4c9f7d501fafe4205
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -448396501185140214
-    second: "\uBC30\uACBD\uC6A9 \uBCC4_0"
-  - first:
-      213: -3828693588935597016
-    second: "\uBC30\uACBD\uC6A9 \uBCC4_1"
+      213: -1037608655778018359
+    second: "\uCC3D_0"
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -54,7 +51,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 32
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -116,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: "\uBC30\uACBD\uC6A9 \uBCC4_0"
+      name: "\uCC3D_0"
       rect:
         serializedVersion: 2
-        x: 20
-        y: 21
-        width: 1203
-        height: 1213
+        x: 65
+        y: 32
+        width: 1116
+        height: 1164
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -131,30 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a0ae45402c9f6c9f0800000000000000
-      internalID: -448396501185140214
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: "\uBC30\uACBD\uC6A9 \uBCC4_1"
-      rect:
-        serializedVersion: 2
-        x: 715
-        y: 49
-        width: 12
-        height: 9
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 824ada5577fbddac0800000000000000
-      internalID: -3828693588935597016
+      spriteID: 9cb0b70dc6ca991f0800000000000000
+      internalID: -1037608655778018359
       vertices: []
       indices: 
       edges: []
@@ -173,8 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      "\uBC30\uACBD\uC6A9 \uBCC4_0": -448396501185140214
-      "\uBC30\uACBD\uC6A9 \uBCC4_1": -3828693588935597016
+      "\uCC3D_0": -1037608655778018359
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

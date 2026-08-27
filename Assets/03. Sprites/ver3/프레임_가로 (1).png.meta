@@ -1,13 +1,19 @@
 fileFormatVersion: 2
-guid: 1e8089d5ffdebcc4786059ece0b0eaff
+guid: 0da418ad4e9dcb145bd8d9ff426d0771
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -448396501185140214
-    second: "\uBC30\uACBD\uC6A9 \uBCC4_0"
+      213: 6382511436080003810
+    second: "\uD504\uB808\uC784_\uAC00\uB85C (1)_0"
   - first:
-      213: -3828693588935597016
-    second: "\uBC30\uACBD\uC6A9 \uBCC4_1"
+      213: 353008261539306840
+    second: "\uD504\uB808\uC784_\uAC00\uB85C (1)_1"
+  - first:
+      213: 2758642470298473185
+    second: "\uD504\uB808\uC784_\uAC00\uB85C (1)_2"
+  - first:
+      213: -4691366617929830202
+    second: "\uD504\uB808\uC784_\uAC00\uB85C (1)_3"
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -54,7 +60,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 32
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -78,7 +84,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -116,13 +122,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: "\uBC30\uACBD\uC6A9 \uBCC4_0"
+      name: "\uD504\uB808\uC784_\uAC00\uB85C (1)_0"
       rect:
         serializedVersion: 2
-        x: 20
-        y: 21
-        width: 1203
-        height: 1213
+        x: 507
+        y: 917
+        width: 184
+        height: 56
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -131,19 +137,41 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a0ae45402c9f6c9f0800000000000000
-      internalID: -448396501185140214
+      spriteID: 2eaba6ac55c339850800000000000000
+      internalID: 6382511436080003810
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: "\uBC30\uACBD\uC6A9 \uBCC4_1"
+      name: "\uD504\uB808\uC784_\uAC00\uB85C (1)_1"
       rect:
         serializedVersion: 2
-        x: 715
-        y: 49
-        width: 12
+        x: 690
+        y: 921
+        width: 53
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 85d14dfb42326e400800000000000000
+      internalID: 353008261539306840
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\uD504\uB808\uC784_\uAC00\uB85C (1)_2"
+      rect:
+        serializedVersion: 2
+        x: 780
+        y: 933
+        width: 26
         height: 9
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -153,8 +181,30 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 824ada5577fbddac0800000000000000
-      internalID: -3828693588935597016
+      spriteID: 1e25278f5baa84620800000000000000
+      internalID: 2758642470298473185
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\uD504\uB808\uC784_\uAC00\uB85C (1)_3"
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 88
+        width: 1448
+        height: 844
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c0ba2bbaeae4eeb0800000000000000
+      internalID: -4691366617929830202
       vertices: []
       indices: 
       edges: []
@@ -173,8 +223,10 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      "\uBC30\uACBD\uC6A9 \uBCC4_0": -448396501185140214
-      "\uBC30\uACBD\uC6A9 \uBCC4_1": -3828693588935597016
+      "\uD504\uB808\uC784_\uAC00\uB85C (1)_0": 6382511436080003810
+      "\uD504\uB808\uC784_\uAC00\uB85C (1)_1": 353008261539306840
+      "\uD504\uB808\uC784_\uAC00\uB85C (1)_2": 2758642470298473185
+      "\uD504\uB808\uC784_\uAC00\uB85C (1)_3": -4691366617929830202
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
