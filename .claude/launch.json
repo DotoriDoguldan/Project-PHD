@@ -6,6 +6,12 @@
       "runtimeExecutable": "python",
       "runtimeArgs": ["-m", "http.server", "8765", "--directory", "Build/WebGL"],
       "port": 8765
+    },
+    {
+      "name": "phd-web",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["C:\\TEMPFOLDER~1\\claude\\phd_serve.py"],
+      "port": 8080
     }
   ]
 }

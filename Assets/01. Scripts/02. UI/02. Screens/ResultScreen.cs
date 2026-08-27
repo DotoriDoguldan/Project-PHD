@@ -12,20 +12,22 @@ using UnityEngine.UI;
 public class ResultScreen : UIScreen
 {
     [Header("글자")]
+    [Tooltip("카드 맨 위 제목. 신기록이면 문구가 바뀐다.")]
+    [SerializeField] private TMP_Text headingText;
+    [Tooltip("평소 제목 문구.")]
+    [SerializeField] private string headingNormal = "RESULT";
+    [Tooltip("최고 기록을 깼을 때의 제목 문구. 좁은 카드에 배지를 따로 두는 대신 제목을 바꿔 알린다.")]
+    [SerializeField] private string headingNewBest = "NEW BEST!";
     [Tooltip("도달한 라운드 수를 표시할 텍스트.")]
     [SerializeField] private TMP_Text roundText;
     [Tooltip("이번 판 점수를 표시할 텍스트.")]
     [SerializeField] private TMP_Text scoreText;
     [Tooltip("최고 점수를 표시할 텍스트.")]
     [SerializeField] private TMP_Text bestText;
-    [Tooltip("신기록일 때만 켜지는 표시.")]
-    [SerializeField] private GameObject newBestBadge;
 
     [Header("버튼")]
-    [Tooltip("누르면 대기 화면을 거치지 않고 바로 다음 판을 시작한다.")]
+    [Tooltip("누르면 대기 화면을 거치지 않고 바로 다음 판을 시작한다. 결과창을 빠져나가는 유일한 길이다.")]
     [SerializeField] private Button replayButton;
-    [Tooltip("누르면 결과창만 닫고 대기 화면으로 돌아간다.")]
-    [SerializeField] private Button closeButton;
 
     [Header("공유")]
     [Tooltip("웹 빌드에서 공유 버튼 두 개(카카오톡 공유 / 공유하기)가 겹쳐 놓일 빈 자리. " +
@@ -54,7 +56,6 @@ public class ResultScreen : UIScreen
         _baseScale = transform.localScale;
 
         if (replayButton != null) replayButton.onClick.AddListener(OnReplay);
-        if (closeButton != null) closeButton.onClick.AddListener(OnClose);
     }
 
     private void OnDestroy()
@@ -63,17 +64,16 @@ public class ResultScreen : UIScreen
         HideShare();
 
         if (replayButton != null) replayButton.onClick.RemoveListener(OnReplay);
-        if (closeButton != null) closeButton.onClick.RemoveListener(OnClose);
     }
 
     public void Present(int round, int score, int best, bool newBest)
     {
         _action = ResultShare.Action.None;
 
+        if (headingText != null) headingText.SetText(newBest ? headingNewBest : headingNormal);
         if (roundText != null) roundText.SetText("{0}", round);
         if (scoreText != null) scoreText.SetText("{0}", score);
         if (bestText != null) bestText.SetText("{0}", best);
-        if (newBestBadge != null) newBestBadge.SetActive(newBest);
 
         var root = UIRoot.Current;
         if (root != null) root.OpenPopup(this);
@@ -144,12 +144,6 @@ public class ResultScreen : UIScreen
     private void OnReplay()
     {
         _action = ResultShare.Action.Replay;
-        Dismiss();
-    }
-
-    private void OnClose()
-    {
-        _action = ResultShare.Action.Dismiss;
         Dismiss();
     }
 }
