@@ -2163,6 +2163,7 @@ MonoBehaviour:
   newBestBadge: {fileID: 1659095591}
   replayButton: {fileID: 1047617495}
   closeButton: {fileID: 639194964}
+  shareArea: {fileID: 700000011}
   popFrom: 0.8
   popTime: 0.22
 --- !u!225 &974128453
@@ -4601,6 +4602,41 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1 &700000010
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 700000011}
+  m_Layer: 5
+  m_Name: Area_Share
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &700000011
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 700000010}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2109889447}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: -56}
+  m_SizeDelta: {x: 172, y: 27}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2109889446
 GameObject:
   m_ObjectHideFlags: 0
@@ -4636,6 +4672,7 @@ RectTransform:
   - {fileID: 624319131}
   - {fileID: 1798669337}
   - {fileID: 1659095590}
+  - {fileID: 700000011}
   - {fileID: 1047617493}
   - {fileID: 639194962}
   m_Father: {fileID: 974128451}
