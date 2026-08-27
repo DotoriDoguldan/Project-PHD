@@ -35,10 +35,7 @@ public class GameFlow : MonoBehaviour
 
     [Header("참조")]
     [SerializeField] private PadButton[] pads;
-    [Tooltip("순서에 섞여 나오지만 누르면 안 되는 함정 문양들. 비워두면 함정이 나오지 않는다.")]
-    [SerializeField] private Sprite[] trapSprites;
     [SerializeField] private PadInput padInput;
-    [SerializeField] private StageIcon stageIcon;
     [SerializeField] private QtePrompt qtePrompt;
     [SerializeField] private GameHud hud;
 
@@ -46,16 +43,8 @@ public class GameFlow : MonoBehaviour
     [SerializeField] private int firstRoundLength = 3;
     [Tooltip("패턴(라운드) 하나를 끝까지 성공했을 때 더해지는 점수.")]
     [SerializeField] private int roundClearScore = 10;
-    [Tooltip("실수 1회마다 차감되는 점수의 단위. 첫 실수 -10, 두 번째 -20, 세 번째 -30 처럼 실수 횟수에 비례해 커진다.")]
-    [SerializeField] private int mistakePenaltyStep = 10;
     [Tooltip("한 판에서 허용하는 실수 횟수. 이 횟수째 실수에서 게임오버. 1이면 한 번에 게임오버. HUD 의 목숨 칸 수도 이 값을 따라간다.")]
     [SerializeField] private int maxMistakes = 3;
-    [Tooltip("이 라운드부터 함정 문양이 순서에 섞인다. 0 이하면 함정을 쓰지 않는다.")]
-    [SerializeField] private int trapStartRound = 3;
-    [Tooltip("함정이 처음 등장하는 라운드에 섞이는 함정 칸 수.")]
-    [SerializeField] private int trapsAtStart = 1;
-    [Tooltip("몇 라운드마다 함정이 1칸씩 늘어나는지. 0 이하면 늘어나지 않는다.")]
-    [SerializeField] private int roundsPerExtraTrap = 2;
 
     [Header("연출 시간(초)")]
     [SerializeField] private float roundTitleTime = 0.76f;
@@ -177,10 +166,7 @@ public class GameFlow : MonoBehaviour
     {
         if (pads == null || pads.Length == 0) Debug.LogError("[PHD] GameFlow: pads 가 비어 있습니다.", this);
         if (padInput == null) Debug.LogError("[PHD] GameFlow: padInput 이 없습니다.", this);
-        if (stageIcon == null) Debug.LogError("[PHD] GameFlow: stageIcon 이 없습니다.", this);
         if (hud == null) Debug.LogError("[PHD] GameFlow: hud 가 없습니다.", this);
-        if (trapStartRound > 0 && (trapSprites == null || trapSprites.Length == 0))
-            Debug.LogWarning("[PHD] GameFlow: trapSprites 가 비어 있어 함정이 나오지 않습니다.", this);
     }
 
     private void OnDestroy()
@@ -238,10 +224,7 @@ public class GameFlow : MonoBehaviour
         else
         {
             _mistakes++;
-            // 실수할수록 차감량이 커진다. 첫 실수 -10, 두 번째 -20, 세 번째 -30 ...
-            _score -= mistakePenaltyStep * _mistakes;
-            if (_score < 0) _score = 0;
-            hud.SetScore(_score);
+            // 목숨만 하나 줄어든다. 이미 쌓은 점수는 깎지 않는다.
             hud.SetLives(RemainingLives);
             var sound = SoundManager.Instance;
 
@@ -273,7 +256,6 @@ public class GameFlow : MonoBehaviour
         _failed = false;
         _mistakes = 0;
 
-        stageIcon.Hide();
         qtePrompt.Hide();
         hud.SetRound(0);
         hud.SetScore(0);
@@ -334,12 +316,10 @@ public class GameFlow : MonoBehaviour
         _phase = GamePhase.Countdown;
 
         int length = firstRoundLength + (_round - 1);
-        int trapChoices = trapSprites != null ? trapSprites.Length : 0;
-        _sequence.Generate(length, pads.Length, trapChoices, TrapCountForRound(_round, length));
+        _sequence.Generate(length, pads.Length);
 
         hud.SetRound(_round);
-        // 점은 "눌러야 하는 횟수"를 뜻한다. 함정 칸은 입력이 없으므로 세지 않는다.
-        hud.Dots.Setup(_sequence.AnswerLength);
+        hud.Dots.Setup(_sequence.Length);
         hud.SetMessage("ROUND {0}", _round);
 
         // 인스펙터 BPM이 있으면 박자 연출로, 없으면(0 이하) 초 기반 폴백으로 진행한다.
@@ -368,8 +348,6 @@ public class GameFlow : MonoBehaviour
         {
             yield return ShowSequenceFree();
         }
-
-        stageIcon.Hide();
 
         // --- 입력 ---
         _phase = GamePhase.AwaitInput;
@@ -627,40 +605,17 @@ public class GameFlow : MonoBehaviour
         _replayRequested = action == ResultShare.Action.Replay;
     }
 
-    // ------------------------------------------------------------ 함정
+    // ------------------------------------------------------------ 출제 연출
 
     /// <summary>
     /// 순서의 한 칸을 보여준다.
-    /// 패드는 QTE 프롬프트(제임스 + 버튼 문양 + 줄어드는 링) + 해당 버튼이 함께 켜지지만,
-    /// 함정은 <b>중앙 무대에만</b> 뜬다. 누를 버튼이 없다는 것 자체가 "건너뛰어라"라는 신호다.
+    /// QTE 프롬프트(제임스 + 버튼 문양 + 줄어드는 링)와 해당 버튼이 함께 켜진다.
     /// </summary>
     private void ShowStep(int step, float hold)
     {
-        int trap = _sequence.TrapIndex(step);
-        if (trap >= 0)
-        {
-            if (trapSprites == null || trap >= trapSprites.Length) return;
-
-            stageIcon.Show(trapSprites[trap], hold);
-            SoundManager.Instance?.PlaySfx(SfxId.Trap(trap));
-            return;
-        }
-
         qtePrompt.ShowStep(step, pads[step].Sprite, hold);
         pads[step].Highlight(hold);
         SoundManager.Instance?.PlaySfx(SfxId.Pad(step));
-    }
-
-    /// <summary>이 라운드의 순서에 섞을 함정 칸 수. 최소 1칸은 패드로 남긴다.</summary>
-    private int TrapCountForRound(int round, int length)
-    {
-        if (trapStartRound <= 0 || round < trapStartRound) return 0;
-        if (trapSprites == null || trapSprites.Length == 0) return 0;
-
-        int count = trapsAtStart;
-        if (roundsPerExtraTrap > 0) count += (round - trapStartRound) / roundsPerExtraTrap;
-
-        return Mathf.Clamp(count, 0, Mathf.Max(0, length - 1));
     }
 
     // ------------------------------------------------------------ 유틸

@@ -44,10 +44,6 @@ public static class GameLayout
     public const float LifeBottomMargin = 12f;  // 화면판 아래 가장자리에서 하트까지
     public const float LifeGap = 5f;
 
-    // ---- 중앙 문양 ----
-    // 위로는 score 블록, 아래로는 진행 점을 피해 들어가는 크기.
-    public const float StageIconSize = 64f;
-
     // ---- 타이틀 화면 ----
     public const float LogoWidth = 183f;        // Logo_* 원본 크기
     public const float LogoHeight = 192f;
