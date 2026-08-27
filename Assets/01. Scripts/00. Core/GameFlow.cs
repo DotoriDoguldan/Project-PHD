@@ -226,6 +226,8 @@ public class GameFlow : MonoBehaviour
     {
         if (_sequence.Submit(index))
         {
+            // 정답일 때만 패드음을 낸다. (오답은 아래 ApplyMistake에서 wrong 효과음만 재생)
+            SoundManager.Instance?.PlaySfx(SfxId.Pad(index));
             hud.Dots.SetFilled(_sequence.Progress);
 
             // 다음 노트는 그 노트의 문제 박자(그루브)만큼 제한시간을 받는다. 마지막 입력이면 RunRound가 곧 링을 숨긴다.
