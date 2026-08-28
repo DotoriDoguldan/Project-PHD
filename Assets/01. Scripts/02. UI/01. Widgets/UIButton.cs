@@ -73,6 +73,25 @@ public class UIButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         else ApplyPress(0f);
     }
 
+    /// <summary>
+    /// 버튼을 다른 자리로 옮긴다. <b>코드가 자리를 바꿀 때는 transform 을 직접 건드리지 않고 이것을 쓴다.</b>
+    /// 눌림 연출은 Awake 에서 읽어 둔 자리를 기준으로 오르내리기 때문에, 그냥 옮겨 두면
+    /// 처음 누르는 순간 옛 자리로 튄다 — 누르자마자 레이아웃이 바뀐 것처럼 보인다.
+    /// 옮기는 김에 눌려 있던 연출도 걷고 새 자리에 앉힌다.
+    /// </summary>
+    public void MoveHome(Vector2 anchoredPosition)
+    {
+        _basePosition = anchoredPosition;
+
+        StopRoutine();
+        _pressed = false;
+
+        // Awake 전이면 아직 원래 크기를 모른다(ApplyPress 가 크기를 0으로 만든다).
+        // 자리만 옮겨 두면 Awake 가 그 자리를 그대로 자기 집으로 읽는다.
+        if (_rect != null) ApplyPress(0f);
+        else ((RectTransform)transform).anchoredPosition = anchoredPosition;
+    }
+
     private void PlayClickSound()
     {
         if (string.IsNullOrEmpty(clickSfx)) return;

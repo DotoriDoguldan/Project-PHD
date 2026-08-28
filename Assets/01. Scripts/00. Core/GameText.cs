@@ -15,6 +15,25 @@ public static class TextId
 
     /// <summary>타이틀 언어 버튼의 라벨. 각 언어를 그 언어 표기로 적는다(KOR/ENG).</summary>
     public const string LanguageName = "language_name";
+
+    // 결과창 공유에서 쓰는 문구. 화면에 찍히는 것이 아니라 웹 템플릿(index.html)의
+    // window.PHDShare 로 넘어가 공유 글과 안내 토스트가 된다.
+    // 여기 있는 이유는 하나다 — 언어를 따라 바뀌는 문구를 표 한 곳에서만 고치기 위해서.
+    //
+    // 카카오톡 쪽 문구(버튼 이름·마지막 줄·토스트)는 여기 없다. 카카오 버튼 자체가 한국어에서만
+    // 나오므로 그 문구는 언어를 따라 바뀌지 않는다 — 템플릿이 한국어로 그대로 갖는다.
+
+    /// <summary>공유 글에서 신기록일 때 점수 뒤에 붙는 말.</summary>
+    public const string ShareNewBest = "share_new_best";
+
+    /// <summary>공유하기 버튼의 이름. 화면에는 보이지 않고 스크린 리더가 읽는다.</summary>
+    public const string ShareLabel = "share_label";
+
+    /// <summary>브라우저가 navigator.share 를 지원하지 않을 때의 토스트.</summary>
+    public const string ShareUnavailable = "share_unavailable";
+
+    /// <summary>공유를 시도했지만 실패했을 때의 토스트.</summary>
+    public const string ShareFailed = "share_failed";
 }
 
 /// <summary>
@@ -74,7 +93,13 @@ public static class GameText
         new(TextId.Retry,           "다시하기?",                "RETRY?"),
         new(TextId.ChallengeFriend, "친구에게 공유하기",           "Challenge with Friend!"),
         new(TextId.DownloadGif,     "GIF 다운로드",              "Download GIF"),
-        new(TextId.LanguageName,    "KOR",                     "ENG")
+        new(TextId.LanguageName,    "KOR",                     "ENG"),
+
+        // 공유 문구. ROUND · SCORE · BEST 같은 머리글은 어느 언어에서나 같아서 웹 템플릿이 그대로 찍는다.
+        new(TextId.ShareNewBest,    "신기록! 🏆",                "NEW BEST! 🏆"),
+        new(TextId.ShareLabel,      "친구에게 알리기",            "Share with friends"),
+        new(TextId.ShareUnavailable, "이 브라우저에서는 공유하기를 쓸 수 없어요", "Sharing isn't available in this browser"),
+        new(TextId.ShareFailed,     "공유에 실패했어요",          "Sharing failed")
     };
 
     // 표는 실행 중에 바뀌지 않으므로 한 번만 만든다. 도메인 리로드를 꺼도 내용이 같아 안전하다.

@@ -3,7 +3,8 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 
 /// <summary>
-/// 결과창의 공유 버튼 두 개(카카오톡 공유 / 공유하기)를 브라우저 쪽에 맡기는 창구.
+/// 결과창의 공유 버튼(카카오톡 공유 / 공유하기)을 브라우저 쪽에 맡기는 창구.
+/// 카카오톡은 한국어에서만 나간다(<see cref="UsesKakao"/>).
 ///
 /// 결과 카드 자체는 Unity UI(<see cref="ResultScreen"/>)가 그린다. 공유 버튼만 DOM 버튼으로
 /// 남겨 캔버스 위에 겹쳐 놓는 이유는 두 가지다.
@@ -35,7 +36,19 @@ public static class WebShare
     // GetWorldCorners 가 채워 줄 버퍼. 매 프레임 위치를 갱신하므로 재사용한다(WebGL GC 대응).
     private static readonly Vector3[] Corners = new Vector3[4];
 
-    /// <summary>공유 버튼을 띄운다. 문구에 쓸 숫자만 넘기고, 문장은 JS 쪽에서 만든다.</summary>
+    /// <summary>
+    /// 카카오톡으로 공유하는 언어인지. 카카오톡은 사실상 한국에서만 쓰는 앱이라,
+    /// 다른 언어에서는 버튼째로 빼고 시스템 공유 시트만 남긴다.
+    /// 브라우저의 DOM 버튼과 <see cref="ResultScreen"/> 이 그리는 아이콘이 <b>같은 답을 봐야</b>
+    /// 하므로(한쪽만 빠지면 눌리지 않는 아이콘이나 유령 버튼이 된다) 판단은 여기 한 곳에서만 한다.
+    /// </summary>
+    public static bool UsesKakao => LanguageSettings.Current == GameLanguage.Korean;
+
+    /// <summary>
+    /// 공유 버튼을 띄운다. 문장 조립은 JS 가 하고, 여기서는 숫자와 함께
+    /// 언어를 따라 바뀌는 조각만 <see cref="GameText"/> 표에서 꺼내 넘긴다 —
+    /// 공유 글도 게임과 같은 언어로 나가야 하는데, 표를 두 곳으로 갈라 두지 않으려는 것이다.
+    /// </summary>
     public static void Show(int round, int score, int best, bool newBest)
     {
         if (!IsAvailable) return;
@@ -95,8 +108,28 @@ public static class WebShare
         return true;
     }
 
+    // 카카오 쪽 문구는 넘기지 않는다 — 그 버튼은 한국어에서만 나오므로 템플릿이 한국어로 들고 있다.
     private static string BuildJson(int round, int score, int best, bool newBest)
         => string.Format(CultureInfo.InvariantCulture,
-            "{{\"round\":{0},\"score\":{1},\"best\":{2},\"newBest\":{3}}}",
-            round, score, best, newBest ? "true" : "false");
+            "{{\"round\":{0},\"score\":{1},\"best\":{2},\"newBest\":{3},\"kakao\":{4},\"text\":{{" +
+            "\"newBest\":\"{5}\",\"shareLabel\":\"{6}\"," +
+            "\"shareUnavailable\":\"{7}\",\"failed\":\"{8}\"}}}}",
+            round, score, best, newBest ? "true" : "false", UsesKakao ? "true" : "false",
+            Escape(GameText.Get(TextId.ShareNewBest)),
+            Escape(GameText.Get(TextId.ShareLabel)),
+            Escape(GameText.Get(TextId.ShareUnavailable)),
+            Escape(GameText.Get(TextId.ShareFailed)));
+
+    // 표의 문구는 사람이 손으로 적는다. 따옴표가 하나 섞이면 JS 의 JSON.parse 가 통째로 실패해
+    // 공유 판이 아예 뜨지 않으므로, 문장을 깨뜨릴 수 있는 글자만 막아 둔다.
+    private static string Escape(string value)
+    {
+        if (string.IsNullOrEmpty(value)) return string.Empty;
+
+        return value
+            .Replace("\\", "\\\\")
+            .Replace("\"", "\\\"")
+            .Replace("\n", "\\n")
+            .Replace("\r", string.Empty);
+    }
 }

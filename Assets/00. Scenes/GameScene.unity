@@ -1135,6 +1135,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74bbaaed9c664922a384a6529b6ea155, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WebShareAnchor
+  kakaoButton: {fileID: 710000100}
+  shareButton: {fileID: 710000202}
 --- !u!1 &710000100
 GameObject:
   m_ObjectHideFlags: 0
