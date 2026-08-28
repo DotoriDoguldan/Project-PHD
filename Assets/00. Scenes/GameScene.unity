@@ -1066,10 +1066,10 @@ MonoBehaviour:
   keyImage: {fileID: 1285316727}
   ringImage: {fileID: 1330699794}
   jamesSprites:
+  - {fileID: 7440936482464858474, guid: 264f1cca4c6f147449a61e52aa6627ef, type: 3}
   - {fileID: -589000758293856476, guid: 264f1cca4c6f147449a61e52aa6627ef, type: 3}
   - {fileID: -1147252586555017094, guid: 264f1cca4c6f147449a61e52aa6627ef, type: 3}
   - {fileID: -2076745074616829005, guid: 264f1cca4c6f147449a61e52aa6627ef, type: 3}
-  - {fileID: 7440936482464858474, guid: 264f1cca4c6f147449a61e52aa6627ef, type: 3}
   topFrame: {fileID: 810000006}
   bottomFrame: {fileID: 968711243}
   jamesMargin: 12

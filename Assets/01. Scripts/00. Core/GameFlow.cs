@@ -83,9 +83,9 @@ public class GameFlow : MonoBehaviour
         new GrooveCell { steps = new[] { 3, 3, 2, 3, 3, 2 } },       // ★★★  당김음(점8분)
         new GrooveCell { steps = new[] { 3, 1, 2, 2, 3, 1, 2, 2 } }, // ★★★★ 16분 스탭 섞인 촘촘함
     };
-    [Tooltip("입력 제한시간을 문제(그루브)의 몇 배로 줄지. 각 노트는 문제에서 가졌던 박자(그루브 칸)만큼 시간을 받고, 이 값으로 늘어난다.\n" +
-             "1 = 문제와 정확히 같은 박자, 2 = 두 배 여유. (BPM이 0 이하일 땐 무시하고 QtePrompt 기본 주기 사용)")]
-    [SerializeField, Min(0.1f)] private float inputTimeScale = 1.5f;
+    [Tooltip("입력 제한시간을 문제(그루브)의 몇 배로 줄지. 각 노트는 문제에서 그 노트로 넘어올 때 걸렸던 박자(직전 그루브 칸)만큼 시간을 받고, 이 값으로 늘어난다.\n" +
+             "1 = 제시된 박자 텀과 정확히 같음(최소값), 2 = 두 배 여유. (BPM이 0 이하일 땐 무시하고 QtePrompt 기본 주기 사용)")]
+    [SerializeField, Min(1f)] private float inputTimeScale = 1.5f;
 
     [Tooltip("백킹 킥 사용 여부. 켜면 게임 내내 매 박자(정박)마다 kick 효과음이 울려 그루브의 뼈대를 잡는다. (BPM이 0보다 클 때만 동작)")]
     [SerializeField] private bool useBackingKick = true;
@@ -235,7 +235,7 @@ public class GameFlow : MonoBehaviour
             SoundManager.Instance?.PlaySfx(SfxId.Pad(index));
             hud.Dots.SetFilled(_sequence.Progress);
 
-            // 다음 노트는 그 노트의 문제 박자(그루브)만큼 제한시간을 받는다. 마지막 입력이면 RunRound가 곧 링을 숨긴다.
+            // 다음 노트는 문제에서 그 노트로 넘어올 때 걸렸던 박자만큼 제한시간을 받는다. 마지막 입력이면 RunRound가 곧 링을 숨긴다.
             if (!_sequence.IsComplete) qtePrompt.ShowInputRing(InputWindowSeconds());
         }
         else
@@ -386,7 +386,7 @@ public class GameFlow : MonoBehaviour
         stageBackground.ResetToDefault();
         _phase = GamePhase.AwaitInput;
         hud.SetMessage("YOUR TURN");
-        // 입력 중에는 무슨 키인지 보여주지 않는다 — 줄어드는 링이 그 노트의 문제 박자(그루브)만큼 제한시간을 준다.
+        // 입력 중에는 무슨 키인지 보여주지 않는다 — 줄어드는 링이 문제에서 그 노트로 넘어올 때 걸렸던 박자만큼 제한시간을 준다.
         qtePrompt.ShowInputRing(InputWindowSeconds());
         padInput.InputEnabled = true;
 
@@ -467,7 +467,7 @@ public class GameFlow : MonoBehaviour
 
         for (int i = 0; i < _sequence.Length; i++)
         {
-            int gap = Mathf.Max(1, groove[i % groove.Length]);   // 셀을 순환 → 순서가 길어져도 그루브 유지
+            int gap = GapSteps(groove, i);   // 셀을 순환 → 순서가 길어져도 그루브 유지
             float wait = sixteenth * gap;
             float hold = wait * showBeatHoldRatio;
 
@@ -490,20 +490,33 @@ public class GameFlow : MonoBehaviour
         return DefaultGrooves[r % DefaultGrooves.Length];
     }
 
-    /// <summary>
-    /// 지금 눌러야 하는 답 노트의 입력 제한시간(초). 문제(그루브)와 같은 박자로 —
-    /// 그 노트의 그루브 칸(gap)만큼 주고 <see cref="inputTimeScale"/> 배로 늘린다.
-    /// 박자 기능이 꺼졌으면(BPM≤0) 0을 돌려줘 QtePrompt 기본 주기를 쓰게 한다.
-    /// </summary>
+    // 지금 눌러야 하는 답 노트의 입력 제한시간(초). 문제(그루브)와 같은 박자로 —
+    // 문제에서 그 노트로 '넘어올 때' 걸렸던 칸만큼 주고 inputTimeScale 배로 늘린다.
+    // 박자 기능이 꺼졌으면(BPM≤0) 0을 돌려줘 QtePrompt 기본 주기를 쓰게 한다.
     private float InputWindowSeconds()
     {
         if (BeatDuration <= 0f) return 0f;
 
-        int[] groove = CurrentGrooveSteps();
-        int gap = Mathf.Max(1, groove[_sequence.Progress % groove.Length]);
         float sixteenth = BeatDuration / 4f;
-        return sixteenth * gap * Mathf.Max(0.1f, inputTimeScale);
+        return sixteenth * IncomingGapSteps(_sequence.Progress) * Mathf.Max(1f, inputTimeScale);
     }
+
+    // 문제 재생에서 noteIndex 번째 노트로 넘어올 때 지나간 16분음표 칸 수.
+    // 그루브 칸은 "이 음 이후 다음 음까지"의 간격이라, 노트 자신의 칸을 쓰면 짧은 칸 뒤에 긴 칸이 오는
+    // 그루브(예: {3,1,2,2})에서 제시된 박자 텀보다 제한시간이 짧아진다 — 리듬 그대로 따라 쳐도 시간이 모자란다.
+    // 첫 노트는 직전 노트가 없으므로, 마지막 출제 노트에서 플레이어 차례까지 지나간 칸을 쓴다.
+    private int IncomingGapSteps(int noteIndex)
+    {
+        int[] groove = CurrentGrooveSteps();
+        int prev = noteIndex > 0 ? noteIndex - 1 : Mathf.Max(0, _sequence.Length - 1);
+        return GapSteps(groove, prev);
+    }
+
+    // 그루브 셀에서 noteIndex 번째 노트 이후 다음 음까지의 16분음표 칸 수.
+    // 출제(ShowSequenceOnBeat)와 입력 제한시간(IncomingGapSteps)이 같은 식을 써야
+    // 들려준 리듬과 눌러야 하는 리듬이 어긋나지 않는다.
+    private static int GapSteps(int[] groove, int noteIndex)
+        => Mathf.Max(1, groove[noteIndex % groove.Length]);
 
     // --- 백킹 킥: 인스펙터 BPM에 맞춰 매 박자(정박)마다 울리는 단일 펄스. ---
 
@@ -542,9 +555,7 @@ public class GameFlow : MonoBehaviour
             // 음원이 비었거나 볼륨 0이면 그 칸은 쉼표(무음).
             while (_beatTime + 0.0001f >= _nextStepTime)
             {
-                KickPattern.Step step = kickPattern != null
-                    ? kickPattern.StepAt(_kickStepsFired)
-                    : new KickPattern.Step { soundId = SfxId.Kick, volumePercent = 100 };
+                KickPattern.Step step = kickPattern.StepAt(_kickStepsFired);
 
                 if (!string.IsNullOrEmpty(step.soundId) && step.volumePercent > 0)
                     SoundManager.Instance?.PlaySfx(step.soundId, step.volumePercent / 100f, 1f);
