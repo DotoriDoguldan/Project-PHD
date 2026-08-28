@@ -82,6 +82,10 @@ public class GameFlow : MonoBehaviour
         new GrooveCell { steps = new[] { 3, 3, 2, 3, 3, 2 } },       // ★★★  당김음(점8분)
         new GrooveCell { steps = new[] { 3, 1, 2, 2, 3, 1, 2, 2 } }, // ★★★★ 16분 스탭 섞인 촘촘함
     };
+    [Tooltip("입력 제한시간을 문제(그루브)의 몇 배로 줄지. 각 노트는 문제에서 가졌던 박자(그루브 칸)만큼 시간을 받고, 이 값으로 늘어난다.\n" +
+             "1 = 문제와 정확히 같은 박자, 2 = 두 배 여유. (BPM이 0 이하일 땐 무시하고 QtePrompt 기본 주기 사용)")]
+    [SerializeField, Min(0.1f)] private float inputTimeScale = 1.5f;
+
     [Tooltip("백킹 킥 사용 여부. 켜면 게임 내내 매 박자(정박)마다 kick 효과음이 울려 그루브의 뼈대를 잡는다. (BPM이 0보다 클 때만 동작)")]
     [SerializeField] private bool useBackingKick = true;
     [Tooltip("킥 패턴을 한 박(1비트)에 몇 칸으로 쪼갤지. 1=4분음표, 2=8분음표, 4=16분음표. 킥+하이햇 그루브는 보통 2(8분음표).")]
@@ -222,10 +226,12 @@ public class GameFlow : MonoBehaviour
     {
         if (_sequence.Submit(index))
         {
+            // 정답일 때만 패드음을 낸다. (오답은 아래 ApplyMistake에서 wrong 효과음만 재생)
+            SoundManager.Instance?.PlaySfx(SfxId.Pad(index));
             hud.Dots.SetFilled(_sequence.Progress);
 
-            // 다음 순서도 온전한 제한시간을 받는다. 마지막 입력이면 RunRound가 곧 링을 숨긴다.
-            if (!_sequence.IsComplete) qtePrompt.RestartInputRing();
+            // 다음 노트는 그 노트의 문제 박자(그루브)만큼 제한시간을 받는다. 마지막 입력이면 RunRound가 곧 링을 숨긴다.
+            if (!_sequence.IsComplete) qtePrompt.ShowInputRing(InputWindowSeconds());
         }
         else
         {
@@ -259,9 +265,9 @@ public class GameFlow : MonoBehaviour
         else
         {
             // 기회가 남음: wrong 효과음만 한 번 재생하고, 같은 입력을 다시 시도하게 둔다.
-            // (MemorySequence.Submit 이 실패 시 Progress를 올리지 않아 같은 순서를 재입력할 수 있다.)
+            // (MemorySequence.Submit 이 실패 시 Progress를 올리지 않아 같은 노트를 재입력할 수 있다.)
             sound?.PlaySfx(SfxId.Wrong);
-            qtePrompt.RestartInputRing();
+            qtePrompt.ShowInputRing(InputWindowSeconds());
         }
     }
 
@@ -372,8 +378,8 @@ public class GameFlow : MonoBehaviour
         // --- 입력 ---
         _phase = GamePhase.AwaitInput;
         hud.SetMessage("YOUR TURN");
-        // 입력 중에는 무슨 키인지 보여주지 않는다 — 줄어드는 링만 박자(없으면 기본 주기)에 맞춰 반복한다.
-        qtePrompt.ShowInputRing(onBeat ? BeatDuration : 0f);
+        // 입력 중에는 무슨 키인지 보여주지 않는다 — 줄어드는 링이 그 노트의 문제 박자(그루브)만큼 제한시간을 준다.
+        qtePrompt.ShowInputRing(InputWindowSeconds());
         padInput.InputEnabled = true;
 
         while (_phase == GamePhase.AwaitInput && !_sequence.IsComplete)
@@ -474,6 +480,21 @@ public class GameFlow : MonoBehaviour
         }
 
         return DefaultGrooves[r % DefaultGrooves.Length];
+    }
+
+    /// <summary>
+    /// 지금 눌러야 하는 답 노트의 입력 제한시간(초). 문제(그루브)와 같은 박자로 —
+    /// 그 노트의 그루브 칸(gap)만큼 주고 <see cref="inputTimeScale"/> 배로 늘린다.
+    /// 박자 기능이 꺼졌으면(BPM≤0) 0을 돌려줘 QtePrompt 기본 주기를 쓰게 한다.
+    /// </summary>
+    private float InputWindowSeconds()
+    {
+        if (BeatDuration <= 0f) return 0f;
+
+        int[] groove = CurrentGrooveSteps();
+        int gap = Mathf.Max(1, groove[_sequence.Progress % groove.Length]);
+        float sixteenth = BeatDuration / 4f;
+        return sixteenth * gap * Mathf.Max(0.1f, inputTimeScale);
     }
 
     // --- 백킹 킥: 인스펙터 BPM에 맞춰 매 박자(정박)마다 울리는 단일 펄스. ---

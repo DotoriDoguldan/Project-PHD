@@ -49,7 +49,8 @@ public class PadButton : MonoBehaviour, IPointerDownHandler
 
     public void Press()
     {
-        SoundManager.Instance?.PlaySfx(SfxId.Pad(index));
+        // 패드음은 여기서 내지 않는다 — 정답/오답 판정 뒤 GameFlow가 결정한다.
+        // (오답일 땐 패드음 없이 wrong 효과음만 재생하기 위함.)
         Play(Flash(0.16f, pressScale));
         Pressed?.Invoke(index);
     }
