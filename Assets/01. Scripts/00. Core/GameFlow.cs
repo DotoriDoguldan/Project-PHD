@@ -38,6 +38,7 @@ public class GameFlow : MonoBehaviour
     [SerializeField] private PadInput padInput;
     [SerializeField] private QtePrompt qtePrompt;
     [SerializeField] private GameHud hud;
+    [SerializeField] private StageBackground stageBackground;
 
     [Header("규칙")]
     [SerializeField] private int firstRoundLength = 3;
@@ -173,6 +174,7 @@ public class GameFlow : MonoBehaviour
         if (padInput == null) Debug.LogError("[PHD] GameFlow: padInput 이 없습니다.", this);
         if (qtePrompt == null) Debug.LogError("[PHD] GameFlow: qtePrompt 가 없습니다.", this);
         if (hud == null) Debug.LogError("[PHD] GameFlow: hud 가 없습니다.", this);
+        if (stageBackground == null) Debug.LogError("[PHD] GameFlow: stageBackground 가 없습니다.", this);
     }
 
     private void OnDestroy()
@@ -286,6 +288,7 @@ public class GameFlow : MonoBehaviour
         _mistakes = 0;
 
         qtePrompt.Hide();
+        stageBackground.ResetToDefault();
         hud.SetRound(0);
         hud.SetScore(0);
         hud.Dots.Clear();
@@ -379,6 +382,8 @@ public class GameFlow : MonoBehaviour
         }
 
         // --- 입력 ---
+        // 출제가 끝나면 배경은 기본으로 돌아간다 — 플레이어 차례에는 색으로 힌트를 주지 않는다.
+        stageBackground.ResetToDefault();
         _phase = GamePhase.AwaitInput;
         hud.SetMessage("YOUR TURN");
         // 입력 중에는 무슨 키인지 보여주지 않는다 — 줄어드는 링이 그 노트의 문제 박자(그루브)만큼 제한시간을 준다.
@@ -600,11 +605,13 @@ public class GameFlow : MonoBehaviour
         int expected = _sequence.Expected;
         if (expected >= 0 && expected < pads.Length)
         {
+            stageBackground.ShowPad(expected);
             qtePrompt.ShowStep(expected, pads[expected].Sprite, 0.6f);
             pads[expected].Highlight(0.6f);
         }
         yield return Wait(0.9f);
         qtePrompt.Hide();
+        stageBackground.ResetToDefault();
     }
 
     private IEnumerator GameOver()
@@ -654,9 +661,11 @@ public class GameFlow : MonoBehaviour
     /// <summary>
     /// 순서의 한 칸을 보여준다.
     /// QTE 프롬프트(제임스 + 버튼 문양 + 줄어드는 링)와 해당 버튼이 함께 켜진다.
+    /// 배경도 그 버튼 색(원=빨강, 세모=초록, 엑스=파랑, 네모=핑크)으로 바뀐다.
     /// </summary>
     private void ShowStep(int step, float hold)
     {
+        stageBackground.ShowPad(step);
         qtePrompt.ShowStep(step, pads[step].Sprite, hold);
         pads[step].Highlight(hold);
         SoundManager.Instance?.PlaySfx(SfxId.Pad(step));
