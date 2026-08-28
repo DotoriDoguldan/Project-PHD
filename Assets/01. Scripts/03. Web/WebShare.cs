@@ -59,8 +59,12 @@ public static class WebShare
     /// <paramref name="rt"/> 가 화면에서 차지하는 자리를 0~1 비율(좌상단 기준)로 바꾼다.
     /// 브라우저는 캔버스의 CSS 크기가 Unity 의 <see cref="Screen"/> 크기와 다를 수 있어서,
     /// 픽셀이 아니라 비율로 넘기고 실제 픽셀 환산은 JS 가 캔버스 크기를 보고 한다.
+    ///
+    /// <paramref name="cam"/> 은 캔버스가 물고 있는 카메라다. 오버레이 캔버스면 null 을 넘긴다.
+    /// 매 프레임 도는 자리라 캔버스를 여기서 찾지 않는다 — 부르는 쪽이 한 번 찾아 들고 있는다
+    /// (<see cref="WebShareAnchor"/>).
     /// </summary>
-    public static bool TryGetScreenRect(RectTransform rt, out Rect normalized)
+    public static bool TryGetScreenRect(RectTransform rt, Camera cam, out Rect normalized)
     {
         normalized = default;
         if (rt == null) return false;
@@ -68,16 +72,6 @@ public static class WebShare
         float sw = Screen.width;
         float sh = Screen.height;
         if (sw <= 0f || sh <= 0f) return false;
-
-        // 오버레이 캔버스는 카메라가 없다. 그 밖에는 캔버스가 물고 있는 카메라를 써야
-        // 원근/뷰포트가 반영된 화면 좌표가 나온다.
-        Camera cam = null;
-        var canvas = rt.GetComponentInParent<Canvas>();
-        if (canvas != null)
-        {
-            canvas = canvas.rootCanvas;
-            if (canvas.renderMode != RenderMode.ScreenSpaceOverlay) cam = canvas.worldCamera;
-        }
 
         rt.GetWorldCorners(Corners);
 

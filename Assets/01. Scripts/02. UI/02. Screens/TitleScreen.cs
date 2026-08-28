@@ -1,10 +1,9 @@
 using System.Collections;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// 타이틀 화면 — 로고 연출, 최고점수, 시작 안내. 씬 이동은 SceneLoadButton 이 맡는다 —
+/// 타이틀 화면 — 로고 연출과 시작 안내. 씬 이동은 SceneLoadButton 이 맡는다 —
 /// 어느 씬으로 갈지는 UI 가 알 일이 아니고, 인스펙터에서 바꿀 수 있어야 한다.
 /// </summary>
 public class TitleScreen : UIScreen
@@ -14,8 +13,6 @@ public class TitleScreen : UIScreen
     [SerializeField] private RectTransform logo;
     [Tooltip("게임 씬으로 넘어가는 버튼. 로고 연출이 끝날 때까지 잠긴다.")]
     [SerializeField] private Button playButton;
-    [Tooltip("최고점수 표시. 기록이 없으면(0) 통째로 숨긴다.")]
-    [SerializeField] private TMP_Text bestText;
     [Tooltip("\"TAP TO START\" 같은 안내. 천천히 깜빡인다.")]
     [SerializeField] private CanvasGroup hint;
 
@@ -31,10 +28,6 @@ public class TitleScreen : UIScreen
     [SerializeField, Min(0f)] private float logoFloatAmplitude = 1.5f;
     [Tooltip("로고가 한 번 오르내리는 시간(초). 배경 데코(4초)와 어긋나게 잡아야 같이 움직여 보이지 않는다.")]
     [SerializeField, Min(0.1f)] private float logoFloatPeriod = 2.8f;
-
-    [Header("기록")]
-    [Tooltip("최고점수 저장 키. GameFlow 가 쓰는 키와 반드시 같아야 한다.")]
-    [SerializeField] private string bestScoreKey = "phd.memory.best";
 
     private Coroutine _intro;
     // 인트로가 로고 팝 중간에 끊기면(OnHidden) 스케일이 중간값으로 남는다.
@@ -56,8 +49,6 @@ public class TitleScreen : UIScreen
 
     protected override void OnShown()
     {
-        RefreshBest();
-
         if (!isActiveAndEnabled) return;
         if (_intro != null) StopCoroutine(_intro);
         _intro = StartCoroutine(Intro());
@@ -71,16 +62,6 @@ public class TitleScreen : UIScreen
         if (_intro == null) return;
         StopCoroutine(_intro);
         _intro = null;
-    }
-
-    public void RefreshBest()
-    {
-        if (bestText == null) return;
-
-        int best = LoadBest();
-        // 아직 한 판도 안 한 사람에게 "BEST 0" 은 알려주는 게 없다. 그냥 숨긴다.
-        bestText.gameObject.SetActive(best > 0);
-        if (best > 0) bestText.SetText("BEST {0}", best);
     }
 
     private IEnumerator Intro()
@@ -120,20 +101,6 @@ public class TitleScreen : UIScreen
             }
 
             yield return null;
-        }
-    }
-
-    private int LoadBest()
-    {
-        try
-        {
-            return PlayerPrefs.GetInt(bestScoreKey, 0);
-        }
-        catch (System.Exception e)
-        {
-            // 시크릿 모드나 저장소 차단 브라우저에서는 읽기 자체가 실패할 수 있다.
-            Debug.LogWarning("[PHD] 최고점수를 읽지 못했습니다: " + e.Message);
-            return 0;
         }
     }
 }

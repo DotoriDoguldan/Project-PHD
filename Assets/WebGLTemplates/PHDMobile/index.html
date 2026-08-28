@@ -125,22 +125,22 @@
     /* 캔버스 위에 얹히는 버튼 줄. 컨테이너는 클릭을 통과시키고 버튼만 받는다 —
        버튼 사이 빈 자리가 게임 입력을 가로채면 안 된다.
 
-       칸 나눔은 Unity 쪽 ResultScreenBuildKit 의 상수를 그대로 옮긴 것이다
-       (Area_Share 152×37 = 초록 바 116 + 간격 4 + 카카오 아이콘 32).
-       한쪽만 고치면 초록 바를 눌렀는데 카카오가 뜬다. */
+       칸 나눔은 씬의 Area_Share 를 그대로 옮긴 것이다
+       (Area_Share 88×38 = 카톡 아이콘 38 + 간격 12 + 공유 아이콘 38).
+       한쪽만 고치면 공유를 눌렀는데 카카오가 뜬다. */
     #phd-share-layer {
       position: fixed;
       z-index: 10;
       display: flex;
       align-items: center;
-      gap: 2.63%;            /* 4 / 152 */
+      gap: 13.64%;           /* 12 / 88 */
       pointer-events: none;
     }
     #phd-share-layer[hidden] { display: none; }
 
-    /* 카카오 아이콘이 왼쪽, 넓은 초록 바가 오른쪽 — 마크업 순서 그대로다. */
-    #phd-kakao { flex: 0 0 21.05%; height: 86.5%; }   /* 32 / 152, 32 / 37 */
-    #phd-share { flex: 1 1 auto; height: 100%; }
+    /* 카카오 아이콘이 왼쪽, 공유 아이콘이 오른쪽 — 마크업 순서 그대로다. 둘 다 같은 정사각형이다. */
+    #phd-kakao { flex: 0 0 43.18%; height: 100%; }   /* 38 / 88 */
+    #phd-share { flex: 0 0 43.18%; height: 100%; }
 
     /* 보이는 것은 전부 Unity 가 그린다. 이쪽은 클릭만 받는 투명한 판이다.
        글자는 남겨 둔다 — 화면에는 안 보여도 스크린 리더에는 읽힌다. */

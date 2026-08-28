@@ -24,18 +24,22 @@ public class CharacterSelectScreen : UIScreen
     [SerializeField] private CanvasGroup playGroup;
     [Tooltip("정면 캐릭터의 이름 표시.")]
     [SerializeField] private TMP_Text nameText;
-    [Tooltip("몇 번째 캐릭터인지 표시(\"1 / 5\").")]
-    [SerializeField] private TMP_Text counterText;
     [Tooltip("정면 캐릭터의 난이도 이름 표시.")]
     [SerializeField] private TMP_Text difficultyText;
     [Tooltip("난이도 별. 왼쪽부터 켜지고 남는 것은 꺼진다.")]
     [SerializeField] private Image[] difficultyStars;
+    [Tooltip("위쪽 띠의 최고점수 표시.")]
+    [SerializeField] private TMP_Text bestText;
 
     [Header("캐릭터")]
     [Tooltip("회전판 슬롯 순서대로의 캐릭터. 슬롯과 개수가 같아야 한다.")]
     [SerializeField] private Character[] characters;
     [Tooltip("잠긴 슬롯이 정면일 때 이름 자리에 보여줄 문구.")]
     [SerializeField] private string lockedName = "LOCKED";
+
+    [Header("기록")]
+    [Tooltip("최고점수 저장 키. GameFlow 가 쓰는 키와 반드시 같아야 한다.")]
+    [SerializeField] private string bestScoreKey = "phd.memory.best";
 
     [Header("연출")]
     [Tooltip("등장할 때 무대(회전판)가 제자리를 찾는 시간(초).")]
@@ -109,6 +113,7 @@ public class CharacterSelectScreen : UIScreen
 
     protected override void OnShown()
     {
+        RefreshBest();
         Refresh(carousel != null ? carousel.FrontIndex : 0, popName: false);
 
         if (!isActiveAndEnabled) return;
@@ -197,9 +202,6 @@ public class CharacterSelectScreen : UIScreen
             }
         }
 
-        if (counterText != null && carousel != null)
-            counterText.SetText("{0} / {1}", frontIndex + 1, carousel.Count);
-
         if (difficultyText != null) difficultyText.SetText(character.difficulty);
         SetStars(character.stars);
 
@@ -236,6 +238,28 @@ public class CharacterSelectScreen : UIScreen
         {
             if (difficultyStars[i] != null) difficultyStars[i].gameObject.SetActive(i < count);
         }
+    }
+
+    // 최고점수는 게임 씬에서 갱신되고 돌아오므로, 화면이 열릴 때마다 다시 읽는다.
+    private void RefreshBest()
+    {
+        if (bestText == null) return;
+
+        int best;
+        try
+        {
+            best = PlayerPrefs.GetInt(bestScoreKey, 0);
+        }
+        catch (Exception e)
+        {
+            // 시크릿 모드나 저장소 차단 브라우저에서는 읽기 자체가 실패할 수 있다.
+            Debug.LogWarning("[PHD] 최고점수를 읽지 못했습니다: " + e.Message);
+            best = 0;
+        }
+
+        // 아직 한 판도 안 한 사람에게 "BEST 0" 은 알려주는 게 없다. 그냥 숨긴다.
+        bestText.gameObject.SetActive(best > 0);
+        if (best > 0) bestText.SetText("BEST {0}", best);
     }
 
     private IEnumerator NamePop()

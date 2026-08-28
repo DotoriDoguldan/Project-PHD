@@ -116,31 +116,36 @@
          PHDShare.debug(true)          // 히트 영역을 빨간 테두리로 표시
   -->
   <div id="phd-share-layer" hidden>
-    <button type="button" id="phd-kakao" class="phd-btn">카카오톡</button>
-    <button type="button" id="phd-share" class="phd-btn">공유하기</button>
+    <button type="button" id="phd-kakao" class="phd-btn">카카오톡으로 알리기</button>
+    <button type="button" id="phd-share" class="phd-btn">친구에게 알리기</button>
     <div id="phd-toast" role="status" aria-live="polite"></div>
   </div>
 
   <style>
     /* 캔버스 위에 얹히는 버튼 줄. 컨테이너는 클릭을 통과시키고 버튼만 받는다 —
-       버튼 사이 빈 자리가 게임 입력을 가로채면 안 된다. */
-    /* gap 5% = Unity 쪽 두 버튼(각 76px) 사이 간격 8px. Area_Share 폭 160 기준이다.
-       컨테이너는 클릭을 통과시키고 버튼만 받는다 — 사이 빈 자리가 게임 입력을 가로채면 안 된다. */
+       버튼 사이 빈 자리가 게임 입력을 가로채면 안 된다.
+
+       칸 나눔은 Unity 쪽 ResultScreenBuildKit 의 상수를 그대로 옮긴 것이다
+       (Area_Share 152×37 = 초록 바 116 + 간격 4 + 카카오 아이콘 32).
+       한쪽만 고치면 초록 바를 눌렀는데 카카오가 뜬다. */
     #phd-share-layer {
       position: fixed;
       z-index: 10;
       display: flex;
-      gap: 5%;
+      align-items: center;
+      gap: 2.63%;            /* 4 / 152 */
       pointer-events: none;
     }
     #phd-share-layer[hidden] { display: none; }
 
+    /* 카카오 아이콘이 왼쪽, 넓은 초록 바가 오른쪽 — 마크업 순서 그대로다. */
+    #phd-kakao { flex: 0 0 21.05%; height: 86.5%; }   /* 32 / 152, 32 / 37 */
+    #phd-share { flex: 1 1 auto; height: 100%; }
+
     /* 보이는 것은 전부 Unity 가 그린다. 이쪽은 클릭만 받는 투명한 판이다.
        글자는 남겨 둔다 — 화면에는 안 보여도 스크린 리더에는 읽힌다. */
     .phd-btn {
-      flex: 1 1 0;
       min-width: 0;
-      height: 100%;
       padding: 0;
       margin: 0;
       box-sizing: border-box;
@@ -369,7 +374,7 @@
     })();
   </script>
 
-  <script src="Build/docs.loader.js?v=260827074537"></script>
+  <script src="Build/docs.loader.js?v=260828011741"></script>
   <script>
     (function () {
       var canvas = document.querySelector("#unity-canvas");
@@ -425,9 +430,9 @@
       if (window.ResizeObserver) new ResizeObserver(layoutCanvas).observe(document.documentElement);
 
       var config = {
-        dataUrl: "Build/docs.data.unityweb?v=260827074537",
-        frameworkUrl: "Build/docs.framework.js.unityweb?v=260827074537",
-        codeUrl: "Build/docs.wasm.unityweb?v=260827074537",
+        dataUrl: "Build/docs.data.unityweb?v=260828011741",
+        frameworkUrl: "Build/docs.framework.js.unityweb?v=260828011741",
+        codeUrl: "Build/docs.wasm.unityweb?v=260828011741",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "도토리도굴단",
         productName: "PLAY it YOUR WAY",
