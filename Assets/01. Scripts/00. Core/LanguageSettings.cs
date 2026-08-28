@@ -10,7 +10,8 @@ public enum GameLanguage
 
 /// <summary>
 /// 게임 전역 언어 상태. 씬을 넘어도 유지되고, 바뀌면 <see cref="Changed"/> 로 알린다.
-/// 아직 텍스트를 실제로 갈아끼우지는 않는다 — 상태를 들고 알리는 일만 한다.
+/// <b>언어별 문자열은 여기에 두지 않는다</b> — 언어 이름(KOR/ENG)까지 전부 <see cref="GameText"/> 표에 있다.
+/// 한 줄이라도 여기에 적어 두면 언어를 늘릴 때 고칠 곳이 둘로 갈라진다.
 /// 표시를 바꿔야 하는 쪽이 <see cref="Changed"/> 를 구독하고 <see cref="Current"/> 를 읽어 간다.
 ///
 /// 정적 이벤트라 구독한 쪽이 사라져도 구독은 남는다. 구독하는 컴포넌트는
@@ -24,19 +25,15 @@ public static class LanguageSettings
 {
     private const string PrefsKey = "phd.language";
 
-    // 순환 순서. Enum.GetValues 는 호출할 때마다 배열을 새로 만들어서 대신 캐시해 둔다.
-    private static readonly GameLanguage[] Order = { GameLanguage.Korean, GameLanguage.English };
+    // 순환 순서 = enum 선언 순서. Enum.GetValues 는 호출할 때마다 배열을 새로 만들어서 한 번만 읽어 둔다.
+    // 손으로 다시 적지 않는다 — GameText 의 표도 같은 순서를 쓰는데, 언어를 늘릴 때 한쪽만 빠지면
+    // 새 언어가 표에는 있고 버튼으로는 갈 수 없는 상태가 된다.
+    private static readonly GameLanguage[] Order = (GameLanguage[])Enum.GetValues(typeof(GameLanguage));
 
     // 시작 시에는 호출되지 않는다 — 구독하는 쪽이 현재 값으로 한 번 맞추고 시작해야 한다.
     public static event Action<GameLanguage> Changed;
 
     public static GameLanguage Current { get; private set; }
-
-    // 공유 링크·웹 연동용.
-    public static string Code => Current == GameLanguage.English ? "en" : "ko";
-
-    // 화면 표시용. 상수 문자열이라 갱신할 때 할당이 없다.
-    public static string LabelOf(GameLanguage language) => language == GameLanguage.English ? "EN" : "KO";
 
     // 첫 씬이 로드되기 전에 저장된 값을 불러온다. 씬에 무언가를 놓을 필요가 없다.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -56,11 +53,19 @@ public static class LanguageSettings
         Changed?.Invoke(language);
     }
 
-    public static void Next()
+    /// <summary>다음 언어로. 마지막이면 처음으로 돌아온다.</summary>
+    public static void Next() => Step(1);
+
+    /// <summary>이전 언어로. 처음이면 마지막으로 돌아간다.</summary>
+    public static void Previous() => Step(-1);
+
+    // 타이틀의 좌우 화살표가 방향만 달리해서 부른다.
+    private static void Step(int delta)
     {
         // 못 찾으면(-1) 첫 언어로 간다.
         int index = Array.IndexOf(Order, Current);
-        Set(Order[(index + 1) % Order.Length]);
+        int count = Order.Length;
+        Set(Order[((index + delta) % count + count) % count]);
     }
 
     private static GameLanguage Load()

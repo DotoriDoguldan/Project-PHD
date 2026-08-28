@@ -114,7 +114,8 @@ public class ResultScreen : UIScreen
         // 제목 자리는 하나다 — 평소에는 GAME OVER 아트가, 신기록이면 그 자리에 문구가 들어간다.
         if (gameOverArt != null) gameOverArt.SetActive(!newBest);
         if (newBestText != null) newBestText.gameObject.SetActive(newBest);
-        // 라벨과 값을 따로 두지 않고 한 줄로 찍는다. SetText 오버로드라 문자열을 새로 만들지 않는다
+        // 라벨과 값을 따로 두지 않고 한 줄로 찍는다. 이 두 줄은 어느 언어에서나 'round 3 Best 120' 이라
+        // GameText 를 거치지 않는다. SetText 오버로드라 문자열을 새로 만들지 않는다
         // (WebGL 은 단일 스레드라 GC 가 프레임에 그대로 보인다).
         if (roundText != null) roundText.SetText("round {0}", round);
         if (scoreText != null) scoreText.SetText("{0}", score);

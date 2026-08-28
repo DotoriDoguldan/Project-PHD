@@ -1,19 +1,10 @@
 fileFormatVersion: 2
-guid: 264f1cca4c6f147449a61e52aa6627ef
+guid: 15dc078fd4c693748a5eea212702b51d
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -589000758293856476
-    second: james_full_0
-  - first:
-      213: -1147252586555017094
-    second: james_full_1
-  - first:
-      213: -2076745074616829005
-    second: james_full_2
-  - first:
-      213: 7440936482464858474
-    second: james_full_3
+      213: -182861919010056104
+    second: "\uC785\uB825\uC6D0_\uBE68\uAC15_0"
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -55,7 +46,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -122,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: james_full_0
+      name: "\uC785\uB825\uC6D0_\uBE68\uAC15_0"
       rect:
         serializedVersion: 2
-        x: 105
-        y: 61
-        width: 214
-        height: 554
+        x: 0
+        y: 0
+        width: 363
+        height: 363
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -137,74 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 42f75755ee273d7f0800000000000000
-      internalID: -589000758293856476
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: james_full_1
-      rect:
-        serializedVersion: 2
-        x: 384
-        y: 39
-        width: 275
-        height: 583
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: a787db6d9d32410f0800000000000000
-      internalID: -1147252586555017094
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: james_full_2
-      rect:
-        serializedVersion: 2
-        x: 744
-        y: 101
-        width: 258
-        height: 501
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 3bbfb629b5bed23e0800000000000000
-      internalID: -2076745074616829005
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: james_full_3
-      rect:
-        serializedVersion: 2
-        x: 1052
-        y: 106
-        width: 338
-        height: 506
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: a6100999e44834760800000000000000
-      internalID: 7440936482464858474
+      spriteID: 8589572bd08567df0800000000000000
+      internalID: -182861919010056104
       vertices: []
       indices: 
       edges: []
@@ -213,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -223,10 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      james_full_0: -589000758293856476
-      james_full_1: -1147252586555017094
-      james_full_2: -2076745074616829005
-      james_full_3: 7440936482464858474
+      "\uC785\uB825\uC6D0_\uBE68\uAC15_0": -182861919010056104
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

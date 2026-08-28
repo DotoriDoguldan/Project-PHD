@@ -4,8 +4,8 @@ using UnityEngine.UI;
 
 /// <summary>
 /// 출제 문양을 QTE 프롬프트처럼 보여주는 연출.
-/// 출제(Showing) 중에는 프레임 사이를 꽉 채운 제임스 포즈 + 제임스 좌우 랜덤 위치의 버튼 문양 + 버튼 위로 줄어드는 링을 보여주고,
-/// 입력(AwaitInput) 중에는 검게 덮인 버튼 + 줄어드는 링만 반복한다 — 누를 자리·타이밍만 보이고 무슨 키인지는 숨긴다.
+/// 출제(Showing) 중에는 프레임 사이를 꽉 채운 제임스 포즈 + 제임스 좌우 랜덤 위치의 버튼 문양 + 그 버튼 색으로 줄어드는 링을 보여주고,
+/// 입력(AwaitInput) 중에는 검게 덮인 버튼 + 똑같이 검게 덮인 링만 반복한다 — 누를 자리·타이밍만 보이고 무슨 키인지는 숨긴다.
 /// (패드 문양 4종은 실루엣이 같은 원형 버튼이라 검게 덮으면 구분되지 않는다.)
 /// 규칙은 그대로고(제한시간 없음) 표현만 QTE다. 오브젝트 생성 없이 스프라이트만 갈아 끼운다.
 /// </summary>
@@ -29,6 +29,9 @@ public class QtePrompt : MonoBehaviour
     [SerializeField, Min(0f)] private float jamesMargin = 12f;
 
     [Header("링 연출")]
+    [Tooltip("패드 index 순서대로 대응하는 링. 그 패드 버튼과 같은 색이다(원=빨강, 세모=초록, 엑스=파랑, 네모=핑크). " +
+             "해당 칸이 비어 있으면 그 패드는 씬에 꽂힌 기본 링을 쓴다.")]
+    [SerializeField] private Sprite[] ringSprites;
     [Tooltip("링이 줄어들기 시작하는 배율.")]
     [SerializeField] private float ringStartScale = 2.2f;
     [Tooltip("링이 다 줄어든 배율. 1이면 버튼 문양을 감싸는 원본 크기.")]
@@ -43,7 +46,7 @@ public class QtePrompt : MonoBehaviour
     [SerializeField, Min(1f)] private float keySize = 30f;
     [Tooltip("출제 중 버튼 문양과 제임스 옆면 사이 간격(아트 픽셀). 음수면 그만큼 제임스 위로 겹친다.")]
     [SerializeField] private float keyGap = -10f;
-    [Tooltip("입력 대기 중 버튼 문양을 덮는 색. 누를 자리만 보여주고 무슨 키인지는 숨긴다.")]
+    [Tooltip("입력 대기 중 버튼 문양과 링을 덮는 색. 누를 자리만 보여주고 무슨 키인지는 숨긴다.")]
     [SerializeField] private Color hiddenKeyColor = Color.black;
 
     // 브라우저 탭을 전환했다 돌아오면 큰 델타타임이 한 번 들어온다.
@@ -60,9 +63,12 @@ public class QtePrompt : MonoBehaviour
     private RectTransform _keyRect;
     private RectTransform _jamesRect;
     private Coroutine _routine;
+    // 씬에 꽂혀 있는 링. 색이 정해지지 않은 자리(입력 대기)와 빠진 칸이 돌아갈 자리다.
+    private Sprite _defaultRing;
 
     private void Awake()
     {
+        _defaultRing = ringImage.sprite;
         _ringRect = ringImage.rectTransform;
         _keyRect = keyImage.rectTransform;
         _jamesRect = jamesImage.rectTransform;
@@ -94,6 +100,9 @@ public class QtePrompt : MonoBehaviour
         ApplyKeySize(keySprite);
         keyImage.color = Color.white;
 
+        ApplyRingSprite(padIndex);
+        ringImage.color = Color.white;
+
         // 제임스가 없으면 기준으로 삼을 옆면도 없다 — 직전 출제의 크기·위치 잔값으로 밀어내지 않고 중앙에 둔다.
         Vector2 keyPosition = hasJames ? RandomKeyPosition() : Vector2.zero;
         _keyRect.anchoredPosition = keyPosition;
@@ -108,6 +117,10 @@ public class QtePrompt : MonoBehaviour
     public void ShowInputRing(float period)
     {
         keyImage.color = hiddenKeyColor;
+        // 링 색이 곧 정답이다 — 버튼과 똑같이 덮어서 감춘다. 네 링은 색만 다르고 모양이 같으니
+        // 기본 링으로 돌려 놓으면 직전 출제의 색이 남지 않는다.
+        ringImage.sprite = _defaultRing;
+        ringImage.color = hiddenKeyColor;
         _keyRect.anchoredPosition = inputRingPosition;
         _ringRect.anchoredPosition = inputRingPosition;
         Restart(InputRingRoutine(Mathf.Max(0.01f, period > 0f ? period : inputRingPeriod)));
@@ -122,6 +135,17 @@ public class QtePrompt : MonoBehaviour
         }
         SetVisible(false, false, false);
         _ringRect.localScale = Vector3.one;
+    }
+
+    // 링은 패드마다 색이 다르다. 빠진 칸은 직전 출제의 링을 그대로 두지 않고 기본 링으로 돌아간다
+    // — 링 색이 곧 정답이라, 남은 색은 다른 패드를 가리키는 거짓 힌트가 된다.
+    // (StageBackground 가 배경을 갈아 끼우는 방식과 같다.)
+    private void ApplyRingSprite(int padIndex)
+    {
+        bool hasSprite = ringSprites != null
+                         && padIndex >= 0 && padIndex < ringSprites.Length
+                         && ringSprites[padIndex] != null;
+        ringImage.sprite = hasSprite ? ringSprites[padIndex] : _defaultRing;
     }
 
     // 버튼 문양을 keySize(긴 변) 기준으로 비율을 지키며 맞춘다.

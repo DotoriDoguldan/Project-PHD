@@ -1,47 +1,44 @@
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// 지구본 아이콘 버튼 — 누르면 다음 언어로 넘어가고, 옆 라벨에 지금 언어를 보여준다.
-/// 바뀐 언어를 나머지 화면에 반영하는 일은 <see cref="LanguageSettings.Changed"/> 를 구독하는 쪽이 맡는다.
+/// 언어를 바꾸는 버튼. 누르면 <see cref="direction"/> 쪽 언어로 넘어간다 —
+/// 라벨 좌우의 화살표 두 개에 방향만 달리 붙여 쓰라고 만든 필드다.
+/// 언어가 두 개뿐인 지금은 어느 쪽을 눌러도 결과가 같지만, 셋이 되면 화살표대로 움직인다.
+///
+/// 현재 언어를 보여주는 라벨은 이 버튼이 아니라 <see cref="LocalizedText"/>(ID: language_name) 가 맡는다
+/// — 씬 라벨을 언어에 맞춰 갈아 끼우는 일은 이미 그쪽 일이라 여기서 또 할 이유가 없다.
 /// 눌림 연출·클릭음은 UIButton 이 맡는다 — 여기서 또 소리를 내면 두 번 들린다.
 /// </summary>
 [RequireComponent(typeof(Button))]
 [RequireComponent(typeof(UIButton))]
 public class LanguageButton : MonoBehaviour
 {
-    [Tooltip("현재 언어를 보여주는 라벨(KO/EN). 비워두면 아이콘만 보인다.")]
-    [SerializeField] private TMP_Text label;
+    public enum Direction
+    {
+        Next,
+        Previous
+    }
+
+    [Tooltip("누르면 어느 쪽 언어로 넘어갈지. 오른쪽 화살표는 Next, 왼쪽 화살표는 Previous.")]
+    [SerializeField] private Direction direction = Direction.Next;
 
     private Button _button;
 
     private void Awake()
     {
         _button = GetComponent<Button>();
-        _button.onClick.AddListener(LanguageSettings.Next);
-    }
-
-    // 정적 이벤트라 떼지 않으면 씬을 넘어간 뒤에도 죽은 오브젝트가 호출된다.
-    private void OnEnable()
-    {
-        LanguageSettings.Changed += Apply;
-        Apply(LanguageSettings.Current);
-    }
-
-    private void OnDisable()
-    {
-        LanguageSettings.Changed -= Apply;
+        _button.onClick.AddListener(Step);
     }
 
     private void OnDestroy()
     {
-        if (_button != null) _button.onClick.RemoveListener(LanguageSettings.Next);
+        if (_button != null) _button.onClick.RemoveListener(Step);
     }
 
-    private void Apply(GameLanguage language)
+    private void Step()
     {
-        // SetText 는 문자열을 새로 만들지 않는다(WebGL 은 단일 스레드라 GC 가 프레임에 보인다).
-        if (label != null) label.SetText(LanguageSettings.LabelOf(language));
+        if (direction == Direction.Previous) LanguageSettings.Previous();
+        else LanguageSettings.Next();
     }
 }
