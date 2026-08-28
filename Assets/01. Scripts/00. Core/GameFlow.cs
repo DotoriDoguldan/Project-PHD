@@ -224,6 +224,9 @@ public class GameFlow : MonoBehaviour
 
     private void HandleInput(int index)
     {
+        // 플레이어가 입력을 시작하면 "YOUR TURN" 안내를 지운다 (첫 입력 시점에 사라지게).
+        hud.ClearMessage();
+
         if (_sequence.Submit(index))
         {
             // 정답일 때만 패드음을 낸다. (오답은 아래 ApplyMistake에서 wrong 효과음만 재생)
