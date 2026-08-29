@@ -33,19 +33,6 @@ public static class SfxId
         return index >= 0 && index < PadIds.Length ? PadIds[index] : null;
     }
 
-    // 백킹 드럼 킥. 매 박자(정박)마다 울려 그루브의 뼈대를 잡습니다.
-    // 킥 패턴(KickPattern)에서 박자마다 아래 중 하나를 골라(강/약 다른 샘플 등) 볼륨과 함께 재생합니다.
-    // 서로 다른 킥 음원을 쓰고 싶으면 SoundLibrary에 kick_0~kick_3 클립을 등록하고 패턴에서 고르세요.
-    public const string Kick = "kick";       // 기본 킥
-    public const string Kick0 = "kick_0";
-    public const string Kick1 = "kick_1";
-    public const string Kick2 = "kick_2";
-    public const string Kick3 = "kick_3";
-
-    // 하이햇. 킥과 함께 킥 패턴에서 박자(칸)마다 골라 씁니다. (닫힌/열린)
-    public const string HatClosed = "hat_closed";
-    public const string HatOpen = "hat_open";
-
     // 3-2-1 카운트다운 틱
     public const string Countdown = "countdown";
     // 틀렸을 때

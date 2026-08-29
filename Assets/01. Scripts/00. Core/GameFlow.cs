@@ -87,13 +87,6 @@ public class GameFlow : MonoBehaviour
              "1 = 제시된 박자 텀과 정확히 같음(최소값), 2 = 두 배 여유. (BPM이 0 이하일 땐 무시하고 QtePrompt 기본 주기 사용)")]
     [SerializeField, Min(1f)] private float inputTimeScale = 1.5f;
 
-    [Tooltip("백킹 킥 사용 여부. 켜면 게임 내내 매 박자(정박)마다 kick 효과음이 울려 그루브의 뼈대를 잡는다. (BPM이 0보다 클 때만 동작)")]
-    [SerializeField] private bool useBackingKick = true;
-    [Tooltip("킥 패턴을 한 박(1비트)에 몇 칸으로 쪼갤지. 1=4분음표, 2=8분음표, 4=16분음표. 킥+하이햇 그루브는 보통 2(8분음표).")]
-    [SerializeField, Min(1)] private int kickStepsPerBeat = 2;
-    [Tooltip("킥/하이햇의 칸별 {음원 + 볼륨%} 패턴. 칸 순서대로 순환한다. soundId를 비우거나 볼륨 0이면 그 칸은 쉼표(무음).")]
-    [SerializeField] private KickPattern kickPattern = new KickPattern();
-
     private const string BestScoreKey = "phd.memory.best";
     private const float MaxTimeStep = 0.1f;      // 한 프레임에 인정할 최대 경과시간
 
@@ -110,11 +103,6 @@ public class GameFlow : MonoBehaviour
 
     private GamePhase _phase = GamePhase.Ready;
     private Coroutine _loop;
-    private Coroutine _backingKick;
-    private float _beatTime;        // 킥(박자 그리드) 시작 이후 누적된 박자 시계. 카운트다운 정렬의 위상 기준.
-    private float _nextStepTime;    // 다음 킥 '칸'이 울릴 시각(_beatTime 기준). 매 칸마다 현재 BPM으로 갱신.
-    private int _kickStepsFired;    // 지금까지 친 킥 '칸' 수(8분음표 등 세분 단위).
-    private bool _beatClockOn;      // 박자 시계가 도는 중인지.
     private bool _paused;
     private bool _failed;
     private bool _replayRequested;
@@ -181,7 +169,6 @@ public class GameFlow : MonoBehaviour
     {
         // 씬이 내려가는데 결과창만 남아 화면을 덮고 있는 상황을 막는다.
         ResultShare.Hide();
-        StopBackingKick();
         if (qtePrompt != null) qtePrompt.InputRingExpired -= OnInputRingExpired;
 
         if (pads == null) return;
@@ -265,9 +252,8 @@ public class GameFlow : MonoBehaviour
 
         if (_mistakes >= maxMistakes)
         {
-            // 마지막(치명적) 실수: 게임오버 효과음을 재생하고 정박 펄스(킥)를 즉시 멈춘다.
+            // 마지막(치명적) 실수: 게임오버 효과음을 재생한다.
             sound?.PlaySfx(SfxId.GameOver);
-            StopBackingKick();
             _failed = true;
             _phase = GamePhase.GameOver;
         }
@@ -291,7 +277,6 @@ public class GameFlow : MonoBehaviour
 
     private void EnterReady()
     {
-        StopBackingKick();
         _phase = GamePhase.Ready;
         _round = 0;
         _score = 0;
@@ -367,11 +352,6 @@ public class GameFlow : MonoBehaviour
         // 인스펙터 BPM이 있으면 박자 연출로, 없으면(0 이하) 초 기반 폴백으로 진행한다.
         bool onBeat = BeatDuration > 0f;
 
-        // 백킹 킥(정박 펄스)은 첫 라운드에 딱 한 번 시작해 게임오버까지 한 줄기로 이어진다.
-        // 라운드마다 재시작하지 않으므로 전환 지점에서 킥이 겹쳐 들리지 않는다.
-        if (_round == 1 && onBeat)
-            StartBackingKick();
-
         // --- 카운트다운 ---
         if (onBeat)
             yield return CountdownOnBeat();
@@ -382,14 +362,9 @@ public class GameFlow : MonoBehaviour
         // --- 순서 재생(정답 미리보기) ---
         _phase = GamePhase.Showing;
         if (onBeat)
-        {
-            // 백킹 킥은 첫 라운드부터 정박으로 계속 돌고 있다. 여기선 그 위에 멜로디(당김음)만 얹는다.
             yield return ShowSequenceOnBeat();
-        }
         else
-        {
             yield return ShowSequenceFree();
-        }
 
         // --- 입력 ---
         // 누르기 전에는 기본 배경이다 — 색으로 정답을 흘리지 않는다. (누른 뒤는 HandleInput 이 그 패드 색으로 바꾼다)
@@ -426,16 +401,13 @@ public class GameFlow : MonoBehaviour
     }
 
     // 인스펙터 BPM 박자에 맞춰 3-2-1 카운트다운을 진행한다.
-    // 킥의 박자 시계(_beatTime)에 정렬 → countdownStartBeats 대기(그동안 ROUND 표기)
-    // → 각 숫자를 countdownBeatInterval 간격으로(효과음 포함) → previewDelayBeats 대기 순서다.
+    // countdownStartBeats 대기(그동안 ROUND 표기) → 각 숫자를 countdownBeatInterval 간격으로
+    // (효과음 포함) → previewDelayBeats 대기 순서다.
     private IEnumerator CountdownOnBeat()
     {
         float beat = BeatDuration;
 
-        // 킥과 같은 박자 그리드에 정렬한다(다음 박자 경계까지 대기). 그래야 카운트다운이 킥과 같은 박에 떨어진다.
-        yield return Wait(SecondsToNextBeat());
-
-        // 정렬 지점 이후 지정 박자만큼 기다렸다 카운트다운 시작. 그동안 ROUND 타이틀이 보인다.
+        // 지정 박자만큼 기다렸다 카운트다운 시작. 그동안 ROUND 타이틀이 보인다.
         if (countdownStartBeats > 0f)
             yield return Wait(beat * countdownStartBeats);
 
@@ -527,83 +499,6 @@ public class GameFlow : MonoBehaviour
     // 들려준 리듬과 눌러야 하는 리듬이 어긋나지 않는다.
     private static int GapSteps(int[] groove, int noteIndex)
         => Mathf.Max(1, groove[noteIndex % groove.Length]);
-
-    // --- 백킹 킥: 인스펙터 BPM에 맞춰 매 박자(정박)마다 울리는 단일 펄스. ---
-
-    private void StartBackingKick()
-    {
-        if (!useBackingKick || BeatDuration <= 0f) return;
-        StopBackingKick();
-        _backingKick = StartCoroutine(BackingKickLoop());
-    }
-
-    private void StopBackingKick()
-    {
-        _beatClockOn = false;
-        if (_backingKick != null)
-        {
-            StopCoroutine(_backingKick);
-            _backingKick = null;
-        }
-    }
-
-    // 게임 시작(첫 라운드)부터 게임오버/대기까지, 인스펙터 BPM에 맞춰 매 박자에 한 번씩만 치는 단일 펄스.
-    // 게임 자체의 프레임 시계 하나(_beatTime)로만 돌기 때문에 두 시계가 어긋나 겹치거나 당겨지지 않는다.
-    // 박자 경계를 '넘길 때'만 치므로, 프레임이 크게 밀려도(탭 복귀 등) 몰아서 여러 번 치지 않는다.
-    private IEnumerator BackingKickLoop()
-    {
-        if (BeatDuration <= 0f) { _backingKick = null; yield break; }
-
-        _beatTime = 0f;
-        _nextStepTime = 0f;
-        _kickStepsFired = 0;
-        _beatClockOn = true;
-
-        while (_phase != GamePhase.GameOver && _phase != GamePhase.Ready)
-        {
-            // 도달한 칸 경계마다 한 번씩(보통 프레임당 1회). 칸마다 패턴에서 {음원 + 볼륨%}를 순환 조회한다.
-            // 음원이 비었거나 볼륨 0이면 그 칸은 쉼표(무음).
-            while (_beatTime + 0.0001f >= _nextStepTime)
-            {
-                KickPattern.Step step = kickPattern.StepAt(_kickStepsFired);
-
-                if (!string.IsNullOrEmpty(step.soundId) && step.volumePercent > 0)
-                    SoundManager.Instance?.PlaySfx(step.soundId, step.volumePercent / 100f, 1f);
-
-                _kickStepsFired++;
-                // 다음 칸 시각은 '현재' BPM으로 잡는다 → 라운드가 올라 BPM이 바뀌면 곧바로 새 템포를 따른다.
-                float stepDur = BeatDuration / Mathf.Max(1, kickStepsPerBeat);
-                _nextStepTime += stepDur > 0f ? stepDur : 0.001f;
-            }
-
-            yield return null;
-            if (_paused) continue;
-            // Wait과 같은 상한으로 큰 델타를 잘라, 탭 복귀 시 박자 시계가 튀지 않게 한다.
-            _beatTime += Mathf.Min(Time.unscaledDeltaTime, MaxTimeStep);
-        }
-
-        _beatClockOn = false;
-        _backingKick = null;
-    }
-
-    /// <summary>
-    /// 킥 스케줄러 기준, 다음 '박(1비트) 경계'까지 남은 시간(초). 시계가 멈춰 있으면 0.
-    /// 박 경계 = 칸 index가 kickStepsPerBeat의 배수인 지점이라, 카운트다운이 킥과 같은 박에 떨어진다.
-    /// _nextStepTime 로 계산하므로 BPM이 바뀌어도 올바르게 정렬된다.
-    /// </summary>
-    private float SecondsToNextBeat()
-    {
-        if (!_beatClockOn || BeatDuration <= 0f) return 0f;
-
-        int kspb = Mathf.Max(1, kickStepsPerBeat);
-        float stepDur = BeatDuration / kspb;
-
-        // 다음 칸(_kickStepsFired)은 _nextStepTime 에 울린다. 거기서 다음 박 경계까지 남은 칸 수.
-        int rem = _kickStepsFired % kspb;
-        int stepsToBoundary = rem == 0 ? 0 : kspb - rem;
-        float tNextBeat = _nextStepTime + stepsToBoundary * stepDur;
-        return Mathf.Max(0f, tNextBeat - _beatTime);
-    }
 
     // 박자 정보가 없을 때의 폴백. 라운드가 오를수록 조금씩 빨라지는 기존 방식이다.
     private IEnumerator ShowSequenceFree()
