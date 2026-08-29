@@ -75,8 +75,8 @@ public class GameFlow : MonoBehaviour
     [SerializeField, Min(0f)] private float maxBpm = 180f;
     [Tooltip("첫 박자 정렬 후 몇 박자를 기다렸다 3-2-1 카운트다운을 시작할지. 그동안 ROUND 타이틀이 보인다.")]
     [SerializeField, Min(0f)] private float countdownStartBeats = 2f;
-    [Tooltip("카운트다운(READY / GO!)이 몇 박자 간격으로 바뀔지. 각 문구마다 countdown 효과음이 재생된다. (기본 1 → READY+GO 총 2박)")]
-    [SerializeField, Min(0.01f)] private float countdownBeatInterval = 1f;
+    [Tooltip("카운트다운(READY / GO!)이 몇 박자 간격으로 바뀔지. 각 문구마다 countdown 효과음이 재생된다. (0.5 → 각 0.5박, READY+GO 총 1박)")]
+    [SerializeField, Min(0.01f)] private float countdownBeatInterval = 0.5f;
     [Tooltip("카운트다운이 끝난 뒤 몇 박자 후에 정답 미리보기를 보여줄지.")]
     [SerializeField, Min(0f)] private float previewDelayBeats = 1f;
 

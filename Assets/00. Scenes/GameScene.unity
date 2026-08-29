@@ -6493,7 +6493,7 @@ MonoBehaviour:
   bpmIncreaseAmount: 8
   maxBpm: 180
   countdownStartBeats: 1
-  countdownBeatInterval: 1
+  countdownBeatInterval: 0.5
   previewDelayBeats: 0
   grooveCell:
     steps: 04000000040000000400000004000000
