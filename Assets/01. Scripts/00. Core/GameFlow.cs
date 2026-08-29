@@ -41,7 +41,12 @@ public class GameFlow : MonoBehaviour
     [SerializeField] private StageBackground stageBackground;
 
     [Header("규칙")]
+    [Tooltip("첫 라운드의 문제(순서) 길이.")]
     [SerializeField] private int firstRoundLength = 3;
+    [Tooltip("문제 길이가 증가하는 주기. 이 라운드 수(=푼 퍼즐 수)마다 길이가 늘어난다. 1이면 매 라운드.")]
+    [SerializeField, Min(1)] private int lengthIncreaseEveryRounds = 1;
+    [Tooltip("위 주기마다 문제 길이가 몇 개씩 늘어날지. 0이면 늘어나지 않는다.")]
+    [SerializeField, Min(0)] private int lengthIncreaseAmount = 1;
     [Tooltip("패턴(라운드) 하나를 끝까지 성공했을 때 더해지는 점수.")]
     [SerializeField] private int roundClearScore = 10;
     [Tooltip("한 판에서 허용하는 실수 횟수. 이 횟수째 실수에서 게임오버. 1이면 한 번에 게임오버. HUD 의 목숨 칸 수도 이 값을 따라간다.")]
@@ -62,8 +67,10 @@ public class GameFlow : MonoBehaviour
     [Header("박자 타이밍 (킥·연출 템포, 단위: 박)")]
     [Tooltip("시작 BPM. 킥과 박자 연출(카운트다운·순서 재생)의 템포가 이 값에서 시작한다. 0 이하면 박자 기능을 끄고 초 기반 폴백으로 진행한다.")]
     [SerializeField, Min(0f)] private float bpm = 120f;
-    [Tooltip("모든 그루브 셀을 한 바퀴(레벨 하나) 다 쓰면 BPM이 이만큼 증가한다. 0이면 증가하지 않는다.")]
-    [SerializeField, Min(0f)] private float bpmIncreasePerCycle = 8f;
+    [Tooltip("BPM이 증가하는 주기. 이 라운드 수(=푼 퍼즐 수)마다 BPM이 오른다. 1이면 매 라운드.")]
+    [SerializeField, Min(1)] private int bpmIncreaseEveryRounds = 4;
+    [Tooltip("위 주기마다 BPM이 얼마나 증가할지. 0이면 증가하지 않는다.")]
+    [SerializeField, Min(0f)] private float bpmIncreaseAmount = 8f;
     [Tooltip("BPM 상한. 이 값에 도달하면 더 이상 증가하지 않는다. 0 이하면 상한 없음.")]
     [SerializeField, Min(0f)] private float maxBpm = 180f;
     [Tooltip("첫 박자 정렬 후 몇 박자를 기다렸다 3-2-1 카운트다운을 시작할지. 그동안 ROUND 타이틀이 보인다.")]
@@ -74,15 +81,9 @@ public class GameFlow : MonoBehaviour
     [SerializeField, Min(0f)] private float previewDelayBeats = 1f;
 
     [Header("그루브 (박자 재생 시 리듬 셀)")]
-    [Tooltip("데모(순서 재생)에 쓰는 리듬 셀 목록. 라운드마다 순서대로 하나씩 골라 반복 적용한다.\n" +
+    [Tooltip("데모(순서 재생)에 쓰는 리듬 셀 하나.\n" +
              "각 값 = '이 음 이후 다음 음까지의 16분음표 칸 수'(합 16 = 1마디). 비워두면 내장 기본 셀을 쓴다.")]
-    [SerializeField] private GrooveCell[] grooveCells =
-    {
-        new GrooveCell { steps = new[] { 4, 4, 4, 4 } },             // ★    정박 4분음표(쉬움, 브리더)
-        new GrooveCell { steps = new[] { 2, 2, 4, 2, 2, 4 } },       // ★★   8분 바운스
-        new GrooveCell { steps = new[] { 3, 3, 2, 3, 3, 2 } },       // ★★★  당김음(점8분)
-        new GrooveCell { steps = new[] { 3, 1, 2, 2, 3, 1, 2, 2 } }, // ★★★★ 16분 스탭 섞인 촘촘함
-    };
+    [SerializeField] private GrooveCell grooveCell = new GrooveCell { steps = new[] { 2, 2, 4, 2, 2, 4 } };
     [Tooltip("입력 제한시간을 문제(그루브)의 몇 배로 줄지. 각 노트는 문제에서 그 노트로 넘어올 때 걸렸던 박자(직전 그루브 칸)만큼 시간을 받고, 이 값으로 늘어난다.\n" +
              "1 = 제시된 박자 텀과 정확히 같음(최소값), 2 = 두 배 여유. (BPM이 0 이하일 땐 무시하고 QtePrompt 기본 주기 사용)")]
     [SerializeField, Min(1f)] private float inputTimeScale = 1.5f;
@@ -90,14 +91,8 @@ public class GameFlow : MonoBehaviour
     private const string BestScoreKey = "phd.memory.best";
     private const float MaxTimeStep = 0.1f;      // 한 프레임에 인정할 최대 경과시간
 
-    // grooveCells 를 비워둬도 항상 리듬이 붙도록 하는 내장 기본 셀들.
-    private static readonly int[][] DefaultGrooves =
-    {
-        new[] { 4, 4, 4, 4 },             // ★    정박(쉬움)
-        new[] { 2, 2, 4, 2, 2, 4 },       // ★★   8분 바운스
-        new[] { 3, 3, 2, 3, 3, 2 },       // ★★★  당김음
-        new[] { 3, 1, 2, 2, 3, 1, 2, 2 }, // ★★★★ 16분 스탭
-    };
+    // grooveCell 을 비워둬도 항상 리듬이 붙도록 하는 내장 기본 셀.
+    private static readonly int[] DefaultGroove = { 2, 2, 4, 2, 2, 4 };
 
     private readonly MemorySequence _sequence = new MemorySequence();
 
@@ -118,20 +113,16 @@ public class GameFlow : MonoBehaviour
     public int Round => _round;
     public int BestScore => _best;
 
-    /// <summary>레벨 진행에 쓰는 그루브 셀 개수(인스펙터가 비었으면 내장 기본 셀 개수).</summary>
-    private int GrooveCellCount =>
-        (grooveCells != null && grooveCells.Length > 0) ? grooveCells.Length : DefaultGrooves.Length;
-
     /// <summary>
-    /// 이번 라운드의 BPM. 그루브 셀을 한 바퀴(= GrooveCellCount 라운드) 다 쓸 때마다
-    /// <see cref="bpmIncreasePerCycle"/> 만큼 오르고, <see cref="maxBpm"/> 에서 멈춘다.
+    /// 이번 라운드의 BPM. <see cref="bpmIncreaseEveryRounds"/> 라운드마다
+    /// <see cref="bpmIncreaseAmount"/> 만큼 오르고, <see cref="maxBpm"/> 에서 멈춘다.
     /// </summary>
     private float CurrentBpm
     {
         get
         {
-            int cyclesDone = Mathf.Max(0, _round - 1) / Mathf.Max(1, GrooveCellCount);
-            float result = bpm + cyclesDone * bpmIncreasePerCycle;
+            int increments = Mathf.Max(0, _round - 1) / Mathf.Max(1, bpmIncreaseEveryRounds);
+            float result = bpm + increments * bpmIncreaseAmount;
             if (maxBpm > 0f) result = Mathf.Min(result, maxBpm);
             return Mathf.Max(0f, result);
         }
@@ -342,7 +333,9 @@ public class GameFlow : MonoBehaviour
         padInput.InputEnabled = false;
         _phase = GamePhase.Countdown;
 
-        int length = firstRoundLength + (_round - 1);
+        // lengthIncreaseEveryRounds 라운드마다 lengthIncreaseAmount 개씩 길어진다.
+        int lengthSteps = Mathf.Max(0, _round - 1) / Mathf.Max(1, lengthIncreaseEveryRounds);
+        int length = firstRoundLength + lengthSteps * lengthIncreaseAmount;
         _sequence.Generate(length, pads.Length);
 
         hud.SetRound(_round);
@@ -458,18 +451,13 @@ public class GameFlow : MonoBehaviour
         }
     }
 
-    /// <summary>이번 라운드에 쓸 리듬 셀. 인스펙터 목록을 라운드별로 순환 선택하고, 비어 있으면 내장 기본 셀을 쓴다.</summary>
+    /// <summary>재생·입력에 쓸 리듬 셀. 인스펙터 셀이 비어 있으면 내장 기본 셀을 쓴다.</summary>
     private int[] CurrentGrooveSteps()
     {
-        int r = Mathf.Max(0, _round - 1);
+        if (grooveCell != null && grooveCell.steps != null && grooveCell.steps.Length > 0)
+            return grooveCell.steps;
 
-        if (grooveCells != null && grooveCells.Length > 0)
-        {
-            GrooveCell cell = grooveCells[r % grooveCells.Length];
-            if (cell != null && cell.steps != null && cell.steps.Length > 0) return cell.steps;
-        }
-
-        return DefaultGrooves[r % DefaultGrooves.Length];
+        return DefaultGroove;
     }
 
     // 지금 눌러야 하는 답 노트의 입력 제한시간(초). 문제(그루브)와 같은 박자로 —

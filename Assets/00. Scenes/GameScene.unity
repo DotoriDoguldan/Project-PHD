@@ -6475,6 +6475,8 @@ MonoBehaviour:
   hud: {fileID: 2137011925}
   stageBackground: {fileID: 840000011}
   firstRoundLength: 3
+  lengthIncreaseEveryRounds: 4
+  lengthIncreaseAmount: 1
   roundClearScore: 10
   maxMistakes: 3
   roundTitleTime: 0.76
@@ -6487,29 +6489,15 @@ MonoBehaviour:
   resultTime: 1
   showBeatHoldRatio: 0.7
   bpm: 60
-  bpmIncreasePerCycle: 8
+  bpmIncreaseEveryRounds: 4
+  bpmIncreaseAmount: 8
   maxBpm: 180
   countdownStartBeats: 1
   countdownBeatInterval: 1
   previewDelayBeats: 0
-  grooveCells:
-  - steps: 04000000040000000400000004000000
-  - steps: 0400000004000000020000000200000004000000
-  - steps: 020000000200000004000000020000000200000004000000
-  - steps: 030000000300000002000000030000000300000002000000
+  grooveCell:
+    steps: 04000000040000000400000004000000
   inputTimeScale: 2
-  useBackingKick: 1
-  kickStepsPerBeat: 2
-  kickPattern:
-    steps:
-    - soundId: kick
-      volumePercent: 100
-    - soundId: hat_closed
-      volumePercent: 10
-    - soundId: kick
-      volumePercent: 50
-    - soundId: hat_closed
-      volumePercent: 10
 --- !u!4 &1408934206
 Transform:
   m_ObjectHideFlags: 0
@@ -7301,7 +7289,7 @@ MonoBehaviour:
   m_fontColor32:
     serializedVersion: 2
     rgba: 4291588096
-  m_fontColor: {r: 0, g: 0.43921569, b: 0.8, a: 1}
+  m_fontColor: {r: 0, g: 0.4392157, b: 0.8, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -7438,7 +7426,7 @@ MonoBehaviour:
   m_fontColor32:
     serializedVersion: 2
     rgba: 4291588096
-  m_fontColor: {r: 0, g: 0.43921569, b: 0.8, a: 1}
+  m_fontColor: {r: 0, g: 0.4392157, b: 0.8, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
