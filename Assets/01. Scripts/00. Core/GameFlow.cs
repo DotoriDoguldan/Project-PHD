@@ -75,7 +75,7 @@ public class GameFlow : MonoBehaviour
     [SerializeField, Min(0f)] private float maxBpm = 180f;
     [Tooltip("첫 박자 정렬 후 몇 박자를 기다렸다 3-2-1 카운트다운을 시작할지. 그동안 ROUND 타이틀이 보인다.")]
     [SerializeField, Min(0f)] private float countdownStartBeats = 2f;
-    [Tooltip("카운트다운 숫자(3, 2, 1)가 몇 박자 간격으로 바뀔지. 각 숫자마다 countdown 효과음이 재생된다.")]
+    [Tooltip("카운트다운(READY / GO!)이 몇 박자 간격으로 바뀔지. 각 문구마다 countdown 효과음이 재생된다. (기본 1 → READY+GO 총 2박)")]
     [SerializeField, Min(0.01f)] private float countdownBeatInterval = 1f;
     [Tooltip("카운트다운이 끝난 뒤 몇 박자 후에 정답 미리보기를 보여줄지.")]
     [SerializeField, Min(0f)] private float previewDelayBeats = 1f;
@@ -393,9 +393,8 @@ public class GameFlow : MonoBehaviour
         yield return Wait(resultTime);
     }
 
-    // 인스펙터 BPM 박자에 맞춰 3-2-1 카운트다운을 진행한다.
-    // countdownStartBeats 대기(그동안 ROUND 표기) → 각 숫자를 countdownBeatInterval 간격으로
-    // (효과음 포함) → previewDelayBeats 대기 순서다.
+    // 인스펙터 BPM 박자에 맞춰 READY → GO! 카운트다운을 진행한다(각 countdownBeatInterval 박, 기본 2박).
+    // countdownStartBeats 대기(그동안 ROUND 표기) → READY → GO! (효과음 포함) → previewDelayBeats 대기 순서다.
     private IEnumerator CountdownOnBeat()
     {
         float beat = BeatDuration;
@@ -404,12 +403,13 @@ public class GameFlow : MonoBehaviour
         if (countdownStartBeats > 0f)
             yield return Wait(beat * countdownStartBeats);
 
-        for (int n = 3; n >= 1; n--)
-        {
-            hud.SetMessage("{0}", n);
-            SoundManager.Instance?.PlaySfx(SfxId.Countdown);
-            yield return Wait(beat * countdownBeatInterval);
-        }
+        hud.SetMessage("READY");
+        SoundManager.Instance?.PlaySfx(SfxId.Countdown);
+        yield return Wait(beat * countdownBeatInterval);
+
+        hud.SetMessage("GO!");
+        SoundManager.Instance?.PlaySfx(SfxId.Countdown);
+        yield return Wait(beat * countdownBeatInterval);
 
         // 카운트다운이 끝나고 지정 박자 이후 정답 미리보기를 시작한다.
         if (previewDelayBeats > 0f)
@@ -421,12 +421,13 @@ public class GameFlow : MonoBehaviour
     {
         yield return Wait(roundTitleTime);
 
-        for (int n = 3; n >= 1; n--)
-        {
-            hud.SetMessage("{0}", n);
-            SoundManager.Instance?.PlaySfx(SfxId.Countdown);
-            yield return Wait(countdownStep);
-        }
+        hud.SetMessage("READY");
+        SoundManager.Instance?.PlaySfx(SfxId.Countdown);
+        yield return Wait(countdownStep);
+
+        hud.SetMessage("GO!");
+        SoundManager.Instance?.PlaySfx(SfxId.Countdown);
+        yield return Wait(countdownStep);
     }
 
     // 인스펙터 BPM 박자에 맞춰 순서를 보여준다.
