@@ -229,6 +229,10 @@ public class GameFlow : MonoBehaviour
         // 플레이어가 입력을 시작하면 "YOUR TURN" 안내를 지운다 (첫 입력 시점에 사라지게).
         hud.ClearMessage();
 
+        // 정답 여부와 무관하다 — 방금 '내가 누른 것'을 보여주는 자리다.
+        qtePrompt.ShowPressedJames(index);
+        stageBackground.ShowPad(index);
+
         if (_sequence.Submit(index))
         {
             // 정답일 때만 패드음을 낸다. (오답은 아래 ApplyMistake에서 wrong 효과음만 재생)
@@ -276,6 +280,13 @@ public class GameFlow : MonoBehaviour
         }
     }
 
+    // 프롬프트와 배경은 항상 같이 켜지고 같이 꺼진다 — 한쪽만 지우면 마지막으로 누른 패드 색이 화면에 남는다.
+    private void ClearStage()
+    {
+        qtePrompt.Hide();
+        stageBackground.ResetToDefault();
+    }
+
     // ------------------------------------------------------------ 루프
 
     private void EnterReady()
@@ -287,8 +298,7 @@ public class GameFlow : MonoBehaviour
         _failed = false;
         _mistakes = 0;
 
-        qtePrompt.Hide();
-        stageBackground.ResetToDefault();
+        ClearStage();
         hud.SetRound(0);
         hud.SetScore(0);
         hud.Dots.Clear();
@@ -382,7 +392,7 @@ public class GameFlow : MonoBehaviour
         }
 
         // --- 입력 ---
-        // 출제가 끝나면 배경은 기본으로 돌아간다 — 플레이어 차례에는 색으로 힌트를 주지 않는다.
+        // 누르기 전에는 기본 배경이다 — 색으로 정답을 흘리지 않는다. (누른 뒤는 HandleInput 이 그 패드 색으로 바꾼다)
         stageBackground.ResetToDefault();
         _phase = GamePhase.AwaitInput;
         hud.SetMessage("YOUR TURN");
@@ -398,7 +408,7 @@ public class GameFlow : MonoBehaviour
         // 킥은 여기서 멈추지 않는다 — 라운드 클리어 연출과 다음 라운드 준비 사이에도
         // 정박 펄스가 이어지도록 두고, 게임오버(HandleInput)와 대기 진입에서만 멈춘다.
         padInput.InputEnabled = false;
-        qtePrompt.Hide();
+        ClearStage();
 
         if (_failed)
         {
@@ -621,8 +631,7 @@ public class GameFlow : MonoBehaviour
             pads[expected].Highlight(0.6f);
         }
         yield return Wait(0.9f);
-        qtePrompt.Hide();
-        stageBackground.ResetToDefault();
+        ClearStage();
     }
 
     private IEnumerator GameOver()

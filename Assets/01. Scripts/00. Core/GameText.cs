@@ -91,7 +91,7 @@ public static class GameText
     private static readonly Entry[] Table =
     {
         new(TextId.Retry,           "다시하기?",                "RETRY?"),
-        new(TextId.ChallengeFriend, "친구에게 공유하기",           "Challenge with Friend!"),
+        new(TextId.ChallengeFriend, "친구 초대하기",             "Invite a friend"),
         new(TextId.DownloadGif,     "GIF 다운로드",              "Download GIF"),
         new(TextId.LanguageName,    "KOR",                     "ENG"),
 

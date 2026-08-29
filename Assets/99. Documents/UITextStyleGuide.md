@@ -27,7 +27,7 @@
 | 본문 전부 | `05. Arts/Fonts/esamanru/esamanru Medium SDF.asset` | 21 |
 | 강조 2자리 | `05. Arts/Fonts/esamanru/esamanru Bold SDF.asset` | 2 |
 
-Bold 를 쓰는 자리는 결과창의 **`RETRY?`** 와 **`Challenge with Friend!`** 뿐이다.
+Bold 를 쓰는 자리는 결과창의 **`RETRY?`** 와 **`Invite a friend`** 뿐이다.
 둘 다 알약 버튼/권유 문구로 "누르라"는 자리라서 굵기를 준다. 그 밖에 Bold 를 늘리지 않는다.
 
 ### 은퇴한 폰트
@@ -101,7 +101,7 @@ Bold 도 행높이 비율이 같다(140.97 / 121 = 1.165 em).
 |---|---|
 | **8** | 결과창 `round 0` · `Best 0` — 점수 아래 한 줄에 나란히 서는 자리 |
 | **10** | 타이틀 언어 라벨(`KOR`/`ENG`) — 지구본 아이콘 아래 |
-| **12** | 결과창 `Challenge with Friend!` · `RANKING` |
+| **12** | 결과창 `Invite a friend` · `RANKING` |
 | **14** | 기본값. 타이틀 `WITH CORTIS`, 캐릭터 선택 띠(`CHOOSE PLAYER`·`BEST`·`RANK`)와 난이도, HUD `round` 라벨·값, 결과창 `RETRY?`·`Download GIF` |
 | **18** | HUD `score` 라벨·값, 결과창 `NEW BEST!` |
 | **24** | 캐릭터 선택 `PLAY`·캐릭터 이름, 결과창 점수 |
@@ -123,16 +123,21 @@ Bold 도 행높이 비율이 같다(140.97 / 121 = 1.165 em).
 
 ## 색
 
+**파랑은 플레이스테이션 브랜드 블루 `#0070CC` 하나뿐이다.** 콜라보 화면이라 파란 글자를 전부
+이 값으로 모았다(2026-08-30). 예전에 쓰던 `#0035A7`(HUD·권유 문구) · `#1668D8`(결과창 점수) ·
+`#2A4A63`(캐릭터 이름·난이도)은 더 이상 쓰지 않는다 — **파랑을 새로 만들지 않는다.**
+`#2A4A63` 은 결과창 `RANKING` 한 자리에만 남아 있다.
+
 색이 갈리는 기준은 **배경**이다. ver3 아트는 배경이 밝아서, 예전 어두운 기기 화면용
 팔레트(`#EEF1FF` · `#FFD84A` · `#35C1F1`)는 **전부 쓰이지 않는다.**
 
 | 색 | 쓰는 곳 |
 |---|---|
 | `#3D4045` | 밝은 프레임·배경 위 기본 글자 — 타이틀 태그라인, 캐릭터 선택 위·아래 띠, HUD `round` 라벨·값 |
-| `#2A4A63` | 캐릭터 선택 캐릭터 이름 · 난이도 |
-| `#0035A7` | HUD `score` 값 · 안내 문구, 타이틀 언어 라벨, 결과창 권유 문구 |
+| `#2A4A63` | 결과창 `RANKING` — 이 한 자리만 남았다 |
+| `#0070CC` | **파란 글자는 전부 이 색이다** — HUD `score` 값 · 안내 문구, 타이틀 언어 라벨,
+캐릭터 선택 캐릭터 이름 · 난이도, 결과창 점수 · 권유 문구 |
 | `#FFFFFF` | 결과창 `Download GIF`(파랑 알약 위) |
-| `#1668D8` | 결과창 점수 |
 | `#EE3124` | 결과창 `NEW BEST!` — 이 한 자리에만 쓴다 |
 | `#084D00` | 결과창 `RETRY?`(초록 알약 위) |
 | `#000000` | 결과창 `round`·`Best` — 8px 이라 `#2A4A63` 로는 흰 바탕에서 흐려진다 |
@@ -143,18 +148,18 @@ Bold 도 행높이 비율이 같다(140.97 / 121 = 1.165 em).
 |---|---|---|
 | HUD `round` 라벨·값 | 14 | `#3D4045` |
 | HUD `score` 라벨 | 18 | `#3D4045` |
-| HUD `score` 값 | 18 | `#0035A7` |
-| HUD 안내 문구 | 30 | `#0035A7` |
+| HUD `score` 값 | 18 | `#0070CC` |
+| HUD 안내 문구 | 30 | `#0070CC` |
 | 타이틀 태그라인 (`WITH CORTIS`) | 14 | `#3D4045` |
-| 타이틀 언어 라벨 (`KOR`/`ENG`) | 10 | `#0035A7` |
+| 타이틀 언어 라벨 (`KOR`/`ENG`) | 10 | `#0070CC` |
 | 캐릭터 선택 위 띠 (`BEST`·`CHOOSE PLAYER`·`RANK`) | 14 | `#3D4045` |
-| 캐릭터 선택 캐릭터 이름 | 24 | `#2A4A63` |
-| 캐릭터 선택 난이도 | 14 | `#2A4A63` |
+| 캐릭터 선택 캐릭터 이름 | 24 | `#0070CC` |
+| 캐릭터 선택 난이도 | 14 | `#0070CC` |
 | 캐릭터 선택 `PLAY` | 24 | `#3D4045` |
-| 결과창 점수 | 24 | `#1668D8` |
+| 결과창 점수 | 24 | `#0070CC` |
 | 결과창 `round`·`Best` | 8 | `#000000` |
 | 결과창 `NEW BEST!` | 18 | `#EE3124` |
-| 결과창 권유 문구 | 12 | `#0035A7` |
+| 결과창 권유 문구 | 12 | `#0070CC` |
 | 결과창 `RANKING` | 12 | `#2A4A63` |
 | 결과창 `RETRY?` | 14 | `#084D00` |
 | 결과창 `Download GIF` | 14 | `#FFFFFF` |
@@ -184,7 +189,7 @@ Bold 도 행높이 비율이 같다(140.97 / 121 = 1.165 em).
 | `esamanru Medium_Grey` | `#FFFFFF` a=1 | −0.36 / (−0.11, 0.25) / 1.0 | 밝은 띠 위 회색 글자 — 타이틀 태그라인, 캐릭터 선택 띠·`PLAY`, HUD `round`/`score` 라벨·값 |
 | `esamanru Medium_Underlay` | `#FFFFFF` a=0.5 | 1.0 / (1, −1) / 0.2 | 흰 테두리 — 캐릭터 이름·난이도, `Download GIF` |
 | `esamanru Medium_Gradiation_Blue` | `#FFFFFF` a=0.5 | 0.52 / (0.2, 0.2) / 0.277 | HUD 점수·안내 문구, 타이틀 언어 라벨, 결과창 점수·`round`·`Best`·`RANKING` |
-| `esamanru Bold_Gradiation_Blue` | `#000000` a=0.5 | 0 / (1, −0.2) / 0 | `Challenge with Friend!` |
+| `esamanru Bold_Gradiation_Blue` | `#000000` a=0.5 | 0 / (1, −0.2) / 0 | `Invite a friend` |
 | `esamanru Bold_Gradiation_Green` | `#000000` a=0.5 | 0 / (1, −0.2) / 0 | `RETRY?` |
 
 > `esamanru Medium_Gradiation_Green` 은 참조가 0이라 지웠다(2026-08-28).
@@ -226,7 +231,7 @@ Bold 도 행높이 비율이 같다(140.97 / 121 = 1.165 em).
 
 | 자리 | 채우는 방법 |
 | --- | --- |
-| 씬에 고정된 결과창 라벨 (`NEW BEST!` · `RETRY?` · `Challenge with Friend!` · `Download GIF` · `RANKING`) | 그 TMP 오브젝트에 **`LocalizedText`** 를 붙이고 인스펙터 드롭다운에서 ID 를 고른다 |
+| 씬에 고정된 결과창 라벨 (`NEW BEST!` · `RETRY?` · `Invite a friend` · `Download GIF` · `RANKING`) | 그 TMP 오브젝트에 **`LocalizedText`** 를 붙이고 인스펙터 드롭다운에서 ID 를 고른다 |
 | 코드가 찍는 결과창 문구 | `roundText.SetText(GameText.Get(TextId.ResultRound), round)` |
 | 타이틀 언어 라벨 (`KOR`/`ENG`) | `Tmp_Language` 의 **`LocalizedText`**(ID `language_name`). 언어 이름도 표에 있어서 `LanguageSettings` 는 문자열을 하나도 들고 있지 않다 |
 
@@ -257,7 +262,7 @@ Bold 도 행높이 비율이 같다(140.97 / 121 = 1.165 em).
 | `result_best` | 최고 {0} | Best {0} | `ResultScreen` 코드 |
 | `new_best_title` | 신기록! | NEW BEST! | `Tmp_NewBest` |
 | `retry` | 다시 할래? | RETRY? | `Btn_Replay ▸ Tmp_Label` |
-| `challenge_friend` | 친구에게 도전장 보내기! | Challenge with Friend! | `Tmp_Challenge` |
+| `challenge_friend` | 친구 초대하기 | Invite a friend | `Tmp_Challenge` |
 | `download_gif` | GIF 저장 | Download GIF | `Btn_DownloadGif ▸ Tmp_Label` |
 | `ranking` | 랭킹 | RANKING | `Btn_Ranking ▸ Tmp_Label` |
 

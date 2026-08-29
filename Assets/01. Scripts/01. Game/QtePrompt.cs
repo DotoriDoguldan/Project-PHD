@@ -6,6 +6,7 @@ using UnityEngine.UI;
 /// 출제 문양을 QTE 프롬프트처럼 보여주는 연출.
 /// 출제(Showing) 중에는 프레임 사이를 꽉 채운 제임스 포즈 + 제임스 좌우 랜덤 위치의 버튼 문양 + 그 버튼 색으로 줄어드는 링을 보여주고,
 /// 입력(AwaitInput) 중에는 검게 덮인 버튼 + 똑같이 검게 덮인 링만 반복한다 — 누를 자리·타이밍만 보이고 무슨 키인지는 숨긴다.
+/// 다만 플레이어가 패드를 누르면 그 패드의 제임스 포즈를 붙여 준다 — 이미 누른 것이라 숨길 이유가 없다.
 /// (패드 문양 4종은 실루엣이 같은 원형 버튼이라 검게 덮으면 구분되지 않는다.)
 /// 규칙은 그대로고(제한시간 없음) 표현만 QTE다. 오브젝트 생성 없이 스프라이트만 갈아 끼운다.
 /// </summary>
@@ -65,6 +66,7 @@ public class QtePrompt : MonoBehaviour
     private Coroutine _routine;
     // 씬에 꽂혀 있는 링. 색이 정해지지 않은 자리(입력 대기)와 빠진 칸이 돌아갈 자리다.
     private Sprite _defaultRing;
+    private bool _pressedJames;
 
     private void Awake()
     {
@@ -87,14 +89,8 @@ public class QtePrompt : MonoBehaviour
     {
         if (keySprite == null) return;
 
-        bool hasJames = jamesSprites != null
-                        && padIndex >= 0 && padIndex < jamesSprites.Length
-                        && jamesSprites[padIndex] != null;
-        if (hasJames)
-        {
-            jamesImage.sprite = jamesSprites[padIndex];
-            ApplyJamesSize(jamesSprites[padIndex]);
-        }
+        _pressedJames = false;
+        bool hasJames = TryApplyJames(padIndex);
 
         keyImage.sprite = keySprite;
         ApplyKeySize(keySprite);
@@ -109,6 +105,15 @@ public class QtePrompt : MonoBehaviour
         _ringRect.anchoredPosition = keyPosition;
 
         Restart(ShowStepRoutine(hasJames, hold));
+    }
+
+    // '내가 무엇을 눌렀는지'를 보여주는 자리라 정답·오답을 가리지 않는다 — 링 색과 달리 정답을 흘리지 않는다.
+    // 붙인 포즈는 다음 출제(ShowStep)나 Hide 까지 남고, 그 사이 ShowInputRing 이 다시 불려도 지워지지 않는다.
+    public void ShowPressedJames(int padIndex)
+    {
+        // 빠진 칸이면 직전 포즈를 그대로 두지 않고 끈다 — 남은 포즈는 방금 누른 패드를 가리키지 않는다.
+        _pressedJames = TryApplyJames(padIndex);
+        jamesImage.enabled = _pressedJames;
     }
 
     // 입력 대기 연출. Hide 나 다음 ShowStep 까지 검게 덮인 버튼 위로 줄어드는 링을 반복해서 보여준다.
@@ -133,8 +138,21 @@ public class QtePrompt : MonoBehaviour
             StopCoroutine(_routine);
             _routine = null;
         }
+        _pressedJames = false;
         SetVisible(false, false, false);
         _ringRect.localScale = Vector3.one;
+    }
+
+    private bool TryApplyJames(int padIndex)
+    {
+        if (jamesSprites == null || padIndex < 0 || padIndex >= jamesSprites.Length) return false;
+
+        Sprite sprite = jamesSprites[padIndex];
+        if (sprite == null) return false;
+
+        jamesImage.sprite = sprite;
+        ApplyJamesSize(sprite);
+        return true;
     }
 
     // 링은 패드마다 색이 다르다. 빠진 칸은 직전 출제의 링을 그대로 두지 않고 기본 링으로 돌아간다
@@ -214,7 +232,7 @@ public class QtePrompt : MonoBehaviour
 
     private IEnumerator InputRingRoutine(float period)
     {
-        SetVisible(false, true, true);
+        SetVisible(_pressedJames, true, true);
 
         // 입력 대기는 얼마나 길어질지 모른다 — 코루틴 중첩(yield return ShrinkRing)은 반복마다
         // 열거자를 새로 만들므로, 한 루프 안에서 시간을 되감아 할당 없이 반복한다(WebGL GC 대응).
