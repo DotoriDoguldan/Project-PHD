@@ -3,8 +3,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// 같은 아이콘을 개수만 바꿔 한 줄로 늘어놓는 위젯의 공통 뼈대(목숨·진행 점).
-/// 아이콘은 만들고 나면 지우지 않고 꺼둔다 — WebGL 은 단일 스레드라 Instantiate/Destroy GC 가 프레임에 보인다.
+/// 같은 아이콘을 개수만 바꿔 한 줄로 늘어놓는 위젯의 공통 뼈대입니다(목숨·진행 점).
+/// 아이콘은 만들고 나면 지우지 않고 꺼둡니다 — WebGL 은 단일 스레드라 Instantiate/Destroy GC 가 프레임에 보입니다.
 /// </summary>
 public abstract class UIIconStrip : MonoBehaviour
 {
@@ -18,6 +18,9 @@ public abstract class UIIconStrip : MonoBehaviour
     public int ActiveCount => _active;
 
     protected IReadOnlyList<Image> Icons => _icons;
+
+    /// <summary>아이콘 원본 프리팹에 꽂혀 있는 스프라이트입니다. 칸을 비운 모습으로 되돌릴 때 씁니다.</summary>
+    protected Sprite IconSprite => iconPrefab != null ? iconPrefab.sprite : null;
 
     protected virtual void Awake() => ValidateSetup();
 
@@ -44,9 +47,12 @@ public abstract class UIIconStrip : MonoBehaviour
     {
         for (int i = 0; i < _active; i++)
         {
-            _icons[i].color = ColorFor(i);
+            Paint(_icons[i], i);
         }
     }
+
+    /// <summary>아이콘 한 칸을 지금 상태로 그립니다. 색 말고도 바꿀 것이 있으면 여기서 덮어씁니다.</summary>
+    protected virtual void Paint(Image icon, int index) => icon.color = ColorFor(index);
 
     protected abstract Color ColorFor(int index);
 

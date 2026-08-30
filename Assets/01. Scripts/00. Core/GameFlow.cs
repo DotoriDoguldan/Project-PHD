@@ -142,7 +142,7 @@ public class GameFlow : MonoBehaviour
                 if (pads[i] != null) pads[i].Pressed += OnPadPressed;
             }
         }
-        if (qtePrompt != null) qtePrompt.InputRingExpired += OnInputRingExpired;
+        if (hud != null && hud.Timer != null) hud.Timer.Expired += OnInputTimeExpired;
         _best = LoadBest();
         ValidateReferences();
     }
@@ -160,7 +160,7 @@ public class GameFlow : MonoBehaviour
     {
         // 씬이 내려가는데 결과창만 남아 화면을 덮고 있는 상황을 막는다.
         ResultShare.Hide();
-        if (qtePrompt != null) qtePrompt.InputRingExpired -= OnInputRingExpired;
+        if (hud != null && hud.Timer != null) hud.Timer.Expired -= OnInputTimeExpired;
 
         if (pads == null) return;
         for (int i = 0; i < pads.Length; i++)
@@ -208,17 +208,18 @@ public class GameFlow : MonoBehaviour
         hud.ClearMessage();
 
         // 정답 여부와 무관하다 — 방금 '내가 누른 것'을 보여주는 자리다.
-        qtePrompt.ShowPressedJames(index);
+        qtePrompt.ShowPressed(index, pads[index].Sprite);
         stageBackground.ShowPad(index);
 
         if (_sequence.Submit(index))
         {
             // 정답일 때만 패드음을 낸다. (오답은 아래 ApplyMistake에서 wrong 효과음만 재생)
             SoundManager.Instance?.PlaySfx(SfxId.Pad(index));
-            hud.Dots.SetFilled(_sequence.Progress);
+            // 맞힌 칸은 방금 누른 버튼 문양으로 채워진다.
+            hud.Dots.SetFilled(_sequence.Progress, pads[index].Sprite);
 
-            // 다음 노트는 문제에서 그 노트로 넘어올 때 걸렸던 박자만큼 제한시간을 받는다. 마지막 입력이면 RunRound가 곧 링을 숨긴다.
-            if (!_sequence.IsComplete) qtePrompt.ShowInputRing(InputWindowSeconds());
+            // 다음 노트는 문제에서 그 노트로 넘어올 때 걸렸던 박자만큼 제한시간을 받는다. 마지막 입력이면 RunRound가 곧 타이머를 멈춘다.
+            if (!_sequence.IsComplete) hud.Timer.Begin(InputWindowSeconds());
         }
         else
         {
@@ -226,8 +227,8 @@ public class GameFlow : MonoBehaviour
         }
     }
 
-    /// <summary>하얀 링이 끝까지 줄어들 때 현재 입력을 놓친 것으로 처리한다.</summary>
-    private void OnInputRingExpired()
+    /// <summary>타이머 막대가 끝까지 줄어들 때 현재 입력을 놓친 것으로 처리한다.</summary>
+    private void OnInputTimeExpired()
     {
         if (_phase != GamePhase.AwaitInput || _sequence.IsComplete) return;
         ApplyMistake();
@@ -245,6 +246,7 @@ public class GameFlow : MonoBehaviour
         {
             // 마지막(치명적) 실수: 게임오버 효과음을 재생한다.
             sound?.PlaySfx(SfxId.GameOver);
+            hud.Timer.Stop();
             _failed = true;
             _phase = GamePhase.GameOver;
         }
@@ -253,15 +255,17 @@ public class GameFlow : MonoBehaviour
             // 기회가 남음: wrong 효과음만 한 번 재생하고, 같은 입력을 다시 시도하게 둔다.
             // (MemorySequence.Submit 이 실패 시 Progress를 올리지 않아 같은 노트를 재입력할 수 있다.)
             sound?.PlaySfx(SfxId.Wrong);
-            qtePrompt.ShowInputRing(InputWindowSeconds());
+            hud.Timer.Begin(InputWindowSeconds());
         }
     }
 
     // 프롬프트와 배경은 항상 같이 켜지고 같이 꺼진다 — 한쪽만 지우면 마지막으로 누른 패드 색이 화면에 남는다.
+    // 남은 시간 막대도 같이 걷는다 — 무대가 비었는데 시간만 계속 줄어들면 안 된다.
     private void ClearStage()
     {
         qtePrompt.Hide();
         stageBackground.ResetToDefault();
+        hud.Timer.Stop();
     }
 
     // ------------------------------------------------------------ 루프
@@ -364,8 +368,9 @@ public class GameFlow : MonoBehaviour
         stageBackground.ResetToDefault();
         _phase = GamePhase.AwaitInput;
         hud.SetMessage("YOUR TURN");
-        // 입력 중에는 무슨 키인지 보여주지 않는다 — 줄어드는 링이 문제에서 그 노트로 넘어올 때 걸렸던 박자만큼 제한시간을 준다.
-        qtePrompt.ShowInputRing(InputWindowSeconds());
+        // 입력 중에는 무대를 비워 둔다 — 누르기 전에는 아무것도 뜨지 않고, 누르면 그때 누른 버튼이 뜬다.
+        // 남은 제한시간(문제에서 그 노트로 넘어올 때 걸렸던 박자만큼)은 HUD 타이머 막대가 보여준다.
+        hud.Timer.Begin(InputWindowSeconds());
         padInput.InputEnabled = true;
 
         while (_phase == GamePhase.AwaitInput && !_sequence.IsComplete)

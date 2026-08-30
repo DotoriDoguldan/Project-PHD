@@ -21,6 +21,8 @@ public class GameHud : UIScreen
     [SerializeField] private ProgressDots dots;
     [Tooltip("남은 기회를 보여주는 하트 줄.")]
     [SerializeField] private LifeIcons lives;
+    [Tooltip("플레이어 턴의 남은 제한시간을 보여주는 막대.")]
+    [SerializeField] private TurnTimerBar timer;
 
     [Header("연출")]
     [Tooltip("점수·문구가 바뀔 때 튀어오르는 배율. 1이면 연출하지 않는다.")]
@@ -39,6 +41,7 @@ public class GameHud : UIScreen
     private Vector3 _messageBaseScale = Vector3.one;
 
     public ProgressDots Dots => dots;
+    public TurnTimerBar Timer => timer;
 
     protected override void Awake()
     {
@@ -175,5 +178,6 @@ public class GameHud : UIScreen
         if (messageText == null) Debug.LogWarning("[PHD] GameHud: messageText 가 비어 있습니다.", this);
         if (dots == null) Debug.LogError("[PHD] GameHud: dots 가 없어 진행도를 표시할 수 없습니다.", this);
         if (lives == null) Debug.LogError("[PHD] GameHud: lives 가 없어 목숨을 표시할 수 없습니다.", this);
+        if (timer == null) Debug.LogError("[PHD] GameHud: timer 가 없어 남은 제한시간을 표시할 수 없습니다.", this);
     }
 }
