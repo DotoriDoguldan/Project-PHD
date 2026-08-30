@@ -5561,10 +5561,10 @@ MonoBehaviour:
   gapSecondsMin: 0.1
   resultTime: 1
   showBeatHoldRatio: 0.7
-  bpm: 60
+  bpm: 120
   bpmIncreaseEveryRounds: 4
   bpmIncreaseAmount: 8
-  maxBpm: 180
+  maxBpm: 240
   countdownStartBeats: 1
   countdownBeatInterval: 0.5
   previewDelayBeats: 0
