@@ -5566,8 +5566,8 @@ MonoBehaviour:
   bpmIncreaseAmount: 8
   maxBpm: 240
   countdownStartBeats: 1
-  countdownBeatInterval: 0.5
-  previewDelayBeats: 0
+  countdownBeatInterval: 1
+  previewDelayBeats: 1
   grooveCell:
     steps: 04000000040000000400000004000000
   inputTimeScale: 2

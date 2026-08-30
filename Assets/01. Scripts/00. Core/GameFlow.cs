@@ -75,8 +75,8 @@ public class GameFlow : MonoBehaviour
     [SerializeField, Min(0f)] private float maxBpm = 180f;
     [Tooltip("첫 박자 정렬 후 몇 박자를 기다렸다 3-2-1 카운트다운을 시작할지. 그동안 ROUND 타이틀이 보인다.")]
     [SerializeField, Min(0f)] private float countdownStartBeats = 2f;
-    [Tooltip("카운트다운(READY / GO!)이 몇 박자 간격으로 바뀔지. 각 문구마다 countdown 효과음이 재생된다. (0.5 → 각 0.5박, READY+GO 총 1박)")]
-    [SerializeField, Min(0.01f)] private float countdownBeatInterval = 0.5f;
+    [Tooltip("READY / GO! 가 각각 몇 박자 동안 표시될지. 각 문구마다 countdown 효과음이 재생된다. (1 → 각 1박, READY+GO 총 2박)")]
+    [SerializeField, Min(0.01f)] private float countdownBeatInterval = 1f;
     [Tooltip("카운트다운이 끝난 뒤 몇 박자 후에 정답 미리보기를 보여줄지.")]
     [SerializeField, Min(0f)] private float previewDelayBeats = 1f;
 
@@ -314,6 +314,9 @@ public class GameFlow : MonoBehaviour
         bool again = true;
         while (again)
         {
+            // 판 시작에 READY → GO! 를 한 번만 보여준다. 이후 라운드는 ROUND N 만 반복.
+            yield return Intro();
+
             while (!_failed)
             {
                 yield return RunRound();
@@ -344,17 +347,12 @@ public class GameFlow : MonoBehaviour
 
         hud.SetRound(_round);
         hud.Dots.Setup(_sequence.Length);
-        hud.SetMessage("ROUND {0}", _round);
 
         // 인스펙터 BPM이 있으면 박자 연출로, 없으면(0 이하) 초 기반 폴백으로 진행한다.
         bool onBeat = BeatDuration > 0f;
 
-        // --- 카운트다운 ---
-        if (onBeat)
-            yield return CountdownOnBeat();
-        else
-            yield return CountdownFree();
-        hud.ClearMessage();
+        // --- 라운드 타이틀 (READY/GO는 판 시작 Intro에서 한 번만) ---
+        yield return RoundTitle();
 
         // --- 순서 재생(정답 미리보기) ---
         _phase = GamePhase.Showing;
@@ -368,6 +366,8 @@ public class GameFlow : MonoBehaviour
         stageBackground.ResetToDefault();
         _phase = GamePhase.AwaitInput;
         hud.SetMessage("YOUR TURN");
+        // YOUR TURN 은 최대 1박만 보여준다. 그 전에 입력이 들어오면 HandleInput 이 먼저 지운다.
+        StartCoroutine(HideYourTurnAfterBeat());
         // 입력 중에는 무대를 비워 둔다 — 누르기 전에는 아무것도 뜨지 않고, 누르면 그때 누른 버튼이 뜬다.
         // 남은 제한시간(문제에서 그 노트로 넘어올 때 걸렸던 박자만큼)은 HUD 타이머 막대가 보여준다.
         hud.Timer.Begin(InputWindowSeconds());
@@ -378,8 +378,7 @@ public class GameFlow : MonoBehaviour
             yield return null;
         }
 
-        // 킥은 여기서 멈추지 않는다 — 라운드 클리어 연출과 다음 라운드 준비 사이에도
-        // 정박 펄스가 이어지도록 두고, 게임오버(HandleInput)와 대기 진입에서만 멈춘다.
+        // 입력 구간 종료.
         padInput.InputEnabled = false;
         ClearStage();
 
@@ -398,48 +397,52 @@ public class GameFlow : MonoBehaviour
         yield return Wait(resultTime);
     }
 
-    // 인스펙터 BPM 박자에 맞춰 READY → GO! 카운트다운을 진행한다(각 countdownBeatInterval 박, 기본 2박).
-    // countdownStartBeats 대기(그동안 ROUND 표기) → READY → GO! (효과음 포함) → previewDelayBeats 대기 순서다.
-    private IEnumerator CountdownOnBeat()
+    // 판 시작 인트로: READY → GO! (판마다 한 번, 첫 라운드 전에). BPM이 있으면 박자, 없으면 초 기반.
+    // "TAP TO START" 다음에 딱 한 번 나오고, 이후 라운드들은 ROUND N 타이틀만 보여준다.
+    private IEnumerator Intro()
     {
-        float beat = BeatDuration;
+        _phase = GamePhase.Countdown;
+        hud.ClearMessage();   // "TAP TO START" 지우기
 
-        // 지정 박자만큼 기다렸다 카운트다운 시작. 그동안 ROUND 타이틀이 보인다.
-        if (countdownStartBeats > 0f)
-            yield return Wait(beat * countdownStartBeats);
+        float beat = BeatDuration;
+        bool onBeat = beat > 0f;
+        float step = onBeat ? beat * countdownBeatInterval : countdownStep;
+
+        // 시작 직후 약간의 여백(그동안 화면은 비어 있다).
+        yield return Wait(onBeat ? beat * countdownStartBeats : roundTitleTime);
 
         hud.SetMessage("READY");
         SoundManager.Instance?.PlaySfx(SfxId.Countdown);
-        yield return Wait(beat * countdownBeatInterval);
+        yield return Wait(step);
 
         hud.SetMessage("GO!");
         SoundManager.Instance?.PlaySfx(SfxId.Countdown);
-        yield return Wait(beat * countdownBeatInterval);
+        yield return Wait(step);
 
-        // 카운트다운이 끝나고 지정 박자 이후 정답 미리보기를 시작한다.
-        if (previewDelayBeats > 0f)
-            yield return Wait(beat * previewDelayBeats);
+        hud.ClearMessage();
     }
 
-    // 박자 정보가 없을 때의 카운트다운 폴백(초 기반).
-    private IEnumerator CountdownFree()
+    // 라운드 시작: ROUND N 타이틀을 잠깐 보여준 뒤 정답 미리보기로 넘어간다.
+    private IEnumerator RoundTitle()
     {
-        yield return Wait(roundTitleTime);
+        hud.SetMessage("ROUND {0}", _round);
+        yield return Wait(BeatDuration > 0f ? BeatDuration * previewDelayBeats : roundTitleTime);
+        hud.ClearMessage();
+    }
 
-        hud.SetMessage("READY");
-        SoundManager.Instance?.PlaySfx(SfxId.Countdown);
-        yield return Wait(countdownStep);
-
-        hud.SetMessage("GO!");
-        SoundManager.Instance?.PlaySfx(SfxId.Countdown);
-        yield return Wait(countdownStep);
+    // YOUR TURN 을 최대 1박만 유지한다. 그 안에 입력이 들어오면 HandleInput 이 먼저 지우므로,
+    // 여기서는 '입력이 없어 아직 AwaitInput 인' 경우에만 지운다(라운드가 끝나 다른 문구가 떴으면 건드리지 않음).
+    private IEnumerator HideYourTurnAfterBeat()
+    {
+        yield return Wait(BeatDuration > 0f ? BeatDuration : countdownStep);
+        if (_phase == GamePhase.AwaitInput) hud.ClearMessage();
     }
 
     // 인스펙터 BPM 박자에 맞춰 순서를 보여준다.
     // 균일 정박이 아니라 이 라운드의 '그루브 셀'을 16분음표 그리드에 얹어 재생한다.
     // 각 셀 값 = "이 음 이후 다음 음까지의 16분음표 칸 수"라, 당김음·쉼표·길고 짧은 음이 생긴다.
     // 음정(어떤 패드)은 여전히 랜덤, 타이밍만 설계된 그루브를 따른다.
-    // 정렬/미리보기 지연은 CountdownOnBeat에서 이미 처리했으므로 여기서는 바로 재생한다.
+    // 미리보기 지연은 RoundTitle에서 이미 처리했으므로 여기서는 바로 재생한다.
     private IEnumerator ShowSequenceOnBeat()
     {
         float beat = BeatDuration;
